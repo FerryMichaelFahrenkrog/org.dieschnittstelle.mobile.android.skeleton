@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MAD Demo S21</string>
+    <string name="welcome_toast_text">Welcome Again!</string>
 </resources>
