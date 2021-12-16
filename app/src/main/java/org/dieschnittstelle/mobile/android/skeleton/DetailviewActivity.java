@@ -10,11 +10,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import model.ToDo;
+
 public class DetailviewActivity extends AppCompatActivity {
 
     public static final String ARG_ITEM = "item";
     private EditText itemNameText;
-    private String item;
+    private EditText itemDescription;
+    private ToDo item;
     private FloatingActionButton saveButton;
 
     @Override
@@ -25,25 +28,30 @@ public class DetailviewActivity extends AppCompatActivity {
 
         //1. Bedien- und Anzeigeelemente auslesen
         itemNameText = findViewById(R.id.itemName);
+        itemDescription = findViewById(R.id.itemDescription);
         saveButton = findViewById(R.id.saveButton);     // evtl oben refactoren?
 
         //2. Bedienelemente bedienbar machen
         saveButton.setOnClickListener(v -> onSaveItem());
 
         //3. Ansicht mit Daten befüllen
-        item = getIntent().getStringExtra(ARG_ITEM);
+        item = (ToDo)getIntent().getSerializableExtra(ARG_ITEM);
 
         if(item != null){
-            itemNameText.setText(item); //Data Binding
+            itemNameText.setText(item.getName()); //Data Binding
+            itemDescription.setText(item.getDescription()); //Data Binding
         }
-
+        else{
+            item = new ToDo(); // Leeres DataItem
+        }
     }
 
     protected void onSaveItem(){
-        String itemName = itemNameText.getText().toString(); //toString testen?
+        item.setName(itemNameText.getText().toString()); //toString testen?
+        item.setDescription(itemNameText.getText().toString()); //toString testen?
 
         Intent returnIntent = new Intent();
-        returnIntent.putExtra(ARG_ITEM, itemName);
+        returnIntent.putExtra(ARG_ITEM, item);
 
         setResult(Activity.RESULT_OK, returnIntent);
 
