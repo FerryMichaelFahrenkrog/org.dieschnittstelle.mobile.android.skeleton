@@ -1,48 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/itemNameWrapper"
-        app:layout_constraintTop_toTopOf="parent"
-        app:hintEnabled="true"
-        android:hint="@string/name"
+<layout>
+<!--    Datenebene und Layout zusammen bei Data Binding 1h32 Min -->
+    <data>
+        <variable
+            name="controller"
+            type="org.dieschnittstelle.mobile.android.skeleton.DetailviewActivity"/>
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/itemName"
-            android:singleLine="true"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/itemNameWrapper"
+            app:layout_constraintTop_toTopOf="parent"
+            app:hintEnabled="true"
+            android:hint="Name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <requestFocus/>
-        </com.google.android.material.textfield.TextInputEditText>
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/itemName"
+                android:text="@={controller.item.name}"
+                android:singleLine="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <requestFocus/>
+            </com.google.android.material.textfield.TextInputEditText>
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/itemDescriptionWrapper"
-        app:layout_constraintTop_toBottomOf="@id/itemNameWrapper"
-        app:hintEnabled="true"
-        android:hint="@string/beschreibung"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/itemDescription"
-            android:gravity="start"
-            android:lines="10"
-            android:minLines="5"
+        <CheckBox
+            android:id="@+id/itemChecked"
+            android:text="checked"
+            android:checked="@={controller.item.checked}"
+            app:layout_constraintTop_toBottomOf="@+id/itemNameWrapper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
-    </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/saveButton"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:srcCompat="@drawable/baseline_save_white_24dp"
-        android:layout_margin="16dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/itemDescriptionWrapper"
+
+            app:layout_constraintTop_toBottomOf="@id/itemChecked"
+            app:hintEnabled="true"
+            android:hint="@string/beschreibung"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/itemDescription"
+                android:gravity="start"
+                android:text="@={controller.item.description}"
+                android:lines="10"
+                android:minLines="5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/saveButton"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:srcCompat="@drawable/baseline_save_white_24dp"
+            android:onClick="@{() -> controller.onSaveItem()}"
+            android:layout_margin="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

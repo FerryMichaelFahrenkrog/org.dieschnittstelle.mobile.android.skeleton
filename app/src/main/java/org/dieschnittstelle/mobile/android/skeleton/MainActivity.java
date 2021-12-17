@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,15 +34,18 @@ import java.util.stream.Collectors;
 
 import model.ToDo;
 
-public class MainActivity extends AppCompatActivity
-{
+public class MainActivity extends AppCompatActivity {
     private static String logtag = "MainActivity";
 
     //Bedienelemente
     private ListView listView;
     private List<ToDo> items = Arrays.asList("lorem", "ipsum", "dolor", "sit", "amet", "adipiscing", "elit", "larem", "totkopf", "druggy")
             .stream()
-            .map(item -> new ToDo(item))
+            .map(v -> {
+                    ToDo itemobj = new ToDo(v);
+                    itemobj.setId(ToDo.nextId());
+                    return itemobj;
+            })
             .collect(Collectors.toList()); //59 MIN
 
     private ArrayAdapter<ToDo> listViewAdapter;//Selber Typ wie oben
@@ -51,6 +55,8 @@ public class MainActivity extends AppCompatActivity
     private FloatingActionButton addNewItemButton;
 
     private static final int CALL_DETAILVIEW_FOR_CREATE = 0;
+    private static final int CALL_DETAILVIEW_FOR_EDIT = 1;
+
 
     private class DataItemsAdapter extends ArrayAdapter<ToDo>{ //1h.33min
         private int layoutResource;
@@ -71,6 +77,8 @@ public class MainActivity extends AppCompatActivity
 
             TextView itemNameText = currentView.findViewById(R.id.itemName);
             itemNameText.setText(currentItem.getName());
+            CheckBox itemChecked = currentView.findViewById(R.id.itemChecked);
+            itemChecked.setChecked(currentItem.isChecked());
 
             return currentView;
         }
@@ -103,7 +111,7 @@ public class MainActivity extends AppCompatActivity
     protected void onItemSelected(ToDo itemName){
         Intent detailviewIntent = new Intent(this, DetailviewActivity.class);
         detailviewIntent.putExtra(DetailviewActivity.ARG_ITEM, itemName); // in Arg Item das zweite reinpacken //Check mal Seriziable
-        this.startActivity(detailviewIntent);
+        this.startActivityForResult(detailviewIntent, CALL_DETAILVIEW_FOR_EDIT);
     }
 
     protected void onItemCreationRequested(){
@@ -115,29 +123,54 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == CALL_DETAILVIEW_FOR_CREATE){
-            if(resultCode == Activity.RESULT_OK)    // Sagt aus ob man einfach nur zurückgegangen ist oder was durchgeführt hat
-            {
+        if (requestCode == CALL_DETAILVIEW_FOR_CREATE) {
+            if (resultCode == Activity.RESULT_OK) {   // Sagt aus ob man einfach nur zurückgegangen ist oder was durchgeführt hat{
                 onNewItemCreated((ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM));  //1h 28 min!!!!!!!!!!!!!
+        } else {
+            showFeedbackMessage("Returning from detailview for create with " + resultCode);
+        }
+    }
+            else if(requestCode == CALL_DETAILVIEW_FOR_EDIT){
+                if(resultCode == Activity.RESULT_OK){
+                    ToDo editedItem = (ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM);
+                    showFeedbackMessage("Got updated item " + editedItem.getName());
+                    onItemEdited(editedItem);
+                }
+                else{
+                    showFeedbackMessage("Returning from detailview for edit with: " + resultCode);
+                }
             }
             else{
                 showFeedbackMessage("Returning from detailview with " + resultCode);
             }
         }
-    }//45 MIN
 
     protected void showFeedbackMessage(String msg){
         Snackbar.make(findViewById(R.id.rootView), msg, Snackbar.LENGTH_SHORT).show();
     }
 
-    protected void onNewItemCreated(ToDo itemName){
+    protected void onNewItemCreated(ToDo item){
 //        showFeedbackMessage("created new item " + itemName);
 //        TextView newItemView = (TextView) getLayoutInflater().inflate(R.layout.activity_main_listitem, null);
 //        newItemView.setText(itemName);
 //        listView.addView(newItemView);
 //        Log.i(logtag, "list ist now: " + items);
-        listViewAdapter.add(itemName);
-        listView.setSelection(listViewAdapter.getPosition(itemName));
+        item.setId(ToDo.nextId());
+        items.add(item);
+        listViewAdapter.notifyDataSetChanged();
+        listView.setSelection(listViewAdapter.getPosition(item));
+
+    }
+
+    protected void onItemEdited(ToDo editedItem)
+    {
+        int pos = items.indexOf(editedItem);
+        Log.i(logtag, "got position: " + pos);
+
+        items.remove(pos);
+        items.add(pos, editedItem);
+        listViewAdapter.notifyDataSetChanged();
+        listView.setSelection(pos);
 
     }
 }

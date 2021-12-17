@@ -1,11 +1,23 @@
 package model;
 
-import java.io.Serializable;
+import android.util.Log;
 
-public class ToDo implements Serializable {
+import java.io.Serializable;
+import java.util.Objects;
+
+public class ToDo implements Serializable
+{
+    protected static long ID_GENERATOR = 0;
+
+    public static long nextId(){
+        return ++ID_GENERATOR;
+    }
+
+    protected static String logtag ="ToDo";
     private String name;
     private String description;
     private boolean checked;
+    private long id;
 
     public ToDo() {
     }
@@ -24,26 +36,57 @@ public class ToDo implements Serializable {
     }
 
     public String getName() {
+        Log.i(logtag, "getName()" + name);
         return name;
     }
 
     public void setName(String name) {
+        Log.i(logtag, "setName()" + name);
         this.name = name;
     }
 
     public String getDescription() {
+        Log.i(logtag, "getDescription" + description);
+
         return description;
     }
 
     public void setDescription(String description) {
+        Log.i(logtag, "setDescription" + description);
+
         this.description = description;
     }
 
     public boolean isChecked() {
+        Log.i(logtag, "isChecked" + checked);
+
         return checked;
     }
 
     public void setChecked(boolean checked) {
+        Log.i(logtag, "isChecked" + checked);
+
         this.checked = checked;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ToDo toDo = (ToDo) o;
+        return id == toDo.id;
+    }
+
+    @Override
+    public int hashCode() { // -21 Min rest VK 12.5)
+        return Objects.hash(id);
     }
 }
