@@ -3,17 +3,12 @@ package org.dieschnittstelle.mobile.android.skeleton;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.EditText;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityDetailviewBinding;
-
-import model.ToDo;
 
 public class DetailviewActivity extends AppCompatActivity {
 
