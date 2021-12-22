@@ -1,4 +1,4 @@
-package org.dieschnittstelle.mobile.android.skeleton;
+package model;
 
 import android.util.Log;
 

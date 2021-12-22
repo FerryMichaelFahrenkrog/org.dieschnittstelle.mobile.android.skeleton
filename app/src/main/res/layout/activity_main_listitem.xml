@@ -3,7 +3,7 @@
     <data>
         <variable
             name="item"
-            type="org.dieschnittstelle.mobile.android.skeleton.ToDo"/>
+            type="model.ToDo"/>
         <variable
             name="controller"
             type="org.dieschnittstelle.mobile.android.skeleton.MainActivity"/>

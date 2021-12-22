@@ -6,7 +6,6 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -26,13 +24,15 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
+
+import impl.SimpleDataItemCRUDOperationsImpl;
+import impl.ThreadedDataItemCRUDOperationsAsyncImpl;
+import model.IDataItemCRUDOperationsAsync;
+import model.ToDo;
 
 public class MainActivity extends AppCompatActivity {
     private static String logtag = "MainActivity";
@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int CALL_DETAILVIEW_FOR_CREATE = 0;
     private static final int CALL_DETAILVIEW_FOR_EDIT = 1;
+
+    private IDataItemCRUDOperationsAsync crudOperations;
 
 
     private class DataItemsAdapter extends ArrayAdapter<ToDo> { //1h.33min
@@ -126,8 +128,9 @@ public class MainActivity extends AppCompatActivity {
         addNewItemButton.setOnClickListener(v -> this.onItemCreationRequested());
 
         // 3. Load data into view
+        crudOperations = new ThreadedDataItemCRUDOperationsAsyncImpl(new SimpleDataItemCRUDOperationsImpl(), this, progressBar);
 //        listViewAdapter.addAll(readAllDataItems());
-        readAllDataItems(items -> listViewAdapter.addAll(items)); //VK 19.5
+        crudOperations.readAllDataItems(items -> listViewAdapter.addAll(items)); //VK 19.5
     }
 
     protected void onItemSelected(ToDo itemName) {
@@ -174,21 +177,26 @@ public class MainActivity extends AppCompatActivity {
 //        newItemView.setText(itemName);
 //        listView.addView(newItemView);
 //        Log.i(logtag, "list ist now: " + items);
-        item.setId(ToDo.nextId());
-        items.add(item);
-        listViewAdapter.notifyDataSetChanged();
-        listView.setSelection(listViewAdapter.getPosition(item));
 
+        crudOperations.createDataItem(item, created -> {
+//            item.setId(ToDo.nextId());
+            items.add(created);
+            listViewAdapter.notifyDataSetChanged();
+            listView.setSelection(listViewAdapter.getPosition(created));
+        });
     }
 
     protected void onItemEdited(ToDo editedItem) {
-        int pos = items.indexOf(editedItem);
-        Log.i(logtag, "got position: " + pos);
+        crudOperations.updateDataItem(editedItem, updated -> {
+            int pos = items.indexOf(updated);
+//            Log.i(logtag, "got position: " + pos);
 
-        items.remove(pos);
-        items.add(pos, editedItem);
-        listViewAdapter.notifyDataSetChanged();
-        listView.setSelection(pos);
+            items.remove(pos);
+            items.add(pos, updated);
+            listViewAdapter.notifyDataSetChanged();
+            listView.setSelection(pos);
+        });
+
 
     }
 
@@ -197,30 +205,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void readAllDataItems(Consumer<List<ToDo>> onRead) {
-        progressBar.setVisibility(View.VISIBLE);
 
-        new Thread(() -> {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            List<ToDo> items = Arrays.asList("lorem", "ipsum", "dolor", "sit", "amet", "adipiscing", "elit", "larem", "totkopf", "druggy", "Thorsten", "Horst", "Ferraldon", "Lenox")
-                    .stream()
-                    .map(v -> {
-                        ToDo itemobj = new ToDo(v);
-                        itemobj.setId(ToDo.nextId());
-                        return itemobj;
-                    })
-                    .collect(Collectors.toList());
-
-            runOnUiThread(() -> {
-                progressBar.setVisibility(View.GONE);
-                onRead.accept(items);
-
-
-            });
-        }).start();
     }
 }

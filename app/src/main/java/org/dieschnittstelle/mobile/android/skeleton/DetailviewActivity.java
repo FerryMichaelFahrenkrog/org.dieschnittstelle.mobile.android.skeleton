@@ -10,6 +10,8 @@ import androidx.databinding.DataBindingUtil;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityDetailviewBinding;
 
+import model.ToDo;
+
 public class DetailviewActivity extends AppCompatActivity {
 
     public static final String ARG_ITEM = "item";
