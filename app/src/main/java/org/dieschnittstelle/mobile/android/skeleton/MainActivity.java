@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import impl.RoomDataItemCRUDOperationsImpl;
 import impl.SimpleDataItemCRUDOperationsImpl;
 import impl.ThreadedDataItemCRUDOperationsAsyncImpl;
 import model.IDataItemCRUDOperationsAsync;
@@ -128,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         addNewItemButton.setOnClickListener(v -> this.onItemCreationRequested());
 
         // 3. Load data into view
-        crudOperations = new ThreadedDataItemCRUDOperationsAsyncImpl(new SimpleDataItemCRUDOperationsImpl(), this, progressBar);
+        crudOperations = new ThreadedDataItemCRUDOperationsAsyncImpl(new RoomDataItemCRUDOperationsImpl(this), this, progressBar);
 //        listViewAdapter.addAll(readAllDataItems());
         crudOperations.readAllDataItems(items -> listViewAdapter.addAll(items)); //VK 19.5
     }
@@ -200,8 +201,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void onCheckedChangedInListView(ToDo toDo) {
-        showFeedbackMessage("Checked changed to " + toDo.isChecked() + " for " + toDo.getName());
+    public void onCheckedChangedInListView(ToDo toDo)
+        {
+        crudOperations.updateDataItem(toDo, updated -> {
+        showFeedbackMessage("Checked changed to " + updated.isChecked() + " for " + updated.getName());
+        });
     }
 
     protected void readAllDataItems(Consumer<List<ToDo>> onRead) {

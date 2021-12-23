@@ -2,9 +2,13 @@ package model;
 
 import android.util.Log;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.io.Serializable;
 import java.util.Objects;
 
+@Entity // Ich möchte ToDos in meiner DB Ablegen :)
 public class ToDo implements Serializable
 {
     protected static long ID_GENERATOR = 0;
@@ -17,6 +21,8 @@ public class ToDo implements Serializable
     private String name;
     private String description;
     private boolean checked;
+
+    @PrimaryKey(autoGenerate = true) // Zusatzinformationen für einen best. Verwendungszweck
     private long id;
 
     public ToDo() {
