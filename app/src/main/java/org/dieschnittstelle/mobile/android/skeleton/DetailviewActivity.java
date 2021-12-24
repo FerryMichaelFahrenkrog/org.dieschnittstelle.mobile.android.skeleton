@@ -3,6 +3,7 @@ package org.dieschnittstelle.mobile.android.skeleton;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,6 +42,7 @@ public class DetailviewActivity extends AppCompatActivity {
         setResult(Activity.RESULT_OK, returnIntent);
 
         finish();
+//        showContacts();
     }
 
     public ToDo getItem() {
@@ -49,5 +51,11 @@ public class DetailviewActivity extends AppCompatActivity {
 
     public void setItem(ToDo item) {
         this.item = item;
+    }
+
+    public void showContacts()
+    {
+        Intent contactSelectionIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+        startActivityForResult(contactSelectionIntent, 0);
     }
 }

@@ -29,9 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import impl.RoomDataItemCRUDOperationsImpl;
-import impl.SimpleDataItemCRUDOperationsImpl;
+import impl.RetrofitRemoteDataItemCRUDOperationsImpl;
+import impl.RoomLocalDataItemCRUDOperationsImpl;
 import impl.ThreadedDataItemCRUDOperationsAsyncImpl;
+import model.IDataItemCRUDOperations;
 import model.IDataItemCRUDOperationsAsync;
 import model.ToDo;
 
@@ -129,7 +130,8 @@ public class MainActivity extends AppCompatActivity {
         addNewItemButton.setOnClickListener(v -> this.onItemCreationRequested());
 
         // 3. Load data into view
-        crudOperations = new ThreadedDataItemCRUDOperationsAsyncImpl(new RoomDataItemCRUDOperationsImpl(this), this, progressBar);
+        IDataItemCRUDOperations crudExecutor = ((ToDoApplication)this.getApplication()).getCrudOperations();
+        crudOperations = new ThreadedDataItemCRUDOperationsAsyncImpl(new RetrofitRemoteDataItemCRUDOperationsImpl(), this, progressBar);
 //        listViewAdapter.addAll(readAllDataItems());
         crudOperations.readAllDataItems(items -> listViewAdapter.addAll(items)); //VK 19.5
     }

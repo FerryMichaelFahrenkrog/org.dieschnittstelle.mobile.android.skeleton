@@ -5,6 +5,8 @@ import android.util.Log;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -20,6 +22,8 @@ public class ToDo implements Serializable
     protected static String logtag ="ToDo";
     private String name;
     private String description;
+
+    @SerializedName("done") // JSON java name = done
     private boolean checked;
 
     @PrimaryKey(autoGenerate = true) // Zusatzinformationen für einen best. Verwendungszweck
