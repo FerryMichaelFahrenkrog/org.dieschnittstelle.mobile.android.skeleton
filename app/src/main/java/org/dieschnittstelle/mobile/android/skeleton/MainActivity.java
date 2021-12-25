@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 3. Load data into view
         IDataItemCRUDOperations crudExecutor = ((ToDoApplication)this.getApplication()).getCrudOperations();
-        crudOperations = new ThreadedDataItemCRUDOperationsAsyncImpl(new RetrofitRemoteDataItemCRUDOperationsImpl(), this, progressBar);
+        crudOperations = new ThreadedDataItemCRUDOperationsAsyncImpl(crudExecutor, this, progressBar);
 //        listViewAdapter.addAll(readAllDataItems());
         crudOperations.readAllDataItems(items -> listViewAdapter.addAll(items)); //VK 19.5
     }

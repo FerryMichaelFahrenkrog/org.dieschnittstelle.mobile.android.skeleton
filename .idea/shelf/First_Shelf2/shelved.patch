@@ -1,0 +1,103 @@
+Index: app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/ToDoApplication.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.dieschnittstelle.mobile.android.skeleton;\r\n\r\nimport android.app.Application;\r\nimport android.widget.Toast;\r\n\r\nimport impl.RetrofitRemoteDataItemCRUDOperationsImpl;\r\nimport impl.RoomLocalDataItemCRUDOperationsImpl;\r\nimport model.IDataItemCRUDOperations;\r\n\r\npublic class ToDoApplication extends Application {\r\n    @Override\r\n    public void onCreate() {\r\n        super.onCreate();\r\n        Toast.makeText(this, \"Application started...\", Toast.LENGTH_SHORT).show();\r\n    }\r\n\r\n    public IDataItemCRUDOperations getCrudOperations()\r\n    {\r\n//        return new RoomLocalDataItemCRUDOperationsImpl(this);\r\n        return new RetrofitRemoteDataItemCRUDOperationsImpl();\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/ToDoApplication.java b/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/ToDoApplication.java
+--- a/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/ToDoApplication.java	(revision d52c669e7293e831891582d1e146b57b461ca852)
++++ b/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/ToDoApplication.java	(date 1640427757531)
+@@ -1,22 +1,87 @@
+ package org.dieschnittstelle.mobile.android.skeleton;
+ 
+ import android.app.Application;
++import android.util.Log;
+ import android.widget.Toast;
+ 
++import java.io.IOException;
++import java.net.HttpURLConnection;
++import java.net.URL;
++import java.util.concurrent.CompletableFuture;
++import java.util.concurrent.Future;
++
+ import impl.RetrofitRemoteDataItemCRUDOperationsImpl;
+ import impl.RoomLocalDataItemCRUDOperationsImpl;
+ import model.IDataItemCRUDOperations;
+ 
+ public class ToDoApplication extends Application {
++    protected static String logtag = "ToDoApplication";
++    private IDataItemCRUDOperations crudOperations;
++
+     @Override
+     public void onCreate() {
+         super.onCreate();
+-        Toast.makeText(this, "Application started...", Toast.LENGTH_SHORT).show();
++
++        Toast.makeText(this, "Checking connectivity", Toast.LENGTH_SHORT).show();
++
++//        Future<Boolean> connectivityFuture = checkConnectivityAsync();
++//
++//        try{
++//            if(connectivityFuture.get())
++//            {
++//                Toast.makeText(this, "Backend accessible, will use the remote access.", Toast.LENGTH_SHORT).show();
++//                crudOperations = new RetrofitRemoteDataItemCRUDOperationsImpl();
++//            }
++//            else{
++//                Toast.makeText(this, "Backend not accessible, will use local access only.", Toast.LENGTH_SHORT).show();
++//                crudOperations = new RoomLocalDataItemCRUDOperationsImpl(this);
++//            }
++//        }catch(Exception e){
++//            Log.e(logtag, "onCreate(): Got exception: " + e,e);
++//            Toast.makeText(this, "Backend not accessible, got exception: " + e + ", will use local access", Toast.LENGTH_SHORT).show();
++//            crudOperations = new RoomLocalDataItemCRUDOperationsImpl(this);
++//        }
++
++        crudOperations = new RoomLocalDataItemCRUDOperationsImpl(this);
+     }
++
++    public Future<Boolean> checkConnectivityAsync(){
++        CompletableFuture<Boolean> future = new CompletableFuture<>();
++
++        new Thread(() -> {
++            boolean connectionAvailable = checkConnectivity();
++            future.complete(connectionAvailable);
++        }).start();
++
++        return future; //2h 4 rest
++    }
++
++    public boolean checkConnectivity() {
++        HttpURLConnection conn = null;
++
++        try {
++            conn = (HttpURLConnection) new URL("http://10.0.2.2:8080/api/todos").openConnection();
++            conn.setReadTimeout(1000);
++            conn.setConnectTimeout(1000);
++            conn.setRequestMethod("GET");
++            conn.setDoInput(true);
++            conn.connect();
++            conn.getInputStream();
++            Log.e(logtag, "checkConnectivity(): connection successful ");
++            return true;
++        } catch (Exception e) {
++            Log.e(logtag, "checkConnectivity(): Got exception: " + e,e);
++            return false;
++//        } finally{
++//            if(conn != null){
++//                conn.disconnect();
++//
++//            }
++        }
+ 
+-    public IDataItemCRUDOperations getCrudOperations()
+-    {
+-//        return new RoomLocalDataItemCRUDOperationsImpl(this);
+-        return new RetrofitRemoteDataItemCRUDOperationsImpl();
++    }
++
++    public IDataItemCRUDOperations getCrudOperations() {
++        return crudOperations;
+     }
+ }
