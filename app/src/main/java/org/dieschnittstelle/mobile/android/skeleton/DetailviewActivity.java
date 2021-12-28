@@ -2,6 +2,8 @@ package org.dieschnittstelle.mobile.android.skeleton;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -83,11 +85,24 @@ public class DetailviewActivity extends AppCompatActivity {
         if(requestCode == ACTION_PICK_CONTACT && resultCode == Activity.RESULT_OK)
         {
             Log.i("DetailviewActivity", "onActivityResult(): got data: " + data);
+            showContactDetails(data.getData());
         }
         else{
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
-    //1h 15 REST
+    protected void showContactDetails(Uri contactId){
+        Cursor cursor = getContentResolver().query(contactId, null, null, null, null);
+        if(cursor.moveToFirst()){
+            String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+            long internalContactId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+
+            Log.i("DetailviewActivity", "got contact with name " + contactName + " and internal id: " + internalContactId);
+        }
+        else{
+            Log.i("DetailviewActivity", "no contact found");
+        }
+    }
+    //1h 7 REST
 }
