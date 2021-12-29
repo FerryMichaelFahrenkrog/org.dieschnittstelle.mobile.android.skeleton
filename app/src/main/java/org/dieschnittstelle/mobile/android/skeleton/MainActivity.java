@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -26,11 +28,9 @@ import com.google.android.material.snackbar.Snackbar;
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.function.Consumer;
 
-import impl.RetrofitRemoteDataItemCRUDOperationsImpl;
-import impl.RoomLocalDataItemCRUDOperationsImpl;
 import impl.ThreadedDataItemCRUDOperationsAsyncImpl;
 import model.IDataItemCRUDOperations;
 import model.IDataItemCRUDOperationsAsync;
@@ -108,6 +108,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+//        if(!((ToDoApplication)getApplication()).isServerAvailable()){
+//            startActivity((new Intent(this, DetailviewActivity.class)));
+//            return;
+//        }
+
         setContentView(R.layout.activity_main);
 
         //1. Access view elements
@@ -133,7 +138,10 @@ public class MainActivity extends AppCompatActivity {
         IDataItemCRUDOperations crudExecutor = ((ToDoApplication)this.getApplication()).getCrudOperations();
         crudOperations = new ThreadedDataItemCRUDOperationsAsyncImpl(crudExecutor, this, progressBar);
 //        listViewAdapter.addAll(readAllDataItems());
-        crudOperations.readAllDataItems(items -> listViewAdapter.addAll(items)); //VK 19.5
+        crudOperations.readAllDataItems(items -> {
+            sortitems(items);
+            listViewAdapter.addAll(items);
+        }); //VK 19.5
     }
 
     protected void onItemSelected(ToDo itemName) {
@@ -184,8 +192,7 @@ public class MainActivity extends AppCompatActivity {
         crudOperations.createDataItem(item, created -> {
 //            item.setId(ToDo.nextId());
             items.add(created);
-            listViewAdapter.notifyDataSetChanged();
-            listView.setSelection(listViewAdapter.getPosition(created));
+            sortListAndScrollToItem(created);
         });
     }
 
@@ -196,8 +203,8 @@ public class MainActivity extends AppCompatActivity {
 
             items.remove(pos);
             items.add(pos, updated);
-            listViewAdapter.notifyDataSetChanged();
-            listView.setSelection(pos);
+            sortListAndScrollToItem(updated);
+
         });
 
 
@@ -206,11 +213,49 @@ public class MainActivity extends AppCompatActivity {
     public void onCheckedChangedInListView(ToDo toDo)
         {
         crudOperations.updateDataItem(toDo, updated -> {
-        showFeedbackMessage("Checked changed to " + updated.isChecked() + " for " + updated.getName());
+//        showFeedbackMessage("Checked changed to " + updated.isChecked() + " for " + updated.getName());
+        sortListAndScrollToItem(toDo);
         });
     }
 
-    protected void readAllDataItems(Consumer<List<ToDo>> onRead) {
+    //Options Menu & Sorting
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.sortItems){
+            sortListAndScrollToItem(null);
+            return true;
+        }
+        else{
+
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    protected void sortListAndScrollToItem(ToDo item) {
+        showFeedbackMessage("Sort List!");
+        sortitems(items);
+
+        listViewAdapter.notifyDataSetChanged(); //Aktualisierung
+        //Liste = list
+        //ListView = Ansicht
+        //Adapter Zwischenstelle
+        if(item != null){
+            int pos = listViewAdapter.getPosition(item);
+            listView.setSelection(pos);
+        }
+
+
+    }
+
+    private void sortitems(List<ToDo> items) {
+        items.sort(Comparator.comparing(ToDo::isChecked).thenComparing(ToDo::getName)); // rufe die Methode der Klasse auf, Rückgabe = name!
 
     }
 }

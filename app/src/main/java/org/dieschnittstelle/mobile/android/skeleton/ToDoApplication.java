@@ -17,6 +17,7 @@ import model.IDataItemCRUDOperations;
 public class ToDoApplication extends Application {
     protected static String logtag = "ToDoApplication";
     private IDataItemCRUDOperations crudOperations;
+    private boolean serverAvailable;
 
     @Override
     public void onCreate() {
@@ -31,6 +32,7 @@ public class ToDoApplication extends Application {
             {
                 Toast.makeText(this, "Backend accessible, will use the remote access.", Toast.LENGTH_SHORT).show();
                 crudOperations = new RetrofitRemoteDataItemCRUDOperationsImpl();
+                serverAvailable = true;
             }
             else{
                 Toast.makeText(this, "Backend not accessible, will use local access only.", Toast.LENGTH_SHORT).show();
@@ -82,4 +84,11 @@ public class ToDoApplication extends Application {
         }
     }
 
+    public boolean isServerAvailable() {
+        return serverAvailable;
+    }
+
+    public void setServerAvailable(boolean serverAvailable) {
+        this.serverAvailable = serverAvailable;
+    }
 }

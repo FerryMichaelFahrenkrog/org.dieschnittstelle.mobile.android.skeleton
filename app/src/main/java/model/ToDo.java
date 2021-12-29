@@ -56,6 +56,12 @@ public class ToDo implements Serializable
 
     public String getName() {
         Log.i(logtag, "getName()" + name);
+
+        if(name == null)
+        {
+            return "";
+        }
+
         return name;
     }
 

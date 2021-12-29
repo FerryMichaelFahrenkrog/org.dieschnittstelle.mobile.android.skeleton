@@ -9,13 +9,20 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityDetailviewBinding;
 
@@ -29,10 +36,14 @@ public class DetailviewActivity extends AppCompatActivity {
 
     private ToDo item;
     private ActivityDetailviewBinding dataBindingHandle;
+    private String errorStatus;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState); //Zustand wiedeherstellen wenn man das Handy dreht
+
+//        if(!((ToDo)getApplication()).isServerAva)
 
         this.dataBindingHandle = DataBindingUtil.setContentView(this, R.layout.activity_detailview); // braucht man bei DB
 
@@ -79,8 +90,15 @@ public class DetailviewActivity extends AppCompatActivity {
             selectContact();
             return true;
         }
+        else if(item.getItemId() == R.id.sendSMS)
+            {
+                sendSms();
+            }
+
         return super.onOptionsItemSelected(item);
     }
+
+
 
     protected void selectContact(){
         Intent selectContactIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
@@ -150,4 +168,42 @@ public class DetailviewActivity extends AppCompatActivity {
             Log.i("DetailviewActivity", "found number of type " + number + ", of type " + phoneNumberType + ", mobile: " + (phoneNumberType == ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE));
         }
     }
+
+    public void onNameInputCompleted(boolean hasFocus) {
+        Log.i("DetailviewActivity", "onNameInputCompleted: " + hasFocus);
+
+        if(!hasFocus){
+            String name = item.getName();
+
+            if(name != null && name.length() >= 3){
+                Log.i("DetailviewActivity", "validationSuccessful: " + item.getName());
+                errorStatus = null;
+            }
+            else{
+                Log.i("DetailviewActivity", "validation failed" + item.getName());
+                errorStatus = "Name too short!";
+                dataBindingHandle.setController(this);
+            }
+
+        }
+    }
+
+    public void onNameInputChanged(){
+        if(errorStatus != null){
+            errorStatus = null;
+            dataBindingHandle.setController(this);
+        }
+    }
+
+    public String getErrorStatus() {
+        return errorStatus;
+    }
+
+    protected void sendSms() {
+        Uri smsUri = Uri.parse("smsto:000000");
+        Intent smsIntent = new Intent(Intent.ACTION_SENDTO, smsUri);
+        smsIntent.putExtra("sms body", item.getName() + ": " + item.getDescription());
+        startActivity(smsIntent);
+    }
+
 }

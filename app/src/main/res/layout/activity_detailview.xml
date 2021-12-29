@@ -16,10 +16,13 @@
             android:id="@+id/itemNameWrapper"
             app:layout_constraintTop_toTopOf="parent"
             app:hintEnabled="true"
+            android:error="@{controller.errorStatus}"
             android:hint="Name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <com.google.android.material.textfield.TextInputEditText
+                android:onFocusChange="@{(v, c) -> controller.onNameInputCompleted(c)}"
+                android:onTextChanged="@{(a,s,b,c) -> controller.onNameInputChanged()}"
                 android:id="@+id/itemName"
                 android:text="@={controller.item.name}"
                 android:singleLine="true"
