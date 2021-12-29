@@ -4,11 +4,16 @@ import android.util.Log;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverter;
+import androidx.room.TypeConverters;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Objects;
+
+import impl.RoomLocalDataItemCRUDOperationsImpl;
 
 @Entity // Ich möchte ToDos in meiner DB Ablegen :)
 public class ToDo implements Serializable
@@ -20,11 +25,15 @@ public class ToDo implements Serializable
     }
 
     protected static String logtag ="ToDo";
+
     private String name;
     private String description;
-
     @SerializedName("done") // JSON java name = done
     private boolean checked;
+
+    @SerializedName("contacts")
+    @TypeConverters(RoomLocalDataItemCRUDOperationsImpl.ArrayListToStringDatabaseConverter.class)
+    private ArrayList<String> contactIds;
 
     @PrimaryKey(autoGenerate = true) // Zusatzinformationen für einen best. Verwendungszweck
     private long id;
@@ -85,6 +94,18 @@ public class ToDo implements Serializable
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public ArrayList<String> getContactIds() {
+        if(contactIds == null){
+            contactIds = new ArrayList<>();
+            return contactIds;
+        }
+        return contactIds;
+    }
+
+    public void setContactIds(ArrayList<String> contactIds) {
+        this.contactIds = contactIds;
     }
 
     @Override

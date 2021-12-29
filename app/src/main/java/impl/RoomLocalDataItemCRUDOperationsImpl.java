@@ -8,14 +8,41 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverter;
+import androidx.room.TypeConverters;
 import androidx.room.Update;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import model.IDataItemCRUDOperations;
 import model.ToDo;
 
 public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperations {
+
+    public static class ArrayListToStringDatabaseConverter {
+
+        @TypeConverter
+        public static ArrayList<String> fromString(String value) {
+            if(value == null || value.length() == 0){
+                return new ArrayList<>();
+            }
+            return new ArrayList<>(Arrays.asList(value.split(",")));
+        }
+
+        @TypeConverter
+        public static String fromArrayList(ArrayList<String> value) {
+            if(value == null){
+                return "";
+            }
+            return value
+                    .stream()
+                    .collect(Collectors.joining(","));
+        }
+    }
+
     //Room ist ein Framework was Daten, die wir in unsere View als Objekte reingeben, in eine DB zu überführen
     //Oder Daten aus einer DB in unser JavaCode zu überführen
 
@@ -26,13 +53,13 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
     //2tens welche Operationen brauch ich
     //3tens Struktur angeben
 
-    @Database(entities = {ToDo.class}, version = 1)
+    @Database(entities = {ToDo.class}, version = 2)
     public static abstract class RoomToDoDatabase extends RoomDatabase {
         public abstract RoomDataItemCRUDAccess getDao();
     }
 
     @Dao
-    public static interface RoomDataItemCRUDAccess{
+    public static interface RoomDataItemCRUDAccess {
         @Insert
         public long createItem(ToDo toDo); //TODO als Name!
 
@@ -48,7 +75,7 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
 
     private RoomDataItemCRUDAccess roomAccessor;
 
-    public RoomLocalDataItemCRUDOperationsImpl(Context databaseOwner){
+    public RoomLocalDataItemCRUDOperationsImpl(Context databaseOwner) {
         RoomToDoDatabase db = Room.databaseBuilder(databaseOwner.getApplicationContext(),
                 RoomToDoDatabase.class,
                 "dataitems-database-mad21").build();
