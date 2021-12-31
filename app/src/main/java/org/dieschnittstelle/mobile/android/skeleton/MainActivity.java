@@ -232,8 +232,19 @@ public class MainActivity extends AppCompatActivity {
             sortListAndScrollToItem(null);
             return true;
         }
-        else{
+        else if(item.getItemId() == R.id.deleteRemoteItems) {
+            crudOperations.deleteAllDataItems(true, (result) ->{
+                if(result){
 
+                    showFeedbackMessage("Remote items were deleted!");
+                }
+                else{
+                    showFeedbackMessage("Remote items could not be deleted, maybe we are running in local mode");
+                }
+
+            });
+            return true;
+        }else{
             return super.onOptionsItemSelected(item);
         }
     }

@@ -2,5 +2,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:title="SORT" android:id="@+id/sortItems" app:showAsAction="always" android:icon="@drawable/outline_sort_24"></item>
-
+    <item android:title="DELETE REMOTE" android:id="@+id/deleteRemoteItems" app:showAsAction="never"/>
 </menu>

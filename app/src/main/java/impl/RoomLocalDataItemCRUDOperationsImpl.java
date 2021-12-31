@@ -113,4 +113,14 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
 
         return false;
     }
+
+    @Override
+    public boolean deleteAllDataItems(boolean remote) {
+        if(remote){
+            return false;
+        }else{
+            //TODO: delete all items in the local db
+            return true;
+        }
+    }
 }

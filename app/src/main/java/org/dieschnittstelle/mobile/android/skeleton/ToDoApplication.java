@@ -12,6 +12,7 @@ import java.util.concurrent.Future;
 
 import impl.RetrofitRemoteDataItemCRUDOperationsImpl;
 import impl.RoomLocalDataItemCRUDOperationsImpl;
+import impl.SyncedDataItemCRUDOperationsImpl;
 import model.IDataItemCRUDOperations;
 
 public class ToDoApplication extends Application {
@@ -31,7 +32,7 @@ public class ToDoApplication extends Application {
             if(connectivityFuture.get())
             {
                 Toast.makeText(this, "Backend accessible, will use the remote access.", Toast.LENGTH_SHORT).show();
-                crudOperations = new RetrofitRemoteDataItemCRUDOperationsImpl();
+                crudOperations = new SyncedDataItemCRUDOperationsImpl(new RoomLocalDataItemCRUDOperationsImpl(this), new RetrofitRemoteDataItemCRUDOperationsImpl());
                 serverAvailable = true;
             }
             else{

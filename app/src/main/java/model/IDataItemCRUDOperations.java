@@ -12,4 +12,7 @@ public interface IDataItemCRUDOperations {
     public ToDo updateDataItem(ToDo toDo);
 
     public boolean deleteDataItem(long id);
+
+    public boolean deleteAllDataItems(boolean remote);
+
 }

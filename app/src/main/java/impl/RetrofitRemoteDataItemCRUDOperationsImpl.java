@@ -103,4 +103,15 @@ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOp
             return false;
         }
     }
+
+    @Override
+    public boolean deleteAllDataItems(boolean remote)
+    {
+        try {
+            return webAPI.deleteAllToDos().execute().body();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

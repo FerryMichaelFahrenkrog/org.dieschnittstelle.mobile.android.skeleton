@@ -13,4 +13,6 @@ public interface IDataItemCRUDOperationsAsync {
     public void updateDataItem(ToDo toDo, Consumer<ToDo> onupdated);
 
     public boolean deleteDataItem(long id, Consumer<Boolean> ondeleted);
+
+    public void deleteAllDataItems(boolean remote, Consumer<Boolean> ondeleted);
 }
