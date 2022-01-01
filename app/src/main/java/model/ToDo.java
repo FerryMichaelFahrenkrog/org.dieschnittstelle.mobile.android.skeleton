@@ -4,19 +4,19 @@ import android.util.Log;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-import androidx.room.TypeConverter;
 import androidx.room.TypeConverters;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
 import impl.RoomLocalDataItemCRUDOperationsImpl;
 
-@Entity // Ich möchte ToDos in meiner DB Ablegen :)
-public class ToDo implements Serializable
+@Entity // Damit sage ich, dass ich Instanzen der Klasse To-Do in meiner Datenbank ablegen möchte
+public class ToDo implements Serializable // Objekte in Bytes verwandeln, und dann wieder Objekte draus machen, braucht man um Objekte in DB zu speichern
 {
     protected static long ID_GENERATOR = 0;
 
@@ -28,17 +28,22 @@ public class ToDo implements Serializable
 
     private String name;
     private String description;
-    @SerializedName("done") // JSON java name = done
+    @SerializedName("done") // JSON java name = done        //TODO verstehen
     private boolean checked;
 
-    @SerializedName("contacts")
+    private boolean isFavouriteToDo; // wenn ja dann markier später Rot oder so
+
+    private LocalDateTime faelligkeitsdatum;
+
+    @SerializedName("contacts")                             //TODO verstehen
     @TypeConverters(RoomLocalDataItemCRUDOperationsImpl.ArrayListToStringDatabaseConverter.class)
     private ArrayList<String> contactIds;
 
-    @PrimaryKey(autoGenerate = true) // Zusatzinformationen für einen best. Verwendungszweck
+    @PrimaryKey(autoGenerate = true)
     private long id;
 
     public ToDo() {
+
     }
 
     public ToDo(String name) {
@@ -78,7 +83,6 @@ public class ToDo implements Serializable
 
     public void setDescription(String description) {
         Log.i(logtag, "setDescription" + description);
-
         this.description = description;
     }
 
@@ -90,7 +94,6 @@ public class ToDo implements Serializable
 
     public void setChecked(boolean checked) {
         Log.i(logtag, "isChecked" + checked);
-
         this.checked = checked;
     }
 
@@ -100,6 +103,22 @@ public class ToDo implements Serializable
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public boolean isFavouriteToDo() {
+        return isFavouriteToDo;
+    }
+
+    public void setFavouriteToDo(boolean favouriteToDo) {
+        isFavouriteToDo = favouriteToDo;
+    }
+
+    public LocalDateTime getFaelligkeitsdatum() {
+        return faelligkeitsdatum;
+    }
+
+    public void setFaelligkeitsdatum(LocalDateTime faelligkeitsdatum) {
+        this.faelligkeitsdatum = faelligkeitsdatum;
     }
 
     public ArrayList<String> getContactIds() {
