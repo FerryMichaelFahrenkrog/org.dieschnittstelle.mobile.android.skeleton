@@ -31,9 +31,9 @@ public class ToDo implements Serializable // Objekte in Bytes verwandeln, und da
     @SerializedName("done") // JSON java name = done        //TODO verstehen
     private boolean checked;
 
-    private boolean isFavouriteToDo; // wenn ja dann markier später Rot oder so
+//    private boolean isFavouriteToDo; // wenn ja dann markier später Rot oder so
 
-    private LocalDateTime faelligkeitsdatum;
+//    private LocalDateTime faelligkeitsdatum = Loc
 
     @SerializedName("contacts")                             //TODO verstehen
     @TypeConverters(RoomLocalDataItemCRUDOperationsImpl.ArrayListToStringDatabaseConverter.class)
@@ -105,21 +105,21 @@ public class ToDo implements Serializable // Objekte in Bytes verwandeln, und da
         this.id = id;
     }
 
-    public boolean isFavouriteToDo() {
-        return isFavouriteToDo;
-    }
+//    public boolean isFavouriteToDo() {
+//        return isFavouriteToDo;
+//    }
+//
+//    public void setFavouriteToDo(boolean favouriteToDo) {
+//        isFavouriteToDo = favouriteToDo;
+//    }
 
-    public void setFavouriteToDo(boolean favouriteToDo) {
-        isFavouriteToDo = favouriteToDo;
-    }
-
-    public LocalDateTime getFaelligkeitsdatum() {
-        return faelligkeitsdatum;
-    }
-
-    public void setFaelligkeitsdatum(LocalDateTime faelligkeitsdatum) {
-        this.faelligkeitsdatum = faelligkeitsdatum;
-    }
+//    public LocalDateTime getFaelligkeitsdatum() {
+//        return faelligkeitsdatum;
+//    }
+//
+//    public void setFaelligkeitsdatum(LocalDateTime faelligkeitsdatum) {
+//        this.faelligkeitsdatum = faelligkeitsdatum;
+//    }
 
     public ArrayList<String> getContactIds() {
         if(contactIds == null){
