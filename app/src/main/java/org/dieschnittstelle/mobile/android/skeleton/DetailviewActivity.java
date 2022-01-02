@@ -2,9 +2,12 @@ package org.dieschnittstelle.mobile.android.skeleton;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -14,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -26,6 +30,8 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityDetailviewBinding;
 
+import java.util.Calendar;
+
 import model.ToDo;
 
 public class DetailviewActivity extends AppCompatActivity {
@@ -37,6 +43,11 @@ public class DetailviewActivity extends AppCompatActivity {
     private ToDo item;
     private ActivityDetailviewBinding dataBindingHandle;
     private String errorStatus;
+
+    TextView tvDate;
+    EditText etDate;
+    DatePickerDialog.OnDateSetListener setListener;
+
 
 
     @Override
@@ -59,6 +70,40 @@ public class DetailviewActivity extends AppCompatActivity {
         });
 
         this.dataBindingHandle.setController(this);
+
+        tvDate = findViewById(R.id.txtTime);
+        etDate = findViewById(R.id.editTextTimePicker);
+
+        Calendar calendar = Calendar.getInstance();
+        final int year = calendar.get(Calendar.YEAR);
+        final int month = calendar.get(Calendar.MONTH);
+        final int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        tvDate.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    DetailviewActivity.this, android.R.style.Theme_Holo_Light_Dialog_MinWidth, setListener, year, month, day);
+            datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            datePickerDialog.show();
+        });
+
+        setListener = (view, year12, month12, dayOfMonth) -> {
+            month12 = month12 + 1;
+            String date = day+"/"+ month12 +"/"+ year12;
+            tvDate.setText(date);
+
+        };
+
+        etDate.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(DetailviewActivity.this, new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker view, int year1, int month1, int day1) {
+                    month1 = month1 +1 ;
+                    String date = day1 +"/"+ month1 +"/"+ year1;
+                    etDate.setText(date);
+                }
+            },year, month, day);
+            datePickerDialog.show();
+        });
     }
 
     public void onSaveItem(){

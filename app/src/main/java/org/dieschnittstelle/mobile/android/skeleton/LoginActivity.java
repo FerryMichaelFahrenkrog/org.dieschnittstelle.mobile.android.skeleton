@@ -13,7 +13,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.google.common.net.InternetDomainName;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText editTextemailAdresse;
@@ -38,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
         editTextpassword = findViewById(R.id.editTextTextPassword);
         btnLogin = findViewById(R.id.btnLogin);
         txtHinweis = findViewById(R.id.txtWarnmeldung);
+
 
         editTextpassword.setInputType(InputType.TYPE_CLASS_NUMBER);
 
