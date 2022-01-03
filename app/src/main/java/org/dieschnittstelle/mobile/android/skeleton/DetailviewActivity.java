@@ -20,6 +20,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,6 +31,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityDetailviewBinding;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 
 import model.ToDo;
@@ -46,8 +48,8 @@ public class DetailviewActivity extends AppCompatActivity {
 
     TextView tvDate;
     EditText etDate;
-    DatePickerDialog.OnDateSetListener setListener;
 
+    DatePickerDialog.OnDateSetListener setListener;
 
 
     @Override
@@ -74,6 +76,7 @@ public class DetailviewActivity extends AppCompatActivity {
         tvDate = findViewById(R.id.txtTime);
         etDate = findViewById(R.id.editTextTimePicker);
 
+
         Calendar calendar = Calendar.getInstance();
         final int year = calendar.get(Calendar.YEAR);
         final int month = calendar.get(Calendar.MONTH);
@@ -90,6 +93,9 @@ public class DetailviewActivity extends AppCompatActivity {
             month12 = month12 + 1;
             String date = day+"/"+ month12 +"/"+ year12;
             tvDate.setText(date);
+
+
+            Toast.makeText(this, "BLAAAAAA", Toast.LENGTH_SHORT).show();
 
         };
 

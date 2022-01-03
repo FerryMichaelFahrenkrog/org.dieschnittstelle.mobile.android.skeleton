@@ -3,6 +3,7 @@ package model;
 import android.util.Log;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
@@ -31,9 +32,10 @@ public class ToDo implements Serializable // Objekte in Bytes verwandeln, und da
     @SerializedName("done") // JSON java name = done        //TODO verstehen
     private boolean checked;
 
-//    private boolean isFavouriteToDo; // wenn ja dann markier später Rot oder so
+    private boolean isFavouriteToDo; // wenn ja dann markier später Rot oder so
 
-//    private LocalDateTime faelligkeitsdatum = Loc
+    @Ignore
+    private LocalDateTime fälligkeitsdatum;
 
     @SerializedName("contacts")                             //TODO verstehen
     @TypeConverters(RoomLocalDataItemCRUDOperationsImpl.ArrayListToStringDatabaseConverter.class)
@@ -105,21 +107,21 @@ public class ToDo implements Serializable // Objekte in Bytes verwandeln, und da
         this.id = id;
     }
 
-//    public boolean isFavouriteToDo() {
-//        return isFavouriteToDo;
-//    }
-//
-//    public void setFavouriteToDo(boolean favouriteToDo) {
-//        isFavouriteToDo = favouriteToDo;
-//    }
+    public LocalDateTime getFälligkeitsdatum() {
+        return fälligkeitsdatum;
+    }
 
-//    public LocalDateTime getFaelligkeitsdatum() {
-//        return faelligkeitsdatum;
-//    }
-//
-//    public void setFaelligkeitsdatum(LocalDateTime faelligkeitsdatum) {
-//        this.faelligkeitsdatum = faelligkeitsdatum;
-//    }
+    public void setFälligkeitsdatum(LocalDateTime fälligkeitsdatum) {
+        this.fälligkeitsdatum = fälligkeitsdatum;
+    }
+
+        public boolean isFavouriteToDo() {
+        return isFavouriteToDo;
+    }
+
+    public void setFavouriteToDo(boolean favouriteToDo) {
+        isFavouriteToDo = favouriteToDo;
+    }
 
     public ArrayList<String> getContactIds() {
         if(contactIds == null){

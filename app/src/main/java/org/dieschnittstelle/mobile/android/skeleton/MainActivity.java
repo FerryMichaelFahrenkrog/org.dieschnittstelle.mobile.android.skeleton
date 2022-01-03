@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,15 +19,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.events.Event;
+import com.google.firebase.events.EventHandler;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -115,8 +120,18 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
+        //TODO
+//        final DatePicker datePicker = new DatePicker(this);
+//        datePicker.setOnDateChangedListener(new EventHandler() {
+//            public void handle(Event t) {
+//                LocalDate date = datePicker.get();
+//                System.err.println("Selected date: " + date);
+//            }
+//        });
+
         //1. Access view elements
         listView = findViewById(R.id.listView);
+//        listView.setBackgroundColor(Color.RED);
         listViewAdapter = new DataItemsAdapter(this, R.layout.activity_main_listitem, items); // Er hat also die Daten und die ART DER DARSTELLUNG ;)
         listView.setAdapter(listViewAdapter);
         progressBar = findViewById(R.id.progressBar);
@@ -128,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ToDo selectedItem = listViewAdapter.getItem(position);
+                view.setBackgroundColor(Color.RED);
                 onItemSelected(selectedItem);
             }
         });
@@ -267,6 +283,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void sortitems(List<ToDo> items) {
         items.sort(Comparator.comparing(ToDo::isChecked).thenComparing(ToDo::getName)); // rufe die Methode der Klasse auf, Rückgabe = name!
+        //TODO: Hier z.B. mal ne Sortierung nach Fälligkeit --> Ich müsste dann im Model das Fälligkeitsdatum abspeichern und das Fälligkeitsdatum selbst aus dem DateTimePicker auslesen
 
     }
 }
