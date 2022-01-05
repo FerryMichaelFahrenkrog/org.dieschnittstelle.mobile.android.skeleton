@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ToDo selectedItem = listViewAdapter.getItem(position);
-                view.setBackgroundColor(Color.RED);
+//                view.setBackgroundColor(Color.RED);
                 onItemSelected(selectedItem);
             }
         });

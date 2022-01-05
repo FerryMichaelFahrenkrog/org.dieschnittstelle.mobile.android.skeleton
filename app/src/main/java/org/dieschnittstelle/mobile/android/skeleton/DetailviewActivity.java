@@ -3,6 +3,7 @@ package org.dieschnittstelle.mobile.android.skeleton;
 import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -17,9 +18,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,6 +36,7 @@ import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityDetailvi
 
 import java.time.LocalDate;
 import java.util.Calendar;
+import java.util.Locale;
 
 import model.ToDo;
 
@@ -46,11 +50,15 @@ public class DetailviewActivity extends AppCompatActivity {
     private ActivityDetailviewBinding dataBindingHandle;
     private String errorStatus;
 
-    TextView tvDate;
-    EditText etDate;
+    TextView faelligkeit;
+    TextView faelligkeitUhrzeit;
+    TextView kontaktName;
+    Button faelligkeitButton;
+    Button timeButton;
+    int hour, minute;
 
-    DatePickerDialog.OnDateSetListener setListener;
-
+    Calendar c;
+    DatePickerDialog datePickerDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,43 +81,38 @@ public class DetailviewActivity extends AppCompatActivity {
 
         this.dataBindingHandle.setController(this);
 
-        tvDate = findViewById(R.id.txtTime);
-        etDate = findViewById(R.id.editTextTimePicker);
+        faelligkeit = (TextView)findViewById(R.id.txtFaelligkeit);
+        faelligkeitButton = (Button)findViewById(R.id.faelligkeitButton);
+        timeButton = (Button)findViewById(R.id.faelligkeitUhrzeitButton);
 
+        faelligkeitButton.setOnClickListener(v -> {
+            c = Calendar.getInstance();
+            int day = c.get(Calendar.DAY_OF_MONTH);
+            int month = c.get(Calendar.MONTH);
+            int year = c.get(Calendar.YEAR);
 
-        Calendar calendar = Calendar.getInstance();
-        final int year = calendar.get(Calendar.YEAR);
-        final int month = calendar.get(Calendar.MONTH);
-        final int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        tvDate.setOnClickListener(v -> {
-            DatePickerDialog datePickerDialog = new DatePickerDialog(
-                    DetailviewActivity.this, android.R.style.Theme_Holo_Light_Dialog_MinWidth, setListener, year, month, day);
-            datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            datePickerDialog = new DatePickerDialog(DetailviewActivity.this, (view, mYear, mMonth, mDay) -> {
+                faelligkeit.setText(mDay + "/" + (mMonth+1) + "/" + mYear);
+            }, day, month, year);
             datePickerDialog.show();
         });
 
-        setListener = (view, year12, month12, dayOfMonth) -> {
-            month12 = month12 + 1;
-            String date = day+"/"+ month12 +"/"+ year12;
-            tvDate.setText(date);
+    }
 
+    public void popTimePicker(View view) {
+        faelligkeitUhrzeit = (TextView)findViewById(R.id.faelligkeitUhrzeit);
 
-            Toast.makeText(this, "BLAAAAAA", Toast.LENGTH_SHORT).show();
-            //https://www.youtube.com/watch?v=hwe1abDO2Ag
+        TimePickerDialog.OnTimeSetListener onTimeSetListener = (view1, mHour, mMinute) -> {
+            hour = mHour;
+            minute = mMinute;
+            timeButton.setText(String.format(Locale.getDefault(), "%02d:%02d", hour, minute));
         };
 
-        etDate.setOnClickListener(v -> {
-            DatePickerDialog datePickerDialog = new DatePickerDialog(DetailviewActivity.this, new DatePickerDialog.OnDateSetListener() {
-                @Override
-                public void onDateSet(DatePicker view, int year1, int month1, int day1) {
-                    month1 = month1 +1 ;
-                    String date = day1 +"/"+ month1 +"/"+ year1;
-                    etDate.setText(date);
-                }
-            },year, month, day);
-            datePickerDialog.show();
-        });
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this, onTimeSetListener, hour, minute, true);
+        faelligkeitUhrzeit.setText(minute + " / " + hour);
+        timePickerDialog.setTitle("Select Time");
+        timePickerDialog.show();
+
     }
 
     public void onSaveItem(){
@@ -145,6 +148,10 @@ public class DetailviewActivity extends AppCompatActivity {
             {
                 sendSms();
             }
+        else if(item.getItemId() == R.id.deleteRemoteItems)
+        {
+
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -175,6 +182,9 @@ public class DetailviewActivity extends AppCompatActivity {
     }
 
     protected void showContactDetails(Uri contactId){
+
+
+
         int hasReadContactsPermission = checkSelfPermission(Manifest.permission.READ_CONTACTS);
         if(hasReadContactsPermission != PackageManager.PERMISSION_GRANTED)
         {
@@ -207,6 +217,8 @@ public class DetailviewActivity extends AppCompatActivity {
         if(cursor.moveToNext()){
             String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
             Log.i("DetailviewActivity", "found display name for internal id " + internalId + ": " + displayName);
+            kontaktName = (TextView)findViewById(R.id.txtVerknüpfteKontakteNummer1);
+            kontaktName.setText(displayName);
         }else{
             Log.i("DetailviewActivity", "no contacts fount for internal id " + internalId);
         }

@@ -77,6 +77,7 @@
                 android:minLines="5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
+
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -88,5 +89,117 @@
             android:layout_margin="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/faelligkeitButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="28dp"
+            android:layout_marginTop="108dp"
+            android:text="Fälligkeitsdatum"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/itemDescriptionWrapper"
+            app:layout_constraintVertical_bias="0.0"
+            tools:ignore="MissingConstraints" />
+
+        <Button
+            android:id="@+id/faelligkeitUhrzeitButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="108dp"
+            android:onClick="popTimePicker"
+            android:text="Uhrzeit wählen"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.195"
+            app:layout_constraintStart_toEndOf="@+id/faelligkeitButton"
+            app:layout_constraintTop_toBottomOf="@+id/itemDescriptionWrapper"
+            app:layout_constraintVertical_bias="0.0"
+            tools:ignore="MissingConstraints" />
+
+        <TextView
+            android:id="@+id/txtFaelligkeit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="TextView"
+            app:layout_constraintTop_toBottomOf="@+id/faelligkeitButton"
+            tools:layout_editor_absoluteX="76dp"
+            tools:ignore="MissingConstraints" />
+
+        <TextView
+            android:id="@+id/faelligkeitUhrzeit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="TextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.593"
+            app:layout_constraintStart_toEndOf="@+id/txtFaelligkeit"
+            app:layout_constraintTop_toBottomOf="@+id/faelligkeitUhrzeitButton" />
+
+        <TextView
+            android:id="@+id/txtVerknüpfteKontakte"
+            android:layout_width="157dp"
+            android:layout_height="23dp"
+            android:layout_marginTop="100dp"
+            android:text="Verknüpfte Kontakte:"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.079"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/faelligkeitButton"
+            app:layout_constraintVertical_bias="0.016" />
+
+        <TextView
+            android:id="@+id/txtVerknüpfteKontakteNummer1"
+            android:layout_width="157dp"
+            android:layout_height="23dp"
+            android:layout_marginTop="100dp"
+            android:text=""
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.165"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/faelligkeitButton"
+            app:layout_constraintVertical_bias="0.415" />
+
+        <TextView
+            android:id="@+id/txtVerknüpfteKontakteNummer2"
+            android:layout_width="157dp"
+            android:layout_height="23dp"
+            android:layout_marginTop="100dp"
+            android:text=""
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.165"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/faelligkeitButton"
+            app:layout_constraintVertical_bias="0.144" />
+
+        <TextView
+            android:id="@+id/txtVerknüpfteKontakteNummer3"
+            android:layout_width="157dp"
+            android:layout_height="23dp"
+            android:layout_marginTop="100dp"
+            android:text=""
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.165"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/faelligkeitButton"
+            app:layout_constraintVertical_bias="0.283" />
+
+        <!--        <CheckBox-->
+<!--            android:id="@+id/itemIsPrioItem"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:checked="@={controller.item.checked}"-->
+<!--            android:text="wichtiges Item"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/itemDescriptionWrapper" />-->
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

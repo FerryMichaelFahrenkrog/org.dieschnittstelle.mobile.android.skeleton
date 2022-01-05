@@ -1,0 +1,289 @@
+Index: app/src/main/res/layout/activity_login.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<androidx.constraintlayout.widget.ConstraintLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\">\r\n\r\n    <EditText\r\n        android:id=\"@+id/editEmail\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginTop=\"108dp\"\r\n        android:ems=\"10\"\r\n        android:hint=\"E-Mail-Adresse\"\r\n        android:text=\"Admin@gmx.de\"\r\n        android:inputType=\"textPersonName\"\r\n        app:layout_constraintEnd_toEndOf=\"parent\"\r\n        app:layout_constraintHorizontal_bias=\"0.497\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toTopOf=\"parent\"\r\n        tools:ignore=\"MissingConstraints\" />\r\n\r\n    <EditText\r\n        android:id=\"@+id/editTextTextPassword\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginTop=\"52dp\"\r\n        android:hint=\"Passwort\"\r\n        android:text=\"123456\"\r\n        android:ems=\"10\"\r\n        android:inputType=\"textPassword\"\r\n        android:maxLength=\"6\"\r\n        app:layout_constraintEnd_toEndOf=\"parent\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/editEmail\" />\r\n\r\n    <Button\r\n        android:id=\"@+id/btnLogin\"\r\n        android:layout_width=\"146dp\"\r\n        android:layout_height=\"51dp\"\r\n        android:text=\"Login\"\r\n        app:layout_constraintBottom_toBottomOf=\"parent\"\r\n        app:layout_constraintEnd_toEndOf=\"parent\"\r\n        app:layout_constraintHorizontal_bias=\"0.498\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/editTextTextPassword\"\r\n        app:layout_constraintVertical_bias=\"0.124\" />\r\n\r\n    <TextView\r\n        android:id=\"@+id/txtWarnmeldung\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:text=\"TEST\"\r\n        app:layout_constraintBottom_toBottomOf=\"parent\"\r\n        app:layout_constraintEnd_toEndOf=\"parent\"\r\n        app:layout_constraintHorizontal_bias=\"0.498\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/btnLogin\"\r\n        app:layout_constraintVertical_bias=\"0.128\" />\r\n</androidx.constraintlayout.widget.ConstraintLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/activity_login.xml b/app/src/main/res/layout/activity_login.xml
+--- a/app/src/main/res/layout/activity_login.xml	(revision 31e99095ddd06aab62d9a6daf7a8211165803066)
++++ b/app/src/main/res/layout/activity_login.xml	(date 1641379617631)
+@@ -26,9 +26,8 @@
+         android:layout_height="wrap_content"
+         android:layout_marginTop="52dp"
+         android:hint="Passwort"
+-        android:text="123456"
+         android:ems="10"
+-        android:inputType="textPassword"
++        android:inputType="numberPassword"
+         android:maxLength="6"
+         app:layout_constraintEnd_toEndOf="parent"
+         app:layout_constraintStart_toStartOf="parent"
+@@ -50,11 +49,12 @@
+         android:id="@+id/txtWarnmeldung"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+-        android:text="TEST"
++        android:text=""
+         app:layout_constraintBottom_toBottomOf="parent"
+         app:layout_constraintEnd_toEndOf="parent"
+         app:layout_constraintHorizontal_bias="0.498"
+         app:layout_constraintStart_toStartOf="parent"
+         app:layout_constraintTop_toBottomOf="@+id/btnLogin"
+         app:layout_constraintVertical_bias="0.128" />
++
+ </androidx.constraintlayout.widget.ConstraintLayout>
+\ No newline at end of file
+Index: app/src/main/java/model/User.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/model/User.java b/app/src/main/java/model/User.java
+new file mode 100644
+--- /dev/null	(date 1641380828479)
++++ b/app/src/main/java/model/User.java	(date 1641380828479)
+@@ -0,0 +1,36 @@
++package model;
++
++import java.io.Serializable;
++
++public class User implements Serializable {
++    private static final long serialVersionUID = -7306724305413428761L;
++
++    private String password;
++
++    private String email;
++
++    public User() {
++
++    }
++
++    public User(String email,String password) {
++        this.email = email;
++        this.password = password;
++    }
++
++    public String getPassword() {
++        return password;
++    }
++
++    public void setPassword(String password) {
++        this.password = password;
++    }
++
++    public String getEmail() {
++        return email;
++    }
++
++    public void setEmail(String email) {
++        this.email = email;
++    }
++}
+Index: app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/LoginActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.dieschnittstelle.mobile.android.skeleton;\r\n\r\nimport android.content.Intent;\r\nimport android.os.Bundle;\r\nimport android.text.InputType;\r\nimport android.text.TextUtils;\r\nimport android.util.Patterns;\r\nimport android.widget.Button;\r\nimport android.widget.EditText;\r\nimport android.widget.TextView;\r\n\r\nimport androidx.annotation.Nullable;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\n\r\nimport com.google.android.material.snackbar.Snackbar;\r\n\r\npublic class LoginActivity extends AppCompatActivity {\r\n    private EditText editTextemailAdresse;\r\n    private EditText editTextpassword;\r\n    private Button btnLogin;\r\n    private TextView txtHinweis;\r\n\r\n    private final String userName = \"Admin@gmx.de\";\r\n    private final String password = \"123456\";\r\n\r\n    boolean isValid = false;\r\n\r\n    private int counter = 5;\r\n\r\n    @Override\r\n    protected void onCreate(@Nullable Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n\r\n        setContentView(R.layout.activity_login);\r\n\r\n        editTextemailAdresse = findViewById(R.id.editEmail);\r\n        editTextpassword = findViewById(R.id.editTextTextPassword);\r\n        btnLogin = findViewById(R.id.btnLogin);\r\n        txtHinweis = findViewById(R.id.txtWarnmeldung);\r\n\r\n\r\n        editTextpassword.setInputType(InputType.TYPE_CLASS_NUMBER);\r\n\r\n//        btnLogin.setEnabled(false);\r\n\r\n        btnLogin.setOnClickListener(v -> {\r\n            String inputEmail = editTextemailAdresse.getText().toString();\r\n            String inputPassword = editTextpassword.getText().toString();\r\n\r\n            if(inputEmail.isEmpty() || inputPassword.isEmpty()){\r\n//              Snackbar.make(v, \"Eingaben: \" + inputEmail + \" , \" + inputPassword, Snackbar.LENGTH_SHORT).show();\r\n              Snackbar.make(v, \"Fülle beide Felder aus!\", Snackbar.LENGTH_SHORT).show();\r\n              txtHinweis.setText(\"FEHLER!\");\r\n            }else{\r\n//                btnLogin.setEnabled(true);\r\n\r\n                boolean korrektesEmailFormat = isValidEmail(inputEmail);\r\n\r\n                if(korrektesEmailFormat){\r\n                    isValid = validate(inputEmail, inputPassword);\r\n\r\n                    if(!isValid){\r\n                        counter--;\r\n                        Snackbar.make(v, \"Falscher Nutzername oder Passwort!\", Snackbar.LENGTH_SHORT).show();\r\n                        txtHinweis.setText(\"Versuche übrig: \" + counter);\r\n\r\n                        if(counter == 0){\r\n                            btnLogin.setEnabled(false);\r\n                            Snackbar.make(v, \"Neu starten die Anwendung pls!\", Snackbar.LENGTH_SHORT).show();\r\n                        }\r\n                    }else{\r\n                        Snackbar.make(v, \"Erfolgreich!\", Snackbar.LENGTH_SHORT).show();\r\n\r\n                        Intent intent = new Intent(this, MainActivity.class);\r\n                        startActivity(intent);\r\n                    }\r\n                }else{\r\n                    txtHinweis.setText(\"Dies ist keine gültige Email!\");\r\n                }\r\n\r\n            }\r\n\r\n        });\r\n\r\n    }\r\n\r\n    private boolean validate(String name, String password){\r\n        if(name.equals(userName) && password.equals(this.password)){\r\n            return true;\r\n        }\r\n        else\r\n        {\r\n            return false;\r\n        }\r\n    }\r\n\r\n    public static boolean isValidEmail(CharSequence target){\r\n        return (!TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches());\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/LoginActivity.java b/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/LoginActivity.java
+--- a/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/LoginActivity.java	(revision 31e99095ddd06aab62d9a6daf7a8211165803066)
++++ b/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/LoginActivity.java	(date 1641380038991)
+@@ -1,6 +1,9 @@
+ package org.dieschnittstelle.mobile.android.skeleton;
+ 
++import static android.graphics.Color.*;
++
+ import android.content.Intent;
++import android.graphics.Color;
+ import android.os.Bundle;
+ import android.text.InputType;
+ import android.text.TextUtils;
+@@ -37,11 +40,19 @@
+         editTextpassword = findViewById(R.id.editTextTextPassword);
+         btnLogin = findViewById(R.id.btnLogin);
+         txtHinweis = findViewById(R.id.txtWarnmeldung);
++        txtHinweis.setTextColor(RED);
+ 
+ 
+         editTextpassword.setInputType(InputType.TYPE_CLASS_NUMBER);
+ 
+-//        btnLogin.setEnabled(false);
++//        String inputEmail = editTextemailAdresse.getText().toString();
++//        String inputPassword = editTextpassword.getText().toString();
++
++//        if(inputEmail.isEmpty() || inputPassword.isEmpty()){
++//            btnLogin.setEnabled(false);
++//        }else{
++//            btnLogin.setEnabled(true);
++//        }
+ 
+         btnLogin.setOnClickListener(v -> {
+             String inputEmail = editTextemailAdresse.getText().toString();
+@@ -76,6 +87,7 @@
+                     }
+                 }else{
+                     txtHinweis.setText("Dies ist keine gültige Email!");
++
+                 }
+ 
+             }
+Index: app/src/main/java/impl/RoomLocalDataItemCRUDOperationsImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package impl;\r\n\r\nimport android.content.Context;\r\n\r\nimport androidx.room.Dao;\r\nimport androidx.room.Database;\r\nimport androidx.room.Insert;\r\nimport androidx.room.Query;\r\nimport androidx.room.Room;\r\nimport androidx.room.RoomDatabase;\r\nimport androidx.room.TypeConverter;\r\nimport androidx.room.TypeConverters;\r\nimport androidx.room.Update;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.Arrays;\r\nimport java.util.List;\r\nimport java.util.stream.Collectors;\r\n\r\nimport model.IDataItemCRUDOperations;\r\nimport model.ToDo;\r\n\r\npublic class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperations {\r\n\r\n    public static class ArrayListToStringDatabaseConverter {\r\n\r\n        @TypeConverter\r\n        public static ArrayList<String> fromString(String value) {\r\n            if(value == null || value.length() == 0){\r\n                return new ArrayList<>();\r\n            }\r\n            return new ArrayList<>(Arrays.asList(value.split(\",\")));\r\n        }\r\n\r\n        @TypeConverter\r\n        public static String fromArrayList(ArrayList<String> value) {\r\n            if(value == null){\r\n                return \"\";\r\n            }\r\n            return value\r\n                    .stream()\r\n                    .collect(Collectors.joining(\",\"));\r\n        }\r\n    }\r\n\r\n    //Room ist ein Framework was Daten, die wir in unsere View als Objekte reingeben, in eine DB zu überführen\r\n    //Oder Daten aus einer DB in unser JavaCode zu überführen\r\n\r\n    //Angeben welche Inhalte ich in meiner DB Speichern will, welche Klassen meines Projekts sind Klassen deren Instanzen ich\r\n    //dauerhaft in die DB übertragen will. DataItem nicht, Activitiys nicht, nur die to_do Klasse! Dafür ne abstrakteDB Class.\r\n\r\n    //1tens Welche Daten\r\n    //2tens welche Operationen brauch ich\r\n    //3tens Struktur angeben\r\n\r\n    @Database(entities = {ToDo.class}, version = 5)\r\n    public static abstract class RoomToDoDatabase extends RoomDatabase {\r\n        public abstract RoomDataItemCRUDAccess getDao();\r\n    }\r\n\r\n    @Dao\r\n    public static interface RoomDataItemCRUDAccess {\r\n        @Insert\r\n        public long createItem(ToDo toDo); //TODO als Name!\r\n\r\n        @Query(\"select * from todo\")\r\n        public List<ToDo> readAllItems();\r\n\r\n        @Query(\"select * from todo where id = (:id)\")\r\n        public ToDo readItem(Long id);\r\n\r\n        @Update\r\n        public int updateItem(ToDo toDo);\r\n    }\r\n\r\n    private RoomDataItemCRUDAccess roomAccessor;\r\n\r\n    public RoomLocalDataItemCRUDOperationsImpl(Context databaseOwner) {\r\n        RoomToDoDatabase db = Room.databaseBuilder(databaseOwner.getApplicationContext(),\r\n                RoomToDoDatabase.class,\r\n                \"dataitems-database-mad21\").build();\r\n\r\n        roomAccessor = db.getDao();\r\n\r\n    }\r\n\r\n    @Override\r\n    public ToDo createDataItem(ToDo toDo) {\r\n        long newID = roomAccessor.createItem(toDo);\r\n        toDo.setId(newID);\r\n\r\n        return toDo;\r\n    }\r\n\r\n    @Override\r\n    public List<ToDo> readAllDataItems() {\r\n        return roomAccessor.readAllItems();\r\n    }\r\n\r\n    @Override\r\n    public ToDo readDataItem(long id) {\r\n        return null;\r\n    }\r\n\r\n    @Override\r\n    public ToDo updateDataItem(ToDo toDo) {\r\n        roomAccessor.updateItem(toDo);\r\n        return toDo;\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteDataItem(long id) {\r\n\r\n        return false;\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteAllDataItems(boolean remote) {\r\n        if(remote){\r\n            return false;\r\n        }else{\r\n            //TODO: delete all items in the local db\r\n            return false;\r\n        }\r\n    }\r\n\r\n    /*\r\n        @Override\r\n    public boolean deleteAllDataItems(boolean remote)\r\n    {\r\n        try {\r\n            return webAPI.deleteAllToDos().execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return false;\r\n        }\r\n    }\r\n     */\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/impl/RoomLocalDataItemCRUDOperationsImpl.java b/app/src/main/java/impl/RoomLocalDataItemCRUDOperationsImpl.java
+--- a/app/src/main/java/impl/RoomLocalDataItemCRUDOperationsImpl.java	(revision 31e99095ddd06aab62d9a6daf7a8211165803066)
++++ b/app/src/main/java/impl/RoomLocalDataItemCRUDOperationsImpl.java	(date 1641378366509)
+@@ -71,6 +71,9 @@
+ 
+         @Update
+         public int updateItem(ToDo toDo);
++
++        @Query("DELETE FROM ToDo")
++        public void deleteAllToDos();
+     }
+ 
+     private RoomDataItemCRUDAccess roomAccessor;
+@@ -117,23 +120,13 @@
+     @Override
+     public boolean deleteAllDataItems(boolean remote) {
+         if(remote){
+-            return false;
++            roomAccessor.deleteAllToDos();
++
+         }else{
+             //TODO: delete all items in the local db
+-            return false;
+-        }
+-    }
++            roomAccessor.deleteAllToDos();
+ 
+-    /*
+-        @Override
+-    public boolean deleteAllDataItems(boolean remote)
+-    {
+-        try {
+-            return webAPI.deleteAllToDos().execute().body();
+-        } catch (IOException e) {
+-            e.printStackTrace();
+-            return false;
+         }
++        return true;
+     }
+-     */
+ }
+Index: app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/MainActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.dieschnittstelle.mobile.android.skeleton;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.annotation.Nullable;\r\nimport androidx.annotation.RequiresApi;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.databinding.DataBindingUtil;\r\n\r\nimport android.app.Activity;\r\nimport android.content.Context;\r\nimport android.content.Intent;\r\nimport android.graphics.Color;\r\nimport android.os.Build;\r\nimport android.os.Bundle;\r\nimport android.util.Log;\r\nimport android.view.Menu;\r\nimport android.view.MenuItem;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.widget.AdapterView;\r\nimport android.widget.ArrayAdapter;\r\nimport android.widget.DatePicker;\r\nimport android.widget.ListView;\r\nimport android.widget.ProgressBar;\r\nimport android.widget.TextView;\r\n\r\nimport com.google.android.material.floatingactionbutton.FloatingActionButton;\r\nimport com.google.android.material.snackbar.Snackbar;\r\nimport com.google.firebase.events.Event;\r\nimport com.google.firebase.events.EventHandler;\r\n\r\nimport org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;\r\n\r\nimport java.time.LocalDate;\r\nimport java.util.ArrayList;\r\nimport java.util.Comparator;\r\nimport java.util.List;\r\n\r\nimport impl.ThreadedDataItemCRUDOperationsAsyncImpl;\r\nimport model.IDataItemCRUDOperations;\r\nimport model.IDataItemCRUDOperationsAsync;\r\nimport model.ToDo;\r\n\r\npublic class MainActivity extends AppCompatActivity {\r\n    private static String logtag = \"MainActivity\";\r\n\r\n    //Bedienelemente\r\n    private ListView listView;\r\n    private List<ToDo> items = new ArrayList<>();\r\n\r\n    private ArrayAdapter<ToDo> listViewAdapter;//Selber Typ wie oben\r\n\r\n    private ProgressBar progressBar;\r\n\r\n    private FloatingActionButton addNewItemButton;\r\n\r\n    private static final int CALL_DETAILVIEW_FOR_CREATE = 0;\r\n    private static final int CALL_DETAILVIEW_FOR_EDIT = 1;\r\n\r\n    private IDataItemCRUDOperationsAsync crudOperations;\r\n\r\n\r\n    private class DataItemsAdapter extends ArrayAdapter<ToDo> { //1h.33min\r\n        private int layoutResource;\r\n\r\n        //AdapterViews sind dafür da ListViews mit Teilansichten auszustatten.\r\n\r\n        public DataItemsAdapter(@NonNull Context context, int resource, @NonNull List<ToDo> objects) { // für uns angepasst!\r\n            super(context, resource, objects);\r\n            layoutResource = resource;\r\n        }\r\n\r\n        //Muss man überschreiben, wenn man mehrere Dinger haben will\r\n        @NonNull\r\n        @Override\r\n        public View getView(int position, @Nullable View recycleableItemView, @NonNull ViewGroup parent) {\r\n            // HIER PAUSE 1.32h REST!! 19.5!!\r\n            Log.i(logtag, \"getView(): for position \" + position + \" , and recycleableItemView: \" + recycleableItemView);\r\n\r\n            View itemView = null;\r\n            ToDo currentItem = getItem(position);   // Erstmal richtige Stelle auslesen\r\n\r\n            if (recycleableItemView != null) {\r\n                TextView textView = (TextView) recycleableItemView.findViewById(R.id.itemName);\r\n                if (textView != null) {\r\n                    Log.i(logtag, \"getView(): itemName in convertView: \" + textView);\r\n                    //54 MIN RRRRRRRRRRRRRRRRRRRREST\r\n                }\r\n                itemView = recycleableItemView;\r\n                ActivityMainListitemBinding recycleBinding = (ActivityMainListitemBinding) itemView.getTag();\r\n                recycleBinding.setItem(currentItem);\r\n\r\n            } else {\r\n                ActivityMainListitemBinding currentBinding =\r\n                        DataBindingUtil.inflate(getLayoutInflater(),\r\n                                this.layoutResource,\r\n                                null,\r\n                                false);\r\n\r\n                currentBinding.setItem(currentItem);\r\n                currentBinding.setController(MainActivity.this); // Innere Klasse in der Main Activity :)\r\n\r\n                itemView = currentBinding.getRoot();\r\n                itemView.setTag(currentBinding);\r\n            }\r\n            return itemView;\r\n\r\n        }\r\n    }\r\n\r\n    @RequiresApi(api = Build.VERSION_CODES.O)\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n\r\n//        if(!((ToDoApplication)getApplication()).isServerAvailable()){\r\n//            startActivity((new Intent(this, DetailviewActivity.class)));\r\n//            return;\r\n//        }\r\n\r\n        setContentView(R.layout.activity_main);\r\n\r\n        //TODO\r\n//        final DatePicker datePicker = new DatePicker(this);\r\n//        datePicker.setOnDateChangedListener(new EventHandler() {\r\n//            public void handle(Event t) {\r\n//                LocalDate date = datePicker.get();\r\n//                System.err.println(\"Selected date: \" + date);\r\n//            }\r\n//        });\r\n\r\n        //1. Access view elements\r\n        listView = findViewById(R.id.listView);\r\n//        listView.setBackgroundColor(Color.RED);\r\n        listViewAdapter = new DataItemsAdapter(this, R.layout.activity_main_listitem, items); // Er hat also die Daten und die ART DER DARSTELLUNG ;)\r\n        listView.setAdapter(listViewAdapter);\r\n        progressBar = findViewById(R.id.progressBar);\r\n\r\n        addNewItemButton = findViewById(R.id.addNewItemButton);\r\n\r\n        //2- Prepare Elements 4 Interaction\r\n        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {\r\n            @Override\r\n            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {\r\n                ToDo selectedItem = listViewAdapter.getItem(position);\r\n                view.setBackgroundColor(Color.RED);\r\n                onItemSelected(selectedItem);\r\n            }\r\n        });\r\n\r\n        addNewItemButton.setOnClickListener(v -> this.onItemCreationRequested());\r\n\r\n        // 3. Load data into view\r\n        IDataItemCRUDOperations crudExecutor = ((ToDoApplication)this.getApplication()).getCrudOperations();\r\n        crudOperations = new ThreadedDataItemCRUDOperationsAsyncImpl(crudExecutor, this, progressBar);\r\n//        listViewAdapter.addAll(readAllDataItems());\r\n        crudOperations.readAllDataItems(items -> {\r\n            sortitems(items);\r\n            listViewAdapter.addAll(items);\r\n        }); //VK 19.5\r\n    }\r\n\r\n    protected void onItemSelected(ToDo itemName) {\r\n        Intent detailviewIntent = new Intent(this, DetailviewActivity.class);\r\n        detailviewIntent.putExtra(DetailviewActivity.ARG_ITEM, itemName); // in Arg Item das zweite reinpacken //Check mal Seriziable\r\n        this.startActivityForResult(detailviewIntent, CALL_DETAILVIEW_FOR_EDIT);\r\n    }\r\n\r\n    protected void onItemCreationRequested() {\r\n        Intent detailviewForCreateIntent = new Intent(this, DetailviewActivity.class);\r\n        startActivityForResult(detailviewForCreateIntent, CALL_DETAILVIEW_FOR_CREATE);\r\n    }\r\n\r\n    //1h 17min DRIN LASSEN\r\n    @Override\r\n    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {\r\n        super.onActivityResult(requestCode, resultCode, data);\r\n        if (requestCode == CALL_DETAILVIEW_FOR_CREATE) {\r\n            if (resultCode == Activity.RESULT_OK) {   // Sagt aus ob man einfach nur zurückgegangen ist oder was durchgeführt hat{\r\n                onNewItemCreated((ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM));  //1h 28 min!!!!!!!!!!!!!\r\n            } else {\r\n                showFeedbackMessage(\"Returning from detailview for create with \" + resultCode);\r\n            }\r\n        } else if (requestCode == CALL_DETAILVIEW_FOR_EDIT) {\r\n            if (resultCode == Activity.RESULT_OK) {\r\n                ToDo editedItem = (ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM);\r\n                showFeedbackMessage(\"Got updated item \" + editedItem.getName());\r\n                onItemEdited(editedItem);\r\n            } else {\r\n                showFeedbackMessage(\"Returning from detailview for edit with: \" + resultCode);\r\n            }\r\n        } else {\r\n            showFeedbackMessage(\"Returning from detailview with \" + resultCode);\r\n        }\r\n    }\r\n\r\n    protected void showFeedbackMessage(String msg) {\r\n        Snackbar.make(findViewById(R.id.rootView), msg, Snackbar.LENGTH_SHORT).show();\r\n    }\r\n\r\n    protected void onNewItemCreated(ToDo item) {\r\n//        showFeedbackMessage(\"created new item \" + itemName);\r\n//        TextView newItemView = (TextView) getLayoutInflater().inflate(R.layout.activity_main_listitem, null);\r\n//        newItemView.setText(itemName);\r\n//        listView.addView(newItemView);\r\n//        Log.i(logtag, \"list ist now: \" + items);\r\n\r\n        crudOperations.createDataItem(item, created -> {\r\n//            item.setId(ToDo.nextId());\r\n            items.add(created);\r\n            sortListAndScrollToItem(created);\r\n        });\r\n    }\r\n\r\n    protected void onItemEdited(ToDo editedItem) {\r\n        crudOperations.updateDataItem(editedItem, updated -> {\r\n            int pos = items.indexOf(updated);\r\n//            Log.i(logtag, \"got position: \" + pos);\r\n\r\n            items.remove(pos);\r\n            items.add(pos, updated);\r\n            sortListAndScrollToItem(updated);\r\n\r\n        });\r\n\r\n\r\n    }\r\n\r\n    public void onCheckedChangedInListView(ToDo toDo)\r\n        {\r\n        crudOperations.updateDataItem(toDo, updated -> {\r\n//        showFeedbackMessage(\"Checked changed to \" + updated.isChecked() + \" for \" + updated.getName());\r\n        sortListAndScrollToItem(toDo);\r\n        });\r\n    }\r\n\r\n    //Options Menu & Sorting\r\n\r\n    @Override\r\n    public boolean onCreateOptionsMenu(Menu menu) {\r\n        getMenuInflater().inflate(R.menu.main_menu, menu);\r\n        return super.onCreateOptionsMenu(menu);\r\n    }\r\n\r\n    //Menues :)\r\n    @Override\r\n    public boolean onOptionsItemSelected(@NonNull MenuItem item) {\r\n        if(item.getItemId() == R.id.sortItems){\r\n            sortListAndScrollToItem(null);\r\n            return true;\r\n        }  else if(item.getItemId() == R.id.deleteRemoteItems) {\r\n            crudOperations.deleteAllDataItems(true, (result) ->{\r\n                if(result){\r\n\r\n                    showFeedbackMessage(\"Remote items were deleted!\");\r\n                }\r\n                else{\r\n                    showFeedbackMessage(\"Remote items could not be deleted, maybe we are running in local mode\");\r\n                }\r\n\r\n            });\r\n            return true;\r\n        }\r\n        else if(item.getItemId() == R.id.deleteLocalItems) {\r\n            crudOperations.deleteAllDataItems(true, (result) ->{\r\n                if(result){\r\n\r\n                    showFeedbackMessage(\"Local items were deleted!\");\r\n                }\r\n                else{\r\n                    showFeedbackMessage(\"Local items could not be deleted\");\r\n                }\r\n\r\n            });\r\n            return true;\r\n        }\r\n      else{\r\n            return super.onOptionsItemSelected(item);\r\n        }\r\n    }\r\n\r\n    protected void sortListAndScrollToItem(ToDo item) {\r\n        showFeedbackMessage(\"Sort List!\");\r\n        sortitems(items);\r\n\r\n        listViewAdapter.notifyDataSetChanged(); //Aktualisierung\r\n        //Liste = list\r\n        //ListView = Ansicht\r\n        //Adapter Zwischenstelle\r\n        if(item != null){\r\n            int pos = listViewAdapter.getPosition(item);\r\n            listView.setSelection(pos);\r\n        }\r\n\r\n\r\n    }\r\n\r\n    private void sortitems(List<ToDo> items) {\r\n        items.sort(Comparator.comparing(ToDo::isChecked).thenComparing(ToDo::getName)); // rufe die Methode der Klasse auf, Rückgabe = name!\r\n        //TODO: Hier z.B. mal ne Sortierung nach Fälligkeit --> Ich müsste dann im Model das Fälligkeitsdatum abspeichern und das Fälligkeitsdatum selbst aus dem DateTimePicker auslesen\r\n\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/MainActivity.java b/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/MainActivity.java
+--- a/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/MainActivity.java	(revision 31e99095ddd06aab62d9a6daf7a8211165803066)
++++ b/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/MainActivity.java	(date 1641378351863)
+@@ -264,7 +264,6 @@
+         else if(item.getItemId() == R.id.deleteLocalItems) {
+             crudOperations.deleteAllDataItems(true, (result) ->{
+                 if(result){
+-
+                     showFeedbackMessage("Local items were deleted!");
+                 }
+                 else{
+Index: app/src/main/java/impl/RetrofitRemoteDataItemCRUDOperationsImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package impl;\r\n\r\nimport com.google.gson.Gson;\r\n\r\nimport java.io.IOException;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\nimport model.IDataItemCRUDOperations;\r\nimport model.ToDo;\r\nimport retrofit2.Call;\r\nimport retrofit2.Retrofit;\r\nimport retrofit2.converter.gson.GsonConverterFactory;\r\nimport retrofit2.http.Body;\r\nimport retrofit2.http.DELETE;\r\nimport retrofit2.http.GET;\r\nimport retrofit2.http.POST;\r\nimport retrofit2.http.PUT;\r\nimport retrofit2.http.Path;\r\n\r\npublic class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOperations\r\n{\r\n    public static interface ToDoWebAPI{\r\n        //Web API Dokument\r\n\r\n        @POST(\"/api/todos\")\r\n        public Call<ToDo> createToDo(@Body ToDo toDo);\r\n\r\n        @GET(\"/api/todos\")\r\n        public Call<List<ToDo>> readAllToDos();\r\n\r\n        @GET(\"/api/todos/{id}\")\r\n        public Call<ToDo> readToDo(@Path(\"id\")long id);\r\n\r\n        @PUT(\"/api/todos/{id}\")\r\n        public Call<ToDo> updateToDo(@Path(\"id\")long id,@Body ToDo toDo);\r\n\r\n        @DELETE(\"/api/todos/{id}\")\r\n        public Call<Boolean> deleteToDo(@Path(\"id\") long id);\r\n\r\n        @DELETE(\"/api/todos\")\r\n        public Call<Boolean> deleteAllToDos();\r\n        //1h 24 min rest, ab 30 min Blick auf alles\r\n    }\r\n\r\n    private ToDoWebAPI webAPI;\r\n\r\n    public RetrofitRemoteDataItemCRUDOperationsImpl()\r\n    {\r\n        Retrofit apiBase = new Retrofit.Builder()\r\n                .baseUrl(\"http://10.0.2.2:8080/\")\r\n                .addConverterFactory(GsonConverterFactory.create())\r\n                .build();\r\n        webAPI = apiBase.create(ToDoWebAPI.class);\r\n    }\r\n\r\n    @Override\r\n    public ToDo createDataItem(ToDo toDo) {\r\n        try {\r\n            return webAPI.createToDo(toDo).execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return null;\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public List<ToDo> readAllDataItems() {\r\n        try {\r\n            return webAPI.readAllToDos().execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return new ArrayList<>();\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public ToDo readDataItem(long id) {\r\n        try {\r\n            return webAPI.readToDo(id).execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return null;\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public ToDo updateDataItem(ToDo toDo) {\r\n        try {\r\n            return webAPI.updateToDo(toDo.getId(), toDo).execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return null;\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteDataItem(long id) {\r\n        try {\r\n            return webAPI.deleteToDo(id).execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return false;\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteAllDataItems(boolean remote)\r\n    {\r\n        try {\r\n            return webAPI.deleteAllToDos().execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return false;\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/impl/RetrofitRemoteDataItemCRUDOperationsImpl.java b/app/src/main/java/impl/RetrofitRemoteDataItemCRUDOperationsImpl.java
+--- a/app/src/main/java/impl/RetrofitRemoteDataItemCRUDOperationsImpl.java	(revision 31e99095ddd06aab62d9a6daf7a8211165803066)
++++ b/app/src/main/java/impl/RetrofitRemoteDataItemCRUDOperationsImpl.java	(date 1641382725853)
+@@ -8,6 +8,8 @@
+ 
+ import model.IDataItemCRUDOperations;
+ import model.ToDo;
++import model.User;
++import model.UserOperationsImpl;
+ import retrofit2.Call;
+ import retrofit2.Retrofit;
+ import retrofit2.converter.gson.GsonConverterFactory;
+@@ -41,6 +43,9 @@
+         @DELETE("/api/todos")
+         public Call<Boolean> deleteAllToDos();
+         //1h 24 min rest, ab 30 min Blick auf alles
++
++        @PUT("/api/users/auth")
++        public Call<Boolean> authenticateUser(User user);
+     }
+ 
+     private ToDoWebAPI webAPI;
+@@ -114,4 +119,9 @@
+             return false;
+         }
+     }
++
++    public boolean authenticateUser(User user){
++        UserOperationsImpl userOperations = new UserOperationsImpl();
++        boolean richtig = userOperations.authenticateUser(user);
++    }
+ }
+Index: app/src/main/java/model/UserOperationsImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/model/UserOperationsImpl.java b/app/src/main/java/model/UserOperationsImpl.java
+new file mode 100644
+--- /dev/null	(date 1641382592654)
++++ b/app/src/main/java/model/UserOperationsImpl.java	(date 1641382592654)
+@@ -0,0 +1,21 @@
++package model;
++
++import android.util.Log;
++
++public class UserOperationsImpl implements IUserOperations{
++    private static String ANMELDE_EMAIL = "Admin@gmx.de";
++    private static String ANMELDE_PASSWORT = "123456";
++
++    @Override
++    public boolean authenticateUser(User user) {
++        Log.i("Logga", "USERNAME: " + user);
++        return ANMELDE_EMAIL.equals(user.getEmail()) && ANMELDE_PASSWORT.equals(user.getPassword());
++    }
++
++    @Override
++    public boolean prepare(String email, String pwd) {
++        return false;
++    }
++
++
++}
+Index: app/src/main/java/model/IUserOperations.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/model/IUserOperations.java b/app/src/main/java/model/IUserOperations.java
+new file mode 100644
+--- /dev/null	(date 1641382592621)
++++ b/app/src/main/java/model/IUserOperations.java	(date 1641382592621)
+@@ -0,0 +1,12 @@
++package model;
++
++import retrofit2.http.PUT;
++import retrofit2.http.Path;
++
++public interface IUserOperations {
++
++    @PUT("/api/users/auth")
++    public boolean authenticateUser(User user);
++
++    public boolean prepare(String email,String pwd);
++}
