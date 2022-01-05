@@ -242,13 +242,13 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    //Menues :)
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == R.id.sortItems){
             sortListAndScrollToItem(null);
             return true;
-        }
-        else if(item.getItemId() == R.id.deleteRemoteItems) {
+        }  else if(item.getItemId() == R.id.deleteRemoteItems) {
             crudOperations.deleteAllDataItems(true, (result) ->{
                 if(result){
 
@@ -260,7 +260,21 @@ public class MainActivity extends AppCompatActivity {
 
             });
             return true;
-        }else{
+        }
+        else if(item.getItemId() == R.id.deleteLocalItems) {
+            crudOperations.deleteAllDataItems(true, (result) ->{
+                if(result){
+
+                    showFeedbackMessage("Local items were deleted!");
+                }
+                else{
+                    showFeedbackMessage("Local items could not be deleted");
+                }
+
+            });
+            return true;
+        }
+      else{
             return super.onOptionsItemSelected(item);
         }
     }

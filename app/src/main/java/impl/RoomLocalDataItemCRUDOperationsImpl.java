@@ -53,7 +53,7 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
     //2tens welche Operationen brauch ich
     //3tens Struktur angeben
 
-    @Database(entities = {ToDo.class}, version = 3)
+    @Database(entities = {ToDo.class}, version = 5)
     public static abstract class RoomToDoDatabase extends RoomDatabase {
         public abstract RoomDataItemCRUDAccess getDao();
     }
@@ -120,7 +120,20 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
             return false;
         }else{
             //TODO: delete all items in the local db
-            return true;
+            return false;
         }
     }
+
+    /*
+        @Override
+    public boolean deleteAllDataItems(boolean remote)
+    {
+        try {
+            return webAPI.deleteAllToDos().execute().body();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+     */
 }

@@ -96,7 +96,7 @@ public class DetailviewActivity extends AppCompatActivity {
 
 
             Toast.makeText(this, "BLAAAAAA", Toast.LENGTH_SHORT).show();
-
+            //https://www.youtube.com/watch?v=hwe1abDO2Ag
         };
 
         etDate.setOnClickListener(v -> {

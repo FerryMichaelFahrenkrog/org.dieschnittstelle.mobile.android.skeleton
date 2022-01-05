@@ -1,5 +1,8 @@
 package impl;
 
+import android.util.Log;
+
+import java.util.Arrays;
 import java.util.List;
 
 import model.IDataItemCRUDOperations;
@@ -20,7 +23,10 @@ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
     @Override
     public ToDo createDataItem(ToDo toDo)
     {
+        //erstelle lokal createDataitem
         toDo = localCRUD.createDataItem(toDo);
+
+        //dann erstellt mans remote, sie nimmt die lokal zugewiesene ID
         remoteCRUD.createDataItem(toDo);
         return toDo;
     }
@@ -28,15 +34,28 @@ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
     @Override
     public List<ToDo> readAllDataItems() {
         //TODO !
-//        if(!synced){
-//            synclLocalandRemote()
-//        synced = true;
-//        }
+        if(!synced){
+            synclLocalandRemote();
+        synced = true;
+        }
         return localCRUD.readAllDataItems();
     }
 
     private void synclLocalandRemote() {
-        //Seite 2 unten
+        List<ToDo> anzahlDateneinträge = localCRUD.readAllDataItems();
+        int eintraege = anzahlDateneinträge.size();
+
+        Log.i("EINTRAEGE ", "anzahl " + eintraege);
+
+        if(eintraege > 0){
+            //sind lokale ToDos da, dann lösche ich alles remote
+            remoteCRUD.deleteAllDataItems(true);
+
+            //wie übertrage ich jetzt die lokalen ToDos auf Remote seite?
+
+        }else{
+            //Jetzt sollen in die lokale DB alles von der Remote Seite
+        }
     }
 
     @Override
@@ -49,6 +68,10 @@ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
         toDo = localCRUD.updateDataItem(toDo);
         remoteCRUD.updateDataItem(toDo);
         return toDo;
+
+        //if (localCRUD.updateDataITem(item)){
+        //teturn remoteCrud.updateDataitem(item)
+        //return false=
 
     }
 

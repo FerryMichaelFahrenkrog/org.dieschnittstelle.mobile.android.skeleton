@@ -31,11 +31,13 @@ public class ToDoApplication extends Application {
         try{
             if(connectivityFuture.get())
             {
+                Log.i(logtag, "connectivity successful");
                 Toast.makeText(this, "Backend accessible, will use the remote access.", Toast.LENGTH_SHORT).show();
                 crudOperations = new SyncedDataItemCRUDOperationsImpl(new RoomLocalDataItemCRUDOperationsImpl(this), new RetrofitRemoteDataItemCRUDOperationsImpl());
                 serverAvailable = true;
             }
             else{
+                Log.i(logtag, "connectivity failed");
                 Toast.makeText(this, "Backend not accessible, will use local access only.", Toast.LENGTH_SHORT).show();
                 crudOperations = new RoomLocalDataItemCRUDOperationsImpl(this);
             }

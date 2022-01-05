@@ -19,132 +19,134 @@ import impl.RoomLocalDataItemCRUDOperationsImpl;
 @Entity // Damit sage ich, dass ich Instanzen der Klasse To-Do in meiner Datenbank ablegen möchte
 public class ToDo implements Serializable // Objekte in Bytes verwandeln, und dann wieder Objekte draus machen, braucht man um Objekte in DB zu speichern
 {
-    protected static long ID_GENERATOR = 0;
+        protected static long ID_GENERATOR = 0;
 
-    public static long nextId(){
-        return ++ID_GENERATOR;
-    }
-
-    protected static String logtag ="ToDo";
-
-    private String name;
-    private String description;
-    @SerializedName("done") // JSON java name = done        //TODO verstehen
-    private boolean checked;
-
-    private boolean isFavouriteToDo; // wenn ja dann markier später Rot oder so
-
-    @Ignore
-    private LocalDateTime fälligkeitsdatum;
-
-    @SerializedName("contacts")                             //TODO verstehen
-    @TypeConverters(RoomLocalDataItemCRUDOperationsImpl.ArrayListToStringDatabaseConverter.class)
-    private ArrayList<String> contactIds;
-
-    @PrimaryKey(autoGenerate = true)
-    private long id;
-
-    public ToDo() {
-
-    }
-
-    public ToDo(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "ToDo{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", checked=" + checked +
-                '}';
-    }
-
-    public String getName() {
-        Log.i(logtag, "getName()" + name);
-
-        if(name == null)
-        {
-            return "";
+        public static long nextId(){
+            return ++ID_GENERATOR;
         }
 
-        return name;
-    }
+        protected static String logtag ="ToDo";
 
-    public void setName(String name) {
-        Log.i(logtag, "setName()" + name);
-        this.name = name;
-    }
+        private String name;
+        private String description;
+        @SerializedName("done") // JSON java name = done        //TODO verstehen
+        private boolean checked;
 
-    public String getDescription() {
-        Log.i(logtag, "getDescription" + description);
+//    private boolean isFavouriteToDo; // wenn ja dann markier später Rot oder so
+//
+//    @Ignore
+//    private LocalDateTime faelligkeitsdatum;
 
-        return description;
-    }
+        @SerializedName("contacts")                             //TODO verstehen
+        @TypeConverters(RoomLocalDataItemCRUDOperationsImpl.ArrayListToStringDatabaseConverter.class)
+        private ArrayList<String> contactIds;
 
-    public void setDescription(String description) {
-        Log.i(logtag, "setDescription" + description);
-        this.description = description;
-    }
+        @PrimaryKey(autoGenerate = true)
+        private long id;
 
-    public boolean isChecked() {
-        Log.i(logtag, "isChecked" + checked);
+        public ToDo() {
 
-        return checked;
-    }
+        }
 
-    public void setChecked(boolean checked) {
-        Log.i(logtag, "isChecked" + checked);
-        this.checked = checked;
-    }
+        public ToDo(String name) {
+            this.name = name;
+        }
 
-    public long getId() {
-        return id;
-    }
+        @Override
+        public String toString() {
+            return "ToDo{" +
+                    "name='" + name + '\'' +
+                    ", description='" + description + '\'' +
+                    ", checked=" + checked +
+                    '}';
+        }
 
-    public void setId(long id) {
-        this.id = id;
-    }
+        public String getName() {
+            Log.i(logtag, "getName()" + name);
 
-    public LocalDateTime getFälligkeitsdatum() {
-        return fälligkeitsdatum;
-    }
+            if(name == null)
+            {
+                return "";
+            }
 
-    public void setFälligkeitsdatum(LocalDateTime fälligkeitsdatum) {
-        this.fälligkeitsdatum = fälligkeitsdatum;
-    }
+            return name;
+        }
 
-        public boolean isFavouriteToDo() {
-        return isFavouriteToDo;
-    }
+        public void setName(String name) {
+            Log.i(logtag, "setName()" + name);
+            this.name = name;
+        }
 
-    public void setFavouriteToDo(boolean favouriteToDo) {
-        isFavouriteToDo = favouriteToDo;
-    }
+        public String getDescription() {
+            Log.i(logtag, "getDescription" + description);
 
-    public ArrayList<String> getContactIds() {
-        if(contactIds == null){
-            contactIds = new ArrayList<>();
+            return description;
+        }
+
+        public void setDescription(String description) {
+            Log.i(logtag, "setDescription" + description);
+            this.description = description;
+        }
+
+        public boolean isChecked() {
+            Log.i(logtag, "isChecked" + checked);
+
+            return checked;
+        }
+
+        public void setChecked(boolean checked) {
+            Log.i(logtag, "isChecked" + checked);
+            this.checked = checked;
+        }
+
+        public long getId() {
+            return id;
+        }
+
+        public void setId(long id) {
+            this.id = id;
+        }
+
+//    public boolean isFavouriteToDo() {
+//        return isFavouriteToDo;
+//    }
+//
+//    public void setFavouriteToDo(boolean favouriteToDo) {
+//        isFavouriteToDo = favouriteToDo;
+//    }
+//
+//    public LocalDateTime getFaelligkeitsdatum() {
+//        return faelligkeitsdatum;
+//    }
+//
+//    public void setFaelligkeitsdatum(LocalDateTime faelligkeitsdatum) {
+//        this.faelligkeitsdatum = faelligkeitsdatum;
+//    }
+
+        public ArrayList<String> getContactIds() {
+            if(contactIds == null){
+                contactIds = new ArrayList<>();
+                return contactIds;
+            }
             return contactIds;
         }
-        return contactIds;
+
+        public void setContactIds(ArrayList<String> contactIds) {
+            this.contactIds = contactIds;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            model.ToDo toDo = (model.ToDo) o;
+            return id == toDo.id;
+        }
+
+        @Override
+        public int hashCode() { // -21 Min rest VK 12.5)
+            return Objects.hash(id);
+        }
     }
 
-    public void setContactIds(ArrayList<String> contactIds) {
-        this.contactIds = contactIds;
-    }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ToDo toDo = (ToDo) o;
-        return id == toDo.id;
-    }
-
-    @Override
-    public int hashCode() { // -21 Min rest VK 12.5)
-        return Objects.hash(id);
-    }
-}
