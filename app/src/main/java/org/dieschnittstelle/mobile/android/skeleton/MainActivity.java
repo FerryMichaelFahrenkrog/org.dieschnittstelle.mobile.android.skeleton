@@ -9,7 +9,6 @@ import androidx.databinding.DataBindingUtil;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,141 +16,69 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.events.Event;
-import com.google.firebase.events.EventHandler;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import impl.ThreadedDataItemCRUDOperationsAsyncImpl;
 import model.IDataItemCRUDOperations;
 import model.IDataItemCRUDOperationsAsync;
 import model.ToDo;
 
-public class MainActivity extends AppCompatActivity {
-    private static String logtag = "MainActivity";
+public class MainActivity extends AppCompatActivity {               // macht die Klasse zu einer Activity
+    private static String logtag = "MainActivity: ";                // Logger zur Ausgabe
 
-    //Bedienelemente
-    private ListView listView;
-    private List<ToDo> items = new ArrayList<>();
+    //Bedienelemente definieren
+    private ListView listView;                                      // Liste in der alle ToDos drin sind
+    private final List<ToDo> items = new ArrayList<>();             // Hier sind die ToDos drin
 
-    private ArrayAdapter<ToDo> listViewAdapter;//Selber Typ wie oben
+    private ArrayAdapter<ToDo> listViewAdapter;                     // Über einen Arrayadapter werden listenförmige Datensammlungen mit einem AdapterView verbunden. Ein AdapterView ist ein View Element dessen Kinder von einem Adapter vorgegeben werden. Ein AdapterView wird übeer einen Adapter mit einer Datenquelle verbunden. Über den Adapter erhält der AdapterView Zugang zu den Elementen der Datenquelle
 
     private ProgressBar progressBar;
 
     private FloatingActionButton addNewItemButton;
 
-    private static final int CALL_DETAILVIEW_FOR_CREATE = 0;
-    private static final int CALL_DETAILVIEW_FOR_EDIT = 1;
+    private static final int CALL_DETAILVIEW_FOR_CREATE = 0;        // Damit sage ich der "startActivityForResult" Methode, dass ich etwas erzeugen will
+    private static final int CALL_DETAILVIEW_FOR_EDIT = 1;          // Damit sage ich der "startActivityForResult" Methode, dass ich etwas editieren will
 
-    private IDataItemCRUDOperationsAsync crudOperations;
-
-
-    private class DataItemsAdapter extends ArrayAdapter<ToDo> { //1h.33min
-        private int layoutResource;
-
-        //AdapterViews sind dafür da ListViews mit Teilansichten auszustatten.
-
-        public DataItemsAdapter(@NonNull Context context, int resource, @NonNull List<ToDo> objects) { // für uns angepasst!
-            super(context, resource, objects);
-            layoutResource = resource;
-        }
-
-        //Muss man überschreiben, wenn man mehrere Dinger haben will
-        @NonNull
-        @Override
-        public View getView(int position, @Nullable View recycleableItemView, @NonNull ViewGroup parent) {
-            // HIER PAUSE 1.32h REST!! 19.5!!
-            Log.i(logtag, "getView(): for position " + position + " , and recycleableItemView: " + recycleableItemView);
-
-            View itemView = null;
-            ToDo currentItem = getItem(position);   // Erstmal richtige Stelle auslesen
-
-            if (recycleableItemView != null) {
-                TextView textView = (TextView) recycleableItemView.findViewById(R.id.itemName);
-                if (textView != null) {
-                    Log.i(logtag, "getView(): itemName in convertView: " + textView);
-                    //54 MIN RRRRRRRRRRRRRRRRRRRREST
-                }
-                itemView = recycleableItemView;
-                ActivityMainListitemBinding recycleBinding = (ActivityMainListitemBinding) itemView.getTag();
-                recycleBinding.setItem(currentItem);
-
-            } else {
-                ActivityMainListitemBinding currentBinding =
-                        DataBindingUtil.inflate(getLayoutInflater(),
-                                this.layoutResource,
-                                null,
-                                false);
-
-                currentBinding.setItem(currentItem);
-                currentBinding.setController(MainActivity.this); // Innere Klasse in der Main Activity :)
-
-                itemView = currentBinding.getRoot();
-                itemView.setTag(currentBinding);
-            }
-            return itemView;
-
-        }
-    }
+    private IDataItemCRUDOperationsAsync crudOperations;            // ??
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        if(!((ToDoApplication)getApplication()).isServerAvailable()){
-//            startActivity((new Intent(this, DetailviewActivity.class)));
-//            return;
-//        }
-
-        setContentView(R.layout.activity_main);
-
-        //TODO
-//        final DatePicker datePicker = new DatePicker(this);
-//        datePicker.setOnDateChangedListener(new EventHandler() {
-//            public void handle(Event t) {
-//                LocalDate date = datePicker.get();
-//                System.err.println("Selected date: " + date);
-//            }
-//        });
+        setContentView(R.layout.activity_main);                     // setzen der Hauptansicht (Layout)
 
         //1. Access view elements
-        listView = findViewById(R.id.listView);
-//        listView.setBackgroundColor(Color.RED);
-        listViewAdapter = new DataItemsAdapter(this, R.layout.activity_main_listitem, items); // Er hat also die Daten und die ART DER DARSTELLUNG ;)
-        listView.setAdapter(listViewAdapter);
         progressBar = findViewById(R.id.progressBar);
-
         addNewItemButton = findViewById(R.id.addNewItemButton);
+        listView = findViewById(R.id.listView);
 
-        //2- Prepare Elements 4 Interaction
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ToDo selectedItem = listViewAdapter.getItem(position);
-//                view.setBackgroundColor(Color.RED);
-                onItemSelected(selectedItem);
-            }
+        listViewAdapter = new ToDoAdapter(this, R.layout.activity_main_listitem, items); // Der Adapter erhält die Daten & die Art der Darstellung über das Layout.
+        listView.setAdapter(listViewAdapter);
+
+        //2. Prepare Elements 4 Interaction
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            ToDo selectedItem = listViewAdapter.getItem(position);
+            oeffneDetailansichtFuer(selectedItem);                                              // Bei Klick auf ein Item öffnet sich die Detailansicht (mit Vorbefüllung)
         });
 
-        addNewItemButton.setOnClickListener(v -> this.onItemCreationRequested());
+        addNewItemButton.setOnClickListener(v -> this.erzeugeNeuesToDo());                      // Bei Klick auf den New Button wird ein neues To Do erstellt (ohne Vorbefüllung)
 
         // 3. Load data into view
-        IDataItemCRUDOperations crudExecutor = ((ToDoApplication)this.getApplication()).getCrudOperations();
+        IDataItemCRUDOperations crudExecutor = ((ToDoApplication) this.getApplication()).getCrudOperations();                // ??
         crudOperations = new ThreadedDataItemCRUDOperationsAsyncImpl(crudExecutor, this, progressBar);
 //        listViewAdapter.addAll(readAllDataItems());
         crudOperations.readAllDataItems(items -> {
@@ -160,32 +87,74 @@ public class MainActivity extends AppCompatActivity {
         }); //VK 19.5
     }
 
-    protected void onItemSelected(ToDo itemName) {
-        Intent detailviewIntent = new Intent(this, DetailviewActivity.class);
-        detailviewIntent.putExtra(DetailviewActivity.ARG_ITEM, itemName); // in Arg Item das zweite reinpacken //Check mal Seriziable
-        this.startActivityForResult(detailviewIntent, CALL_DETAILVIEW_FOR_EDIT);
+    private class ToDoAdapter extends ArrayAdapter<ToDo> {
+        private int layoutResource;
+
+        public ToDoAdapter(@NonNull Context context, int resource, @NonNull List<ToDo> objects) {
+            super(context, resource, objects);
+            layoutResource = resource;
+        }
+
+        @NonNull
+        @Override // 19.5 Thema
+        public View getView(int position, @Nullable View recycleableItemView, @NonNull ViewGroup parent) {
+            Log.i(logtag, "getView(): for position " + position + " , and recycleableItemView: " + recycleableItemView);
+
+            View itemView = null;
+            ToDo currentItem = getItem(position);   // Hier wird die korrekte Stelle ausgelesen
+
+            if (recycleableItemView != null) {
+                TextView textView = (TextView) recycleableItemView.findViewById(R.id.itemName);
+                if (textView != null) {
+                    Log.i(logtag, "getView(): itemName in convertView: " + textView);
+                }
+                itemView = recycleableItemView;
+                ActivityMainListitemBinding recycleBinding = (ActivityMainListitemBinding) itemView.getTag();
+                recycleBinding.setItem(currentItem);
+            } else {
+                ActivityMainListitemBinding currentBinding =
+                        DataBindingUtil.inflate(getLayoutInflater(),
+                                this.layoutResource,
+                                null,
+                                false);
+
+                currentBinding.setItem(currentItem);
+                currentBinding.setController(MainActivity.this);
+
+                itemView = currentBinding.getRoot();
+                itemView.setTag(currentBinding);
+            }
+            return itemView;
+        }
     }
 
-    protected void onItemCreationRequested() {
+    protected void oeffneDetailansichtFuer(ToDo itemName) {
+        Intent detailviewIntent = new Intent(this, DetailviewActivity.class);
+        detailviewIntent.putExtra(DetailviewActivity.ARG_ITEM, itemName);                       // In das ARG_ITEM wird unser To Do was wir übergeben reingepackt.
+        this.startActivityForResult(detailviewIntent, CALL_DETAILVIEW_FOR_EDIT);                // Wir übergeben das Intent und sagen, dass wir auf eine Rückgabe warten
+    }
+
+    protected void erzeugeNeuesToDo() {
         Intent detailviewForCreateIntent = new Intent(this, DetailviewActivity.class);
         startActivityForResult(detailviewForCreateIntent, CALL_DETAILVIEW_FOR_CREATE);
     }
 
-    //1h 17min DRIN LASSEN
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {                   // Diese Methode reagiert auf die Rückgaben, die wir über onActivityResult bekommen
         super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == CALL_DETAILVIEW_FOR_CREATE) {
-            if (resultCode == Activity.RESULT_OK) {   // Sagt aus ob man einfach nur zurückgegangen ist oder was durchgeführt hat{
-                onNewItemCreated((ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM));  //1h 28 min!!!!!!!!!!!!!
+            if (resultCode == Activity.RESULT_OK) {                                                             // Wenn etwas eingegeben wurde, dann rufe die Methode unten auf und übergebe das Item aus ARG_ITEM
+                ToDo neuesToDoItem = (ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM);
+                onNewItemCreated(neuesToDoItem);                                                                // Meine onXXX - Methoden werden zur Mainactivity zurückgegeben
             } else {
-                showFeedbackMessage("Returning from detailview for create with " + resultCode);
+                showFeedbackMessage("Returning from detailview for create with " + resultCode);           // Ansonsten ist quasi nichts passiert, trotzdem ne kleine Message zur Kontrolle
             }
-        } else if (requestCode == CALL_DETAILVIEW_FOR_EDIT) {
-            if (resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == CALL_DETAILVIEW_FOR_EDIT) {                                                    // In diesem Fall wird auf ein Item bearbeitet, also per Doppelklick editiert.
+            if (resultCode == Activity.RESULT_OK) {                                                            // Wenn es geupdatet wurde (RESULT_OK), dann schreib die Daten in das Edited Item und übergebe das der unteren Funktion
                 ToDo editedItem = (ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM);
                 showFeedbackMessage("Got updated item " + editedItem.getName());
-                onItemEdited(editedItem);
+                onItemEdited(editedItem);                                                                      // Meine onXXX - Methoden werden zur Mainactivity zurückgegeben
             } else {
                 showFeedbackMessage("Returning from detailview for edit with: " + resultCode);
             }
@@ -194,25 +163,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    protected void showFeedbackMessage(String msg) {
-        Snackbar.make(findViewById(R.id.rootView), msg, Snackbar.LENGTH_SHORT).show();
-    }
-
-    protected void onNewItemCreated(ToDo item) {
-//        showFeedbackMessage("created new item " + itemName);
-//        TextView newItemView = (TextView) getLayoutInflater().inflate(R.layout.activity_main_listitem, null);
-//        newItemView.setText(itemName);
-//        listView.addView(newItemView);
-//        Log.i(logtag, "list ist now: " + items);
+    protected void onNewItemCreated(ToDo item) {                                                                // ???
+        showFeedbackMessage("created new item " + item);
 
         crudOperations.createDataItem(item, created -> {
-//            item.setId(ToDo.nextId());
             items.add(created);
-            sortListAndScrollToItem(created);
+            MainActivity.this.sortListAndScrollToItem(created);
         });
     }
 
-    protected void onItemEdited(ToDo editedItem) {
+    protected void onItemEdited(ToDo editedItem) {                                                              // ???
         crudOperations.updateDataItem(editedItem, updated -> {
             int pos = items.indexOf(updated);
 //            Log.i(logtag, "got position: " + pos);
@@ -222,15 +182,12 @@ public class MainActivity extends AppCompatActivity {
             sortListAndScrollToItem(updated);
 
         });
-
-
     }
 
-    public void onCheckedChangedInListView(ToDo toDo)
-        {
+    public void onCheckedChangedInListView(ToDo toDo) {
         crudOperations.updateDataItem(toDo, updated -> {
 //        showFeedbackMessage("Checked changed to " + updated.isChecked() + " for " + updated.getName());
-        sortListAndScrollToItem(toDo);
+            sortListAndScrollToItem(toDo);
         });
     }
 
@@ -245,36 +202,32 @@ public class MainActivity extends AppCompatActivity {
     //Menues :)
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.sortItems){
+        if (item.getItemId() == R.id.sortItems) {
             sortListAndScrollToItem(null);
             return true;
-        }  else if(item.getItemId() == R.id.deleteRemoteItems) {
-            crudOperations.deleteAllDataItems(true, (result) ->{
-                if(result){
+        } else if (item.getItemId() == R.id.deleteRemoteItems) {
+            crudOperations.deleteAllDataItems(true, (result) -> {
+                if (result) {
 
                     showFeedbackMessage("Remote items were deleted!");
-                }
-                else{
+                } else {
                     showFeedbackMessage("Remote items could not be deleted, maybe we are running in local mode");
                 }
 
             });
             return true;
-        }
-        else if(item.getItemId() == R.id.deleteLocalItems) {
-            crudOperations.deleteAllDataItems(true, (result) ->{
-                if(result){
+        } else if (item.getItemId() == R.id.deleteLocalItems) {
+            crudOperations.deleteAllDataItems(true, (result) -> {
+                if (result) {
 
                     showFeedbackMessage("Local items were deleted!");
-                }
-                else{
+                } else {
                     showFeedbackMessage("Local items could not be deleted");
                 }
 
             });
             return true;
-        }
-      else{
+        } else {
             return super.onOptionsItemSelected(item);
         }
     }
@@ -284,20 +237,18 @@ public class MainActivity extends AppCompatActivity {
         sortitems(items);
 
         listViewAdapter.notifyDataSetChanged(); //Aktualisierung
-        //Liste = list
-        //ListView = Ansicht
-        //Adapter Zwischenstelle
-        if(item != null){
+        if (item != null) {
             int pos = listViewAdapter.getPosition(item);
             listView.setSelection(pos);
         }
-
-
     }
 
     private void sortitems(List<ToDo> items) {
         items.sort(Comparator.comparing(ToDo::isChecked).thenComparing(ToDo::getName)); // rufe die Methode der Klasse auf, Rückgabe = name!
         //TODO: Hier z.B. mal ne Sortierung nach Fälligkeit --> Ich müsste dann im Model das Fälligkeitsdatum abspeichern und das Fälligkeitsdatum selbst aus dem DateTimePicker auslesen
+    }
 
+    protected void showFeedbackMessage(String msg) {
+        Snackbar.make(findViewById(R.id.rootView), msg, Snackbar.LENGTH_SHORT).show();
     }
 }

@@ -35,16 +35,17 @@ import com.google.android.material.snackbar.Snackbar;
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityDetailviewBinding;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Locale;
 
 import model.ToDo;
 
-public class DetailviewActivity extends AppCompatActivity {
-
+public class DetailviewActivity extends AppCompatActivity
+{
     public static final int ACTION_PICK_CONTACT = 0;
 
-    public static final String ARG_ITEM = "item";
+    public static final String ARG_ITEM = "item";               // Zur Objektentgegennahme
 
     private ToDo item;
     private ActivityDetailviewBinding dataBindingHandle;
@@ -62,16 +63,14 @@ public class DetailviewActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState); //Zustand wiedeherstellen wenn man das Handy dreht
-
-//        if(!((ToDo)getApplication()).isServerAva)
+        super.onCreate(savedInstanceState);                                 //Zustand wiedeherstellen wenn man das Handy dreht
 
         this.dataBindingHandle = DataBindingUtil.setContentView(this, R.layout.activity_detailview); // braucht man bei DB
 
-        item = (ToDo)getIntent().getSerializableExtra(ARG_ITEM);
+        item = (ToDo)getIntent().getSerializableExtra(ARG_ITEM);            // Hier nehme ich das Argument entgegen aus der Main-Activity und speichere es
 
         if(item == null){
-            item = new ToDo(); // Leeres DataItem
+            item = new ToDo();                                              // Leeres DataItem, falls keines übergeben wurde.
         }
 
         Log.i("DetailviewActivity", "got contact ids: " + item.getContactIds());
@@ -112,14 +111,13 @@ public class DetailviewActivity extends AppCompatActivity {
         faelligkeitUhrzeit.setText(minute + " / " + hour);
         timePickerDialog.setTitle("Select Time");
         timePickerDialog.show();
-
     }
 
     public void onSaveItem(){
-        Intent returnIntent = new Intent();
-        returnIntent.putExtra(ARG_ITEM, item);
+        Intent returnIntent = new Intent();                         // Rückgabe Inteent erstellen
 
-        setResult(Activity.RESULT_OK, returnIntent);
+        returnIntent.putExtra(ARG_ITEM, item);                      // Unsere Daten reinpacken
+        setResult(Activity.RESULT_OK, returnIntent);                // liefert RESULT_OK zurück, wird dann in der MainActivity geprüft
 
         finish();
     }
