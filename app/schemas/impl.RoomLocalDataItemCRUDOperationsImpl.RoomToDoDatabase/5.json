@@ -2,12 +2,18 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "c1c197998dc90dde76bfed2cc335697e",
+    "identityHash": "6a68459793be0e88a255045a3a0c4fe8",
     "entities": [
       {
         "tableName": "ToDo",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT, `description` TEXT, `checked` INTEGER NOT NULL, `contactIds` TEXT, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `description` TEXT, `done` INTEGER NOT NULL, `marked` INTEGER NOT NULL, `finishDate` INTEGER NOT NULL, `contactIds` TEXT)",
         "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
           {
             "fieldPath": "name",
             "columnName": "name",
@@ -22,7 +28,19 @@
           },
           {
             "fieldPath": "checked",
-            "columnName": "checked",
+            "columnName": "done",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "marked",
+            "columnName": "marked",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "finishDateLong",
+            "columnName": "finishDate",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -31,12 +49,6 @@
             "columnName": "contactIds",
             "affinity": "TEXT",
             "notNull": false
-          },
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
           }
         ],
         "primaryKey": {
@@ -52,7 +64,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c1c197998dc90dde76bfed2cc335697e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6a68459793be0e88a255045a3a0c4fe8')"
     ]
   }
 }

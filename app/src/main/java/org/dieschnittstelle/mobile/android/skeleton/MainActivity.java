@@ -87,47 +87,6 @@ public class MainActivity extends AppCompatActivity {               // macht die
         }); //VK 19.5
     }
 
-    private class ToDoAdapter extends ArrayAdapter<ToDo> {
-        private int layoutResource;
-
-        public ToDoAdapter(@NonNull Context context, int resource, @NonNull List<ToDo> objects) {
-            super(context, resource, objects);
-            layoutResource = resource;
-        }
-
-        @NonNull
-        @Override // 19.5 Thema
-        public View getView(int position, @Nullable View recycleableItemView, @NonNull ViewGroup parent) {
-            Log.i(logtag, "getView(): for position " + position + " , and recycleableItemView: " + recycleableItemView);
-
-            View itemView = null;
-            ToDo currentItem = getItem(position);   // Hier wird die korrekte Stelle ausgelesen
-
-            if (recycleableItemView != null) {
-                TextView textView = (TextView) recycleableItemView.findViewById(R.id.itemName);
-                if (textView != null) {
-                    Log.i(logtag, "getView(): itemName in convertView: " + textView);
-                }
-                itemView = recycleableItemView;
-                ActivityMainListitemBinding recycleBinding = (ActivityMainListitemBinding) itemView.getTag();
-                recycleBinding.setItem(currentItem);
-            } else {
-                ActivityMainListitemBinding currentBinding =
-                        DataBindingUtil.inflate(getLayoutInflater(),
-                                this.layoutResource,
-                                null,
-                                false);
-
-                currentBinding.setItem(currentItem);
-                currentBinding.setController(MainActivity.this);
-
-                itemView = currentBinding.getRoot();
-                itemView.setTag(currentBinding);
-            }
-            return itemView;
-        }
-    }
-
     protected void oeffneDetailansichtFuer(ToDo itemName) {
         Intent detailviewIntent = new Intent(this, DetailviewActivity.class);
         detailviewIntent.putExtra(DetailviewActivity.ARG_ITEM, itemName);                       // In das ARG_ITEM wird unser To Do was wir übergeben reingepackt.
@@ -240,6 +199,47 @@ public class MainActivity extends AppCompatActivity {               // macht die
         if (item != null) {
             int pos = listViewAdapter.getPosition(item);
             listView.setSelection(pos);
+        }
+    }
+
+    private class ToDoAdapter extends ArrayAdapter<ToDo> {
+        private int layoutResource;
+
+        public ToDoAdapter(@NonNull Context context, int resource, @NonNull List<ToDo> objects) {
+            super(context, resource, objects);
+            layoutResource = resource;
+        }
+
+        @NonNull
+        @Override // 19.5 Thema
+        public View getView(int position, @Nullable View recycleableItemView, @NonNull ViewGroup parent) {
+            Log.i(logtag, "getView(): for position " + position + " , and recycleableItemView: " + recycleableItemView);
+
+            View itemView = null;
+            ToDo currentItem = getItem(position);   // Hier wird die korrekte Stelle ausgelesen
+
+            if (recycleableItemView != null) {
+                TextView textView = (TextView) recycleableItemView.findViewById(R.id.itemName);
+                if (textView != null) {
+                    Log.i(logtag, "getView(): itemName in convertView: " + textView);
+                }
+                itemView = recycleableItemView;
+                ActivityMainListitemBinding recycleBinding = (ActivityMainListitemBinding) itemView.getTag();
+                recycleBinding.setItem(currentItem);
+            } else {
+                ActivityMainListitemBinding currentBinding =
+                        DataBindingUtil.inflate(getLayoutInflater(),
+                                this.layoutResource,
+                                null,
+                                false);
+
+                currentBinding.setItem(currentItem);
+                currentBinding.setController(MainActivity.this);
+
+                itemView = currentBinding.getRoot();
+                itemView.setTag(currentBinding);
+            }
+            return itemView;
         }
     }
 
