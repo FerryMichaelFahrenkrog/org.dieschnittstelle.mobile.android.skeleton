@@ -1,0 +1,94 @@
+Index: app/src/main/java/model/IDataItemCRUDOperationsAsync.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model;\r\n\r\nimport java.util.List;\r\nimport java.util.function.Consumer;\r\n\r\npublic interface IDataItemCRUDOperationsAsync {\r\n    public void createDataItem(ToDo toDo, Consumer<ToDo> oncreated);\r\n\r\n    public void readAllDataItems(Consumer<List<ToDo>> onread);\r\n\r\n    public void readDataItem(long id, Consumer<ToDo> onread);\r\n\r\n    public void updateDataItem(ToDo toDo, Consumer<ToDo> onupdated);\r\n\r\n    public boolean deleteDataItem(long id, Consumer<Boolean> ondeleted);\r\n\r\n    public void deleteAllDataItems(boolean remote, Consumer<Boolean> ondeleted);\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/model/IDataItemCRUDOperationsAsync.java b/app/src/main/java/model/IDataItemCRUDOperationsAsync.java
+--- a/app/src/main/java/model/IDataItemCRUDOperationsAsync.java	(revision b2aeda489e181f3c1a8db9dda03128d397df6461)
++++ b/app/src/main/java/model/IDataItemCRUDOperationsAsync.java	(date 1641992924188)
+@@ -10,7 +10,8 @@
+ 
+     public void readDataItem(long id, Consumer<ToDo> onread);
+ 
+-    public void updateDataItem(ToDo toDo, Consumer<ToDo> onupdated);
++//    public boolean updateDataItem(ToDo toDo, Consumer<Boolean> onupdated);
++    public ToDo updateDataItem(ToDo toDo, Consumer<ToDo> onupdated);
+ 
+     public boolean deleteDataItem(long id, Consumer<Boolean> ondeleted);
+ 
+Index: app/src/main/res/layout/activity_main_listitem.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<layout xmlns:android=\"http://schemas.android.com/apk/res/android\">\r\n    <data>\r\n        <variable\r\n            name=\"item\"\r\n            type=\"model.ToDo\"/>\r\n        <variable\r\n            name=\"controller\"\r\n            type=\"org.dieschnittstelle.mobile.android.skeleton.MainActivity\"/>\r\n    </data>\r\n\r\n    <LinearLayout\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:orientation=\"horizontal\">\r\n\r\n        <CheckBox\r\n            android:id=\"@+id/itemChecked\"\r\n            android:onClick=\"@{() -> controller.onCheckedChangedInListView(item)}\"\r\n            android:checked=\"@={item.checked}\"\r\n            android:layout_width=\"wrap_content\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_gravity=\"center_vertical\"\r\n            android:focusable=\"false\" />\r\n\r\n        <TextView\r\n            android:id=\"@+id/itemName\"\r\n            android:text=\"@{item.name}\"\r\n            android:layout_width=\"wrap_content\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:padding=\"15dp\"\r\n            android:textSize=\"30sp\" />\r\n\r\n        <RadioButton\r\n            android:id=\"@+id/radioButton\"\r\n            android:layout_width=\"wrap_content\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_gravity=\"center_vertical\"\r\n            android:text=\"Wichtiges ToDo?\" />\r\n\r\n        <TextView\r\n            android:id=\"@+id/itemFaelligkeit\"\r\n            android:layout_width=\"240dp\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_weight=\"1\"\r\n            android:text=\"12.01.2020\" />\r\n\r\n    </LinearLayout>\r\n</layout>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/activity_main_listitem.xml b/app/src/main/res/layout/activity_main_listitem.xml
+--- a/app/src/main/res/layout/activity_main_listitem.xml	(revision b2aeda489e181f3c1a8db9dda03128d397df6461)
++++ b/app/src/main/res/layout/activity_main_listitem.xml	(date 1641969062820)
+@@ -31,19 +31,19 @@
+             android:padding="15dp"
+             android:textSize="30sp" />
+ 
+-        <RadioButton
+-            android:id="@+id/radioButton"
+-            android:layout_width="wrap_content"
+-            android:layout_height="wrap_content"
+-            android:layout_gravity="center_vertical"
+-            android:text="Wichtiges ToDo?" />
++<!--        <RadioButton-->
++<!--            android:id="@+id/radioButton"-->
++<!--            android:layout_width="wrap_content"-->
++<!--            android:layout_height="wrap_content"-->
++<!--            android:layout_gravity="center_vertical"-->
++<!--            android:text="Wichtiges ToDo?" />-->
+ 
+-        <TextView
+-            android:id="@+id/itemFaelligkeit"
+-            android:layout_width="240dp"
+-            android:layout_height="wrap_content"
+-            android:layout_weight="1"
+-            android:text="12.01.2020" />
++<!--        <TextView-->
++<!--            android:id="@+id/itemFaelligkeit"-->
++<!--            android:layout_width="240dp"-->
++<!--            android:layout_height="wrap_content"-->
++<!--            android:layout_weight="1"-->
++<!--            android:text="12.01.2020" />-->
+ 
+     </LinearLayout>
+ </layout>
+Index: app/src/main/java/impl/ThreadedDataItemCRUDOperationsAsyncImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package impl;\r\n\r\nimport android.app.Activity;\r\nimport android.view.View;\r\nimport android.widget.ProgressBar;\r\n\r\nimport java.util.Arrays;\r\nimport java.util.List;\r\nimport java.util.function.Consumer;\r\nimport java.util.stream.Collectors;\r\n\r\nimport model.IDataItemCRUDOperations;\r\nimport model.IDataItemCRUDOperationsAsync;\r\nimport model.ToDo;\r\n\r\npublic class ThreadedDataItemCRUDOperationsAsyncImpl implements IDataItemCRUDOperationsAsync\r\n{\r\n    IDataItemCRUDOperations crudExecutor; // Macht die eigentliche Arbeit\r\n    private Activity uiThreadProvider;\r\n    private ProgressBar progressBar;\r\n\r\n    public ThreadedDataItemCRUDOperationsAsyncImpl(IDataItemCRUDOperations crudExecutor, Activity uiThreadProvider, ProgressBar progressBar) {\r\n        this.crudExecutor = crudExecutor;\r\n        this.uiThreadProvider = uiThreadProvider;\r\n        this.progressBar = progressBar;\r\n    }\r\n\r\n    @Override\r\n    public void createDataItem(ToDo toDo, Consumer<ToDo> oncreated) {\r\n        progressBar.setVisibility(View.VISIBLE);\r\n        new Thread(() -> {\r\n            ToDo created = crudExecutor.createDataItem(toDo);\r\n            uiThreadProvider.runOnUiThread(() -> {\r\n                progressBar.setVisibility(View.GONE);\r\n                oncreated.accept(created);\r\n            });\r\n\r\n        }).start();\r\n    }\r\n\r\n    @Override\r\n    public void readAllDataItems(Consumer<List<ToDo>> onread) {\r\n        progressBar.setVisibility(View.VISIBLE);\r\n\r\n        new Thread(() -> {\r\n            List<ToDo> items = crudExecutor.readAllDataItems();\r\n\r\n            uiThreadProvider.runOnUiThread(() -> {\r\n                progressBar.setVisibility(View.GONE);\r\n                onread.accept(items);\r\n            });\r\n        }).start();\r\n    }\r\n\r\n    @Override\r\n    public void readDataItem(long id, Consumer<ToDo> onread) {\r\n\r\n    }\r\n\r\n    @Override\r\n    public void updateDataItem(ToDo toDo, Consumer<ToDo> onupdated) {\r\n        new Thread(() -> {\r\n            ToDo updated = crudExecutor.updateDataItem(toDo);\r\n            uiThreadProvider.runOnUiThread(() -> onupdated.accept(updated));\r\n        }).start();\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteDataItem(long id, Consumer<Boolean> ondeleted) {\r\n        return false;\r\n    }\r\n\r\n    @Override\r\n    public void deleteAllDataItems(boolean remote, Consumer<Boolean> ondeleted) {\r\n        new Thread(() -> {\r\n            boolean result = crudExecutor.deleteAllDataItems(remote);\r\n            uiThreadProvider.runOnUiThread(() -> ondeleted.accept(result));\r\n        }).start();\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/impl/ThreadedDataItemCRUDOperationsAsyncImpl.java b/app/src/main/java/impl/ThreadedDataItemCRUDOperationsAsyncImpl.java
+--- a/app/src/main/java/impl/ThreadedDataItemCRUDOperationsAsyncImpl.java	(revision b2aeda489e181f3c1a8db9dda03128d397df6461)
++++ b/app/src/main/java/impl/ThreadedDataItemCRUDOperationsAsyncImpl.java	(date 1641992924163)
+@@ -60,11 +60,20 @@
+     @Override
+     public void updateDataItem(ToDo toDo, Consumer<ToDo> onupdated) {
+         new Thread(() -> {
+-            ToDo updated = crudExecutor.updateDataItem(toDo);
++            boolean updated = crudExecutor.updateDataItem(toDo);
+             uiThreadProvider.runOnUiThread(() -> onupdated.accept(updated));
+         }).start();
+     }
+ 
++//        @Override
++//    public boolean updateDataItem(ToDo toDo, Consumer<Boolean> onDoneConsumer) {
++//        new Thread(() -> {
++//            Boolean updated = crudExecutor.updateDataItem(toDo);
++//            uiThreadProvider.runOnUiThread(() -> onDoneConsumer.accept(updated));
++//        }).start();
++//        return true;
++//    }
++
+     @Override
+     public boolean deleteDataItem(long id, Consumer<Boolean> ondeleted) {
+         return false;

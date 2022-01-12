@@ -1,0 +1,604 @@
+Index: app/src/main/java/impl/SyncedDataItemCRUDOperationsImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package impl;\r\n\r\nimport android.util.Log;\r\n\r\nimport java.util.Arrays;\r\nimport java.util.List;\r\n\r\nimport model.IDataItemCRUDOperations;\r\nimport model.IDataItemCRUDOperationsAsync;\r\nimport model.ToDo;\r\n\r\npublic class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations {\r\n    private IDataItemCRUDOperations localCRUD;\r\n    private IDataItemCRUDOperations remoteCRUD;\r\n\r\n    private boolean synced;\r\n\r\n    public SyncedDataItemCRUDOperationsImpl(IDataItemCRUDOperations localCRUD, IDataItemCRUDOperations remoteCRUD){\r\n        this.localCRUD = localCRUD;\r\n        this.remoteCRUD = remoteCRUD;\r\n    }\r\n\r\n    @Override\r\n    public ToDo createDataItem(ToDo toDo)\r\n    {\r\n        //erstelle lokal createDataitem\r\n        toDo = localCRUD.createDataItem(toDo);\r\n\r\n        //dann erstellt mans remote, sie nimmt die lokal zugewiesene ID\r\n        remoteCRUD.createDataItem(toDo);\r\n        return toDo;\r\n    }\r\n\r\n    @Override\r\n    public List<ToDo> readAllDataItems() {\r\n        //TODO !\r\n        if(!synced){\r\n            synclLocalandRemote();\r\n        synced = true;\r\n        }\r\n        return localCRUD.readAllDataItems();\r\n    }\r\n\r\n    private void synclLocalandRemote() {\r\n        List<ToDo> anzahlDateneinträge = localCRUD.readAllDataItems();\r\n        int eintraege = anzahlDateneinträge.size();\r\n\r\n        Log.i(\"EINTRAEGE \", \"anzahl \" + eintraege);\r\n\r\n        if(eintraege > 0){\r\n            //sind lokale ToDos da, dann lösche ich alles remote\r\n            remoteCRUD.deleteAllDataItems(true);\r\n\r\n            //wie übertrage ich jetzt die lokalen ToDos auf Remote seite?\r\n\r\n        }else{\r\n            //Jetzt sollen in die lokale DB alles von der Remote Seite\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public ToDo readDataItem(long id) {\r\n        return null;\r\n    }\r\n\r\n    @Override\r\n    public ToDo updateDataItem(ToDo toDo) {\r\n        toDo = localCRUD.updateDataItem(toDo);\r\n        remoteCRUD.updateDataItem(toDo);\r\n        return toDo;\r\n\r\n        //if (localCRUD.updateDataITem(item)){\r\n        //teturn remoteCrud.updateDataitem(item)\r\n        //return false=\r\n\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteDataItem(long id) {\r\n        return false;\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteAllDataItems(boolean remote) {\r\n        if(remote){\r\n            return remoteCRUD.deleteAllDataItems(remote);\r\n        }else{\r\n            return localCRUD.deleteAllDataItems(remote);\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/impl/SyncedDataItemCRUDOperationsImpl.java b/app/src/main/java/impl/SyncedDataItemCRUDOperationsImpl.java
+--- a/app/src/main/java/impl/SyncedDataItemCRUDOperationsImpl.java	(revision b2aeda489e181f3c1a8db9dda03128d397df6461)
++++ b/app/src/main/java/impl/SyncedDataItemCRUDOperationsImpl.java	(date 1641969098645)
+@@ -8,11 +8,16 @@
+ import model.IDataItemCRUDOperations;
+ import model.IDataItemCRUDOperationsAsync;
+ import model.ToDo;
++import model.User;
+ 
+-public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations {
++public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
++{
+     private IDataItemCRUDOperations localCRUD;
+     private IDataItemCRUDOperations remoteCRUD;
+ 
++    private boolean connectionChecked = false;
++    private boolean remoteAvailable = false;
++
+     private boolean synced;
+ 
+     public SyncedDataItemCRUDOperationsImpl(IDataItemCRUDOperations localCRUD, IDataItemCRUDOperations remoteCRUD){
+@@ -64,22 +69,39 @@
+     }
+ 
+     @Override
+-    public ToDo updateDataItem(ToDo toDo) {
+-        toDo = localCRUD.updateDataItem(toDo);
+-        remoteCRUD.updateDataItem(toDo);
+-        return toDo;
++    public boolean updateDataItem(ToDo toDo) {
++        if(!synced) {
++            return localCRUD.updateDataItem(toDo);
++        }else{
++            if(localCRUD.updateDataItem(toDo)){
++                return remoteCRUD.updateDataItem(toDo);
++            }
++        }
++        return false;
++    }
+ 
+-        //if (localCRUD.updateDataITem(item)){
+-        //teturn remoteCrud.updateDataitem(item)
+-        //return false=
+-
+-    }
++//    @Override
++//    public ToDo updateDataItem(ToDo toDo) {
++//        toDo = localCRUD.updateDataItem(toDo);
++//        remoteCRUD.updateDataItem(toDo);
++//        return toDo;
++//
++//        //if (localCRUD.updateDataITem(item)){
++//        //teturn remoteCrud.updateDataitem(item)
++//        //return false=
++//
++//    }
+ 
+     @Override
+-    public boolean deleteDataItem(long id) {
++    public boolean deleteDataItem(ToDo toDo) {
+         return false;
+     }
+ 
++//    @Override
++//    public boolean deleteDataItem(long id) {
++//        return false;
++//    }
++
+     @Override
+     public boolean deleteAllDataItems(boolean remote) {
+         if(remote){
+@@ -88,4 +110,9 @@
+             return localCRUD.deleteAllDataItems(remote);
+         }
+     }
++
++    @Override
++    public boolean authenticateUser(User user) {
++        return false;
++    }
+ }
+Index: app/src/main/java/model/IDataItemCRUDOperations.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model;\r\n\r\nimport java.util.List;\r\n\r\npublic interface IDataItemCRUDOperations {\r\n    public ToDo createDataItem(ToDo toDo);\r\n\r\n    public List<ToDo> readAllDataItems();\r\n\r\n    public ToDo readDataItem(long id);\r\n\r\n    public ToDo updateDataItem(ToDo toDo);\r\n\r\n    public boolean deleteDataItem(long id);\r\n\r\n    public boolean deleteAllDataItems(boolean remote);\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/model/IDataItemCRUDOperations.java b/app/src/main/java/model/IDataItemCRUDOperations.java
+--- a/app/src/main/java/model/IDataItemCRUDOperations.java	(revision b2aeda489e181f3c1a8db9dda03128d397df6461)
++++ b/app/src/main/java/model/IDataItemCRUDOperations.java	(date 1641992924222)
+@@ -3,16 +3,18 @@
+ import java.util.List;
+ 
+ public interface IDataItemCRUDOperations {
+-    public ToDo createDataItem(ToDo toDo);
++    ToDo createDataItem(ToDo toDo);
+ 
+-    public List<ToDo> readAllDataItems();
++    List<ToDo> readAllDataItems();
+ 
+-    public ToDo readDataItem(long id);
++    ToDo readDataItem(long id);
+ 
+-    public ToDo updateDataItem(ToDo toDo);
++    ToDo updateDataItem(ToDo toDo);
+ 
+-    public boolean deleteDataItem(long id);
++    boolean deleteDataItem(ToDo toDo);
+ 
+-    public boolean deleteAllDataItems(boolean remote);
++    boolean deleteAllDataItems(boolean remote);
++
++    boolean authenticateUser(User user);
+ 
+ }
+Index: app/src/main/java/impl/SimpleDataItemCRUDOperationsImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package impl;\r\n\r\nimport java.util.Arrays;\r\nimport java.util.List;\r\nimport java.util.stream.Collectors;\r\n\r\nimport model.IDataItemCRUDOperations;\r\nimport model.ToDo;\r\n\r\npublic class SimpleDataItemCRUDOperationsImpl implements IDataItemCRUDOperations\r\n{\r\n    @Override\r\n    public ToDo createDataItem(ToDo toDo) {\r\n        toDo.setId(ToDo.nextId());\r\n        return toDo;\r\n    }\r\n\r\n    @Override\r\n    public List<ToDo> readAllDataItems() {\r\n        try {\r\n            Thread.sleep(500);\r\n        } catch (InterruptedException e) {\r\n            e.printStackTrace();\r\n        }\r\n\r\n        List<ToDo> items = Arrays.asList(\"lorem\", \"ipsum\", \"dolor\", \"sit\", \"amet\", \"adipiscing\", \"elit\", \"larem\", \"totkopf\", \"druggy\", \"Thorsten\", \"Horst\", \"Ferraldon\", \"Lenox\")\r\n                .stream()\r\n                .map(v -> {\r\n                    ToDo itemobj = new ToDo(v);\r\n                    itemobj.setId(ToDo.nextId());\r\n                    return itemobj;\r\n                })\r\n                .collect(Collectors.toList());\r\n\r\n        return items;\r\n    }\r\n\r\n    @Override\r\n    public ToDo readDataItem(long id) {\r\n        return null;\r\n    }\r\n\r\n    @Override\r\n    public ToDo updateDataItem(ToDo toDo) {\r\n        return toDo;\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteDataItem(long id) {\r\n        return false;\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteAllDataItems(boolean remote) {\r\n        return false;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/impl/SimpleDataItemCRUDOperationsImpl.java b/app/src/main/java/impl/SimpleDataItemCRUDOperationsImpl.java
+--- a/app/src/main/java/impl/SimpleDataItemCRUDOperationsImpl.java	(revision b2aeda489e181f3c1a8db9dda03128d397df6461)
++++ b/app/src/main/java/impl/SimpleDataItemCRUDOperationsImpl.java	(date 1641969098631)
+@@ -6,52 +6,63 @@
+ 
+ import model.IDataItemCRUDOperations;
+ import model.ToDo;
+-
+-public class SimpleDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
+-{
+-    @Override
+-    public ToDo createDataItem(ToDo toDo) {
+-        toDo.setId(ToDo.nextId());
+-        return toDo;
+-    }
+-
+-    @Override
+-    public List<ToDo> readAllDataItems() {
+-        try {
+-            Thread.sleep(500);
+-        } catch (InterruptedException e) {
+-            e.printStackTrace();
+-        }
+-
+-        List<ToDo> items = Arrays.asList("lorem", "ipsum", "dolor", "sit", "amet", "adipiscing", "elit", "larem", "totkopf", "druggy", "Thorsten", "Horst", "Ferraldon", "Lenox")
+-                .stream()
+-                .map(v -> {
+-                    ToDo itemobj = new ToDo(v);
+-                    itemobj.setId(ToDo.nextId());
+-                    return itemobj;
+-                })
+-                .collect(Collectors.toList());
++import model.User;
+ 
+-        return items;
+-    }
+-
+-    @Override
+-    public ToDo readDataItem(long id) {
+-        return null;
+-    }
+-
+-    @Override
+-    public ToDo updateDataItem(ToDo toDo) {
+-        return toDo;
+-    }
+-
+-    @Override
+-    public boolean deleteDataItem(long id) {
+-        return false;
+-    }
+-
+-    @Override
+-    public boolean deleteAllDataItems(boolean remote) {
+-        return false;
+-    }
+-}
++//public class SimpleDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
++//{
++//    @Override
++//    public ToDo createDataItem(ToDo toDo) {
++//        toDo.setId(ToDo.nextId());
++//        return toDo;
++//    }
++//
++//    @Override
++//    public List<ToDo> readAllDataItems() {
++//        try {
++//            Thread.sleep(500);
++//        } catch (InterruptedException e) {
++//            e.printStackTrace();
++//        }
++//
++//        List<ToDo> items = Arrays.asList("lorem", "ipsum", "dolor", "sit", "amet", "adipiscing", "elit", "larem", "totkopf", "druggy", "Thorsten", "Horst", "Ferraldon", "Lenox")
++//                .stream()
++//                .map(v -> {
++//                    ToDo itemobj = new ToDo(v);
++//                    itemobj.setId(ToDo.nextId());
++//                    return itemobj;
++//                })
++//                .collect(Collectors.toList());
++//
++//        return items;
++//    }
++//
++//    @Override
++//    public ToDo readDataItem(long id) {
++//        return null;
++//    }
++//
++//    @Override
++//    public ToDo updateDataItem(ToDo toDo) {
++//        return toDo;
++//    }
++//
++//    @Override
++//    public boolean deleteDataItem(ToDo toDo) {
++//        return false;
++//    }
++//
++//    @Override
++//    public boolean deleteDataItem(long id) {
++//        return false;
++//    }
++//
++//    @Override
++//    public boolean deleteAllDataItems(boolean remote) {
++//        return false;
++//    }
++//
++//    @Override
++//    public boolean authenticateUser(User user) {
++//        return false;
++//    }
++//}
+Index: app/src/main/java/impl/RoomLocalDataItemCRUDOperationsImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package impl;\r\n\r\nimport android.content.Context;\r\n\r\nimport androidx.room.Dao;\r\nimport androidx.room.Database;\r\nimport androidx.room.Insert;\r\nimport androidx.room.Query;\r\nimport androidx.room.Room;\r\nimport androidx.room.RoomDatabase;\r\nimport androidx.room.TypeConverter;\r\nimport androidx.room.TypeConverters;\r\nimport androidx.room.Update;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.Arrays;\r\nimport java.util.List;\r\nimport java.util.stream.Collectors;\r\n\r\nimport model.IDataItemCRUDOperations;\r\nimport model.ToDo;\r\n\r\npublic class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperations {\r\n\r\n    public static class ArrayListToStringDatabaseConverter {\r\n\r\n        @TypeConverter\r\n        public static ArrayList<String> fromString(String value) {\r\n            if(value == null || value.length() == 0){\r\n                return new ArrayList<>();\r\n            }\r\n            return new ArrayList<>(Arrays.asList(value.split(\",\")));\r\n        }\r\n\r\n        @TypeConverter\r\n        public static String fromArrayList(ArrayList<String> value) {\r\n            if(value == null){\r\n                return \"\";\r\n            }\r\n            return value\r\n                    .stream()\r\n                    .collect(Collectors.joining(\",\"));\r\n        }\r\n    }\r\n\r\n    //Room ist ein Framework was Daten, die wir in unsere View als Objekte reingeben, in eine DB zu überführen\r\n    //Oder Daten aus einer DB in unser JavaCode zu überführen\r\n\r\n    //Angeben welche Inhalte ich in meiner DB Speichern will, welche Klassen meines Projekts sind Klassen deren Instanzen ich\r\n    //dauerhaft in die DB übertragen will. DataItem nicht, Activitiys nicht, nur die to_do Klasse! Dafür ne abstrakteDB Class.\r\n\r\n    //1tens Welche Daten\r\n    //2tens welche Operationen brauch ich\r\n    //3tens Struktur angeben\r\n\r\n    @Database(entities = {ToDo.class}, version = 5)\r\n    public static abstract class RoomToDoDatabase extends RoomDatabase {\r\n        public abstract RoomDataItemCRUDAccess getDao();\r\n    }\r\n\r\n    @Dao\r\n    public static interface RoomDataItemCRUDAccess {\r\n        @Insert\r\n        public long createItem(ToDo toDo); //TODO als Name!\r\n\r\n        @Query(\"select * from todo\")\r\n        public List<ToDo> readAllItems();\r\n\r\n        @Query(\"select * from todo where id = (:id)\")\r\n        public ToDo readItem(Long id);\r\n\r\n        @Update\r\n        public int updateItem(ToDo toDo);\r\n    }\r\n\r\n    private RoomDataItemCRUDAccess roomAccessor;\r\n\r\n    public RoomLocalDataItemCRUDOperationsImpl(Context databaseOwner) {\r\n        RoomToDoDatabase db = Room.databaseBuilder(databaseOwner.getApplicationContext(),\r\n                RoomToDoDatabase.class,\r\n                \"dataitems-database-mad21\").build();\r\n\r\n        roomAccessor = db.getDao();\r\n\r\n    }\r\n\r\n    @Override\r\n    public ToDo createDataItem(ToDo toDo) {\r\n        long newID = roomAccessor.createItem(toDo);\r\n        toDo.setId(newID);\r\n\r\n        return toDo;\r\n    }\r\n\r\n    @Override\r\n    public List<ToDo> readAllDataItems() {\r\n        return roomAccessor.readAllItems();\r\n    }\r\n\r\n    @Override\r\n    public ToDo readDataItem(long id) {\r\n        return null;\r\n    }\r\n\r\n    @Override\r\n    public ToDo updateDataItem(ToDo toDo) {\r\n        roomAccessor.updateItem(toDo);\r\n        return toDo;\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteDataItem(long id) {\r\n\r\n        return false;\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteAllDataItems(boolean remote) {\r\n        if(remote){\r\n            return false;\r\n        }else{\r\n            //TODO: delete all items in the local db\r\n            return false;\r\n        }\r\n    }\r\n\r\n    /*\r\n        @Override\r\n    public boolean deleteAllDataItems(boolean remote)\r\n    {\r\n        try {\r\n            return webAPI.deleteAllToDos().execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return false;\r\n        }\r\n    }\r\n     */\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/impl/RoomLocalDataItemCRUDOperationsImpl.java b/app/src/main/java/impl/RoomLocalDataItemCRUDOperationsImpl.java
+--- a/app/src/main/java/impl/RoomLocalDataItemCRUDOperationsImpl.java	(revision b2aeda489e181f3c1a8db9dda03128d397df6461)
++++ b/app/src/main/java/impl/RoomLocalDataItemCRUDOperationsImpl.java	(date 1641969098612)
+@@ -1,15 +1,16 @@
+ package impl;
+ 
++import android.annotation.SuppressLint;
+ import android.content.Context;
+ 
+ import androidx.room.Dao;
+ import androidx.room.Database;
++import androidx.room.Delete;
+ import androidx.room.Insert;
+ import androidx.room.Query;
+ import androidx.room.Room;
+ import androidx.room.RoomDatabase;
+ import androidx.room.TypeConverter;
+-import androidx.room.TypeConverters;
+ import androidx.room.Update;
+ 
+ import java.util.ArrayList;
+@@ -19,6 +20,7 @@
+ 
+ import model.IDataItemCRUDOperations;
+ import model.ToDo;
++import model.User;
+ 
+ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperations {
+ 
+@@ -43,34 +45,28 @@
+         }
+     }
+ 
+-    //Room ist ein Framework was Daten, die wir in unsere View als Objekte reingeben, in eine DB zu überführen
+-    //Oder Daten aus einer DB in unser JavaCode zu überführen
+-
+-    //Angeben welche Inhalte ich in meiner DB Speichern will, welche Klassen meines Projekts sind Klassen deren Instanzen ich
+-    //dauerhaft in die DB übertragen will. DataItem nicht, Activitiys nicht, nur die to_do Klasse! Dafür ne abstrakteDB Class.
+-
+-    //1tens Welche Daten
+-    //2tens welche Operationen brauch ich
+-    //3tens Struktur angeben
+-
+-    @Database(entities = {ToDo.class}, version = 5)
++    @Database(entities = {ToDo.class}, version = 5, exportSchema = false)
+     public static abstract class RoomToDoDatabase extends RoomDatabase {
+-        public abstract RoomDataItemCRUDAccess getDao();
++        public abstract RoomDataItemCRUDAccess getToDoDAO();
+     }
+ 
+     @Dao
+-    public static interface RoomDataItemCRUDAccess {
++    public static interface RoomDataItemCRUDAccess
++    {
++        @Query("select * from todo")                                    // groß schreiben?
++        List<ToDo> readAllToDos();                                      // GET ALL
++
++        @Query("select * from todo where id = (:id)")
++        ToDo readItem(Long id);                                         // GET SINGLE ;)
++
+         @Insert
+-        public long createItem(ToDo toDo); //TODO als Name!
++        long create(ToDo toDo);
+ 
+-        @Query("select * from todo")
+-        public List<ToDo> readAllItems();
+-
+-        @Query("select * from todo where id = (:id)")
+-        public ToDo readItem(Long id);
++        @Delete
++        void delete(ToDo todo);
+ 
+         @Update
+-        public int updateItem(ToDo toDo);
++        void update(ToDo toDo);
+     }
+ 
+     private RoomDataItemCRUDAccess roomAccessor;
+@@ -80,13 +76,14 @@
+                 RoomToDoDatabase.class,
+                 "dataitems-database-mad21").build();
+ 
+-        roomAccessor = db.getDao();
++        roomAccessor = db.getToDoDAO();
+ 
+     }
+ 
++    @SuppressLint("NewApi")
+     @Override
+     public ToDo createDataItem(ToDo toDo) {
+-        long newID = roomAccessor.createItem(toDo);
++        long newID = roomAccessor.create(toDo);
+         toDo.setId(newID);
+ 
+         return toDo;
+@@ -94,26 +91,29 @@
+ 
+     @Override
+     public List<ToDo> readAllDataItems() {
+-        return roomAccessor.readAllItems();
++        List<ToDo> toDos = roomAccessor.readAllToDos();
++        return toDos;
+     }
+ 
+     @Override
+     public ToDo readDataItem(long id) {
+-        return null;
+-    }
+-
+-    @Override
+-    public ToDo updateDataItem(ToDo toDo) {
+-        roomAccessor.updateItem(toDo);
++        ToDo toDo = roomAccessor.readItem(id);
+         return toDo;
+     }
+ 
+     @Override
+-    public boolean deleteDataItem(long id) {
+-
+-        return false;
++    public boolean updateDataItem(ToDo toDo) {
++        roomAccessor.update(toDo);
++        return true;
+     }
+ 
++    @Override
++    public boolean deleteDataItem(ToDo toDo) {
++        roomAccessor.delete(toDo);
++        return true;
++    }
++
++
+     @Override
+     public boolean deleteAllDataItems(boolean remote) {
+         if(remote){
+@@ -124,6 +124,11 @@
+         }
+     }
+ 
++    @Override
++    public boolean authenticateUser(User user) {
++        return true;
++    }
++
+     /*
+         @Override
+     public boolean deleteAllDataItems(boolean remote)
+@@ -136,4 +141,14 @@
+         }
+     }
+      */
++
++    //Room ist ein Framework was Daten, die wir in unsere View als Objekte reingeben, in eine DB zu überführen
++    //Oder Daten aus einer DB in unser JavaCode zu überführen
++
++    //Angeben welche Inhalte ich in meiner DB Speichern will, welche Klassen meines Projekts sind Klassen deren Instanzen ich
++    //dauerhaft in die DB übertragen will. DataItem nicht, Activitiys nicht, nur die to_do Klasse! Dafür ne abstrakteDB Class.
++
++    //1tens Welche Daten
++    //2tens welche Operationen brauch ich
++    //3tens Struktur angeben
+ }
+Index: app/src/main/java/impl/RetrofitRemoteDataItemCRUDOperationsImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package impl;\r\n\r\nimport com.google.gson.Gson;\r\n\r\nimport java.io.IOException;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\nimport model.IDataItemCRUDOperations;\r\nimport model.ToDo;\r\nimport retrofit2.Call;\r\nimport retrofit2.Retrofit;\r\nimport retrofit2.converter.gson.GsonConverterFactory;\r\nimport retrofit2.http.Body;\r\nimport retrofit2.http.DELETE;\r\nimport retrofit2.http.GET;\r\nimport retrofit2.http.POST;\r\nimport retrofit2.http.PUT;\r\nimport retrofit2.http.Path;\r\n\r\npublic class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOperations\r\n{\r\n    public static interface ToDoWebAPI{\r\n        //Web API Dokument\r\n\r\n        @POST(\"/api/todos\")\r\n        public Call<ToDo> createToDo(@Body ToDo toDo);\r\n\r\n        @GET(\"/api/todos\")\r\n        public Call<List<ToDo>> readAllToDos();\r\n\r\n        @GET(\"/api/todos/{id}\")\r\n        public Call<ToDo> readToDo(@Path(\"id\")long id);\r\n\r\n        @PUT(\"/api/todos/{id}\")\r\n        public Call<ToDo> updateToDo(@Path(\"id\")long id,@Body ToDo toDo);\r\n\r\n        @DELETE(\"/api/todos/{id}\")\r\n        public Call<Boolean> deleteToDo(@Path(\"id\") long id);\r\n\r\n        @DELETE(\"/api/todos\")\r\n        public Call<Boolean> deleteAllToDos();\r\n        //1h 24 min rest, ab 30 min Blick auf alles\r\n    }\r\n\r\n    private ToDoWebAPI webAPI;\r\n\r\n    public RetrofitRemoteDataItemCRUDOperationsImpl()\r\n    {\r\n        Retrofit apiBase = new Retrofit.Builder()\r\n                .baseUrl(\"http://10.0.2.2:8080/\")\r\n                .addConverterFactory(GsonConverterFactory.create())\r\n                .build();\r\n        webAPI = apiBase.create(ToDoWebAPI.class);\r\n    }\r\n\r\n    @Override\r\n    public ToDo createDataItem(ToDo toDo) {\r\n        try {\r\n            return webAPI.createToDo(toDo).execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return null;\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public List<ToDo> readAllDataItems() {\r\n        try {\r\n            return webAPI.readAllToDos().execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return new ArrayList<>();\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public ToDo readDataItem(long id) {\r\n        try {\r\n            return webAPI.readToDo(id).execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return null;\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public ToDo updateDataItem(ToDo toDo) {\r\n        try {\r\n            return webAPI.updateToDo(toDo.getId(), toDo).execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return null;\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteDataItem(long id) {\r\n        try {\r\n            return webAPI.deleteToDo(id).execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return false;\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteAllDataItems(boolean remote)\r\n    {\r\n        try {\r\n            return webAPI.deleteAllToDos().execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return false;\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/impl/RetrofitRemoteDataItemCRUDOperationsImpl.java b/app/src/main/java/impl/RetrofitRemoteDataItemCRUDOperationsImpl.java
+--- a/app/src/main/java/impl/RetrofitRemoteDataItemCRUDOperationsImpl.java	(revision b2aeda489e181f3c1a8db9dda03128d397df6461)
++++ b/app/src/main/java/impl/RetrofitRemoteDataItemCRUDOperationsImpl.java	(date 1641969098586)
+@@ -1,6 +1,9 @@
+ package impl;
+ 
++import android.annotation.SuppressLint;
++
+ import com.google.gson.Gson;
++import com.google.gson.GsonBuilder;
+ 
+ import java.io.IOException;
+ import java.util.ArrayList;
+@@ -8,6 +11,7 @@
+ 
+ import model.IDataItemCRUDOperations;
+ import model.ToDo;
++import model.User;
+ import retrofit2.Call;
+ import retrofit2.Retrofit;
+ import retrofit2.converter.gson.GsonConverterFactory;
+@@ -20,38 +24,43 @@
+ 
+ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
+ {
+-    public static interface ToDoWebAPI{
+-        //Web API Dokument
+-
+-        @POST("/api/todos")
+-        public Call<ToDo> createToDo(@Body ToDo toDo);
+-
++    public static interface ToDoWebAPI
++    {
+         @GET("/api/todos")
+-        public Call<List<ToDo>> readAllToDos();
++        Call<List<ToDo>> readAllToDos();
+ 
+         @GET("/api/todos/{id}")
+-        public Call<ToDo> readToDo(@Path("id")long id);
++        Call<ToDo> readToDo(@Path("id") long id);
+ 
+-        @PUT("/api/todos/{id}")
+-        public Call<ToDo> updateToDo(@Path("id")long id,@Body ToDo toDo);
++        @POST("/api/todos")
++        Call<ToDo> createToDo(@Body ToDo toDo);
+ 
+         @DELETE("/api/todos/{id}")
+-        public Call<Boolean> deleteToDo(@Path("id") long id);
++        Call<Boolean> deleteToDo(@Path("id") long id);
++
++        @PUT("/api/todos/{id}")
++        Call<ToDo> updateToDo(@Path("id") long id, @Body ToDo toDo);
++
++        @PUT("api/users/auth")
++        Call<Boolean> authenticate(@Body User user);
+ 
+         @DELETE("/api/todos")
+-        public Call<Boolean> deleteAllToDos();
+-        //1h 24 min rest, ab 30 min Blick auf alles
++        Call<Boolean> deleteAllToDos();         // KADIR HAT NIX
+     }
+ 
+     private ToDoWebAPI webAPI;
+ 
+     public RetrofitRemoteDataItemCRUDOperationsImpl()
+     {
+-        Retrofit apiBase = new Retrofit.Builder()
++        GsonBuilder builder = new GsonBuilder();
++        builder.excludeFieldsWithoutExposeAnnotation();
++        Gson gson = builder.create();                           // NEU die 3 Zeilen
++
++        Retrofit apiRoot = new Retrofit.Builder()
+                 .baseUrl("http://10.0.2.2:8080/")
+-                .addConverterFactory(GsonConverterFactory.create())
++                .addConverterFactory(GsonConverterFactory.create(gson))
+                 .build();
+-        webAPI = apiBase.create(ToDoWebAPI.class);
++        webAPI = apiRoot.create(ToDoWebAPI.class);
+     }
+ 
+     @Override
+@@ -67,38 +76,49 @@
+     @Override
+     public List<ToDo> readAllDataItems() {
+         try {
+-            return webAPI.readAllToDos().execute().body();
++            List<ToDo> toDos = webAPI.readAllToDos().execute().body();
++
++            return toDos;
+         } catch (IOException e) {
+             e.printStackTrace();
+-            return new ArrayList<>();
++//            return new ArrayList<>();             // ?
++            return null;
+         }
+     }
+ 
+     @Override
+     public ToDo readDataItem(long id) {
+         try {
+-            return webAPI.readToDo(id).execute().body();
++            ToDo toDo = webAPI.readToDo(id).execute().body();
++            return toDo;
+         } catch (IOException e) {
+             e.printStackTrace();
+             return null;
+         }
+     }
+ 
++    @SuppressLint("NewApi")                                                                                 // DENK AN DEN IP KRAM
+     @Override
+-    public ToDo updateDataItem(ToDo toDo) {
++    public boolean updateDataItem(ToDo toDo) {
+         try {
+-            return webAPI.updateToDo(toDo.getId(), toDo).execute().body();
++            if(webAPI.updateToDo(toDo.getId(), toDo).execute().body() != null){
++                return true;
++            }
++            else{
++                return false;
++            }
+         } catch (IOException e) {
+             e.printStackTrace();
+-            return null;
++            return false;
+         }
+     }
+ 
++    @SuppressLint("NewApi")
+     @Override
+-    public boolean deleteDataItem(long id) {
+-        try {
+-            return webAPI.deleteToDo(id).execute().body();
+-        } catch (IOException e) {
++    public boolean deleteDataItem(ToDo toDo) {
++        try{
++            return webAPI.deleteToDo(toDo.getId()).execute().body();
++        }catch (IOException e){
+             e.printStackTrace();
+             return false;
+         }
+@@ -114,4 +134,20 @@
+             return false;
+         }
+     }
++
++    @Override
++    public boolean authenticateUser(User user) {
++        try {
++            Boolean authResponse = webAPI.authenticate(user).execute().body();
++
++            if (authResponse != null) {
++                return authResponse;
++            } else {
++                return authResponse;
++            }
++        } catch (IOException e) {
++            e.printStackTrace();
++            return false;
++        }
++    }
+ }
+Index: .extract/logs/access_log.2022-01-11
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>0:0:0:0:0:0:0:1 - - [11/Jan/2022:18:57:36 +0100] GET / HTTP/1.1 200 6633 http-bio-8080-exec-2 79\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:18:57:36 +0100] GET /favicon.ico HTTP/1.1 404 973 http-bio-8080-exec-1 2\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:18:57:37 +0100] GET /api/todos HTTP/1.1 200 294 http-bio-8080-exec-3 440\r\n127.0.0.1 - - [11/Jan/2022:18:57:37 +0100] GET /api/todos HTTP/1.1 200 294 http-bio-8080-exec-6 3\r\n127.0.0.1 - - [11/Jan/2022:18:58:25 +0100] GET /api/todos HTTP/1.1 200 294 http-bio-8080-exec-8 2\r\n127.0.0.1 - - [11/Jan/2022:19:04:43 +0100] GET /api/todos HTTP/1.1 200 294 http-bio-8080-exec-1 531\r\n127.0.0.1 - - [11/Jan/2022:19:04:47 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-3 5\r\n127.0.0.1 - - [11/Jan/2022:19:04:53 +0100] POST /api/todos HTTP/1.1 400 461 http-bio-8080-exec-4 63\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:04:56 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-5 4\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:04:56 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-7 5\r\n127.0.0.1 - - [11/Jan/2022:19:05:00 +0100] POST /api/todos HTTP/1.1 400 461 http-bio-8080-exec-9 3\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:05:02 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-8 1\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:05:02 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-10 2\r\n127.0.0.1 - - [11/Jan/2022:19:06:40 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-2 3\r\n127.0.0.1 - - [11/Jan/2022:19:06:43 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-4 2\r\n127.0.0.1 - - [11/Jan/2022:19:06:49 +0100] POST /api/todos HTTP/1.1 400 461 http-bio-8080-exec-4 4\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:06:52 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-7 1\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:06:52 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-7 2\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:06:52 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-7 1\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:06:52 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-7 3\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:06:52 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-7 1\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:06:52 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-7 1\r\n127.0.0.1 - - [11/Jan/2022:19:07:21 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-5 3\r\n127.0.0.1 - - [11/Jan/2022:19:07:30 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-8 1\r\n127.0.0.1 - - [11/Jan/2022:19:07:37 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-6 2\r\n127.0.0.1 - - [11/Jan/2022:19:09:15 +0100] POST /api/todos HTTP/1.1 400 461 http-bio-8080-exec-3 3\r\n127.0.0.1 - - [11/Jan/2022:19:21:16 +0100] GET / HTTP/1.1 200 6633 http-bio-8080-exec-1 65\r\n127.0.0.1 - - [11/Jan/2022:19:21:16 +0100] GET /api/todos HTTP/1.1 200 294 http-bio-8080-exec-4 245\r\n127.0.0.1 - - [11/Jan/2022:19:23:51 +0100] GET /api/todos HTTP/1.1 200 294 http-bio-8080-exec-6 16\r\n127.0.0.1 - - [11/Jan/2022:19:23:56 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-8 3\r\n127.0.0.1 - - [11/Jan/2022:19:23:56 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-10 2\r\n127.0.0.1 - - [11/Jan/2022:19:24:02 +0100] POST /api/todos HTTP/1.1 400 461 http-bio-8080-exec-9 67\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:24:06 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-4 6\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:24:06 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-4 2\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:24:07 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-4 1\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:24:07 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-4 2\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:24:07 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-4 1\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:24:07 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-4 3\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:24:08 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-4 1\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:24:08 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-4 3\r\n127.0.0.1 - - [11/Jan/2022:19:25:31 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-5 2\r\n127.0.0.1 - - [11/Jan/2022:19:25:36 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-7 1\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:25:37 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-1 1\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:25:37 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-1 2\r\n127.0.0.1 - - [11/Jan/2022:19:25:41 +0100] POST /api/todos HTTP/1.1 400 461 http-bio-8080-exec-7 3\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:25:42 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-1 0\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:25:42 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-1 3\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:25:42 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-1 1\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:25:42 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-1 1\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:25:42 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-1 0\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:25:42 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-1 3\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:25:42 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-1 1\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:25:42 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-1 2\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:25:43 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-1 1\r\n0:0:0:0:0:0:0:1 - - [11/Jan/2022:19:25:43 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-1 2\r\n127.0.0.1 - - [11/Jan/2022:19:27:08 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-6 2\r\n127.0.0.1 - - [11/Jan/2022:19:27:12 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-8 2\r\n127.0.0.1 - - [11/Jan/2022:19:27:16 +0100] POST /api/todos HTTP/1.1 400 461 http-bio-8080-exec-8 2\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.extract/logs/access_log.2022-01-11 b/.extract/logs/access_log.2022-01-11
+--- a/.extract/logs/access_log.2022-01-11	(revision b2aeda489e181f3c1a8db9dda03128d397df6461)
++++ b/.extract/logs/access_log.2022-01-11	(date 1641969098568)
+@@ -56,3 +56,10 @@
+ 127.0.0.1 - - [11/Jan/2022:19:27:08 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-6 2
+ 127.0.0.1 - - [11/Jan/2022:19:27:12 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-8 2
+ 127.0.0.1 - - [11/Jan/2022:19:27:16 +0100] POST /api/todos HTTP/1.1 400 461 http-bio-8080-exec-8 2
++127.0.0.1 - - [11/Jan/2022:19:35:14 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-10 1
++127.0.0.1 - - [11/Jan/2022:19:35:22 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-2 2
++127.0.0.1 - - [11/Jan/2022:19:35:39 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-9 3
++127.0.0.1 - - [11/Jan/2022:19:35:43 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-5 1
++127.0.0.1 - - [11/Jan/2022:19:35:46 +0100] PUT /api/todos/4 HTTP/1.1 400 461 http-bio-8080-exec-5 10
++127.0.0.1 - - [11/Jan/2022:19:35:51 +0100] POST /api/todos HTTP/1.1 400 461 http-bio-8080-exec-3 3
++127.0.0.1 - - [11/Jan/2022:19:35:58 +0100] POST /api/todos HTTP/1.1 400 461 http-bio-8080-exec-8 8

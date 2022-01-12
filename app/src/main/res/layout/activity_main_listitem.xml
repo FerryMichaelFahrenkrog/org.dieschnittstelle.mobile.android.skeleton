@@ -31,19 +31,19 @@
             android:padding="15dp"
             android:textSize="30sp" />
 
-        <RadioButton
-            android:id="@+id/radioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="Wichtiges ToDo?" />
+<!--        <RadioButton-->
+<!--            android:id="@+id/radioButton"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="center_vertical"-->
+<!--            android:text="Wichtiges ToDo?" />-->
 
-        <TextView
-            android:id="@+id/itemFaelligkeit"
-            android:layout_width="240dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="12.01.2020" />
+<!--        <TextView-->
+<!--            android:id="@+id/itemFaelligkeit"-->
+<!--            android:layout_width="240dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1"-->
+<!--            android:text="12.01.2020" />-->
 
     </LinearLayout>
 </layout>
