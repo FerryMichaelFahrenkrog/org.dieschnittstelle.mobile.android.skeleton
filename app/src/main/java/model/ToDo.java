@@ -1,47 +1,71 @@
 package model;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 
 import impl.RoomLocalDataItemCRUDOperationsImpl;
 
-@Entity // Damit sage ich, dass ich Instanzen der Klasse To-Do in meiner Datenbank ablegen möchte
-public class ToDo implements Serializable // Objekte in Bytes verwandeln, und dann wieder Objekte draus machen, braucht man um Objekte in DB zu speichern
+@Entity                                                                                             // Damit sage ich, dass ich Instanzen der Klasse To-Do in meiner Datenbank ablegen möchte
+public class ToDo implements Serializable                                                           // Objekte in Bytes verwandeln, und dann wieder Objekte draus machen, braucht man um Objekte in DB zu speichern
 {
-    protected static long ID_GENERATOR = 0;
-
-    public static long nextId(){
-        return ++ID_GENERATOR;
-    }
-
-    protected static String logtag ="ToDo";
-
-    private String name;
-    private String description;
-    @SerializedName("done") // JSON java name = done        //TODO verstehen
-    private boolean checked;
-
-//    private boolean isFavouriteToDo; // wenn ja dann markier später Rot oder so
-//
-//    private LocalDateTime faelligkeitsdatum;
-
-    @SerializedName("contacts")                             //TODO verstehen
-    @TypeConverters(RoomLocalDataItemCRUDOperationsImpl.ArrayListToStringDatabaseConverter.class)
-    private ArrayList<String> contactIds;
-
+    @Expose
+    @SerializedName("id")
     @PrimaryKey(autoGenerate = true)
     private long id;
 
+    @Expose
+    @SerializedName("name")
+    @ColumnInfo(name = "name")
+    private String name;
+
+    @Expose
+    @SerializedName("description")
+    @ColumnInfo(name = "description")
+    private String description = "";
+
+    @Expose
+    @SerializedName("done")
+    @ColumnInfo(name = "done")
+    private boolean checked;
+
+    @Expose
+    @SerializedName("favourite")
+    @ColumnInfo(name = "marked")
+    private boolean favouriteToDo;
+
+    @Expose
+    @SerializedName("expiry")
+    @ColumnInfo(name = "finishDate")
+    private long faelligkeitsDatumLong = 0;
+
+    @Expose
+    @SerializedName("contacts")
+    @TypeConverters(RoomLocalDataItemCRUDOperationsImpl.ArrayListToStringDatabaseConverter.class)
+    private ArrayList<String> contactIds = new ArrayList<>();
+
+    @SuppressLint("NewApi")
+    @Ignore
+    private transient LocalDateTime faelligkeitsDatum = LocalDateTime.now();
+
+    @Ignore
+    private transient Date localdate = new Date();
+
+    @Ignore
     public ToDo() {
 
     }
@@ -50,13 +74,32 @@ public class ToDo implements Serializable // Objekte in Bytes verwandeln, und da
         this.name = name;
     }
 
-    @Override
-    public String toString() {
-        return "ToDo{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", checked=" + checked +
-                '}';
+    @Ignore
+    public ToDo(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    @Ignore
+    public ToDo(String name, String description, LocalDateTime faelligkeitsDatum) {
+        this.name = name;
+        this.description = description;
+        this.faelligkeitsDatum = faelligkeitsDatum;
+    }
+
+    public ToDo(String name, String description, boolean favouriteToDo, LocalDateTime faelligkeitsDatum) {
+        this.name = name;
+        this.description = description;
+        this.favouriteToDo = favouriteToDo;
+        this.faelligkeitsDatum = faelligkeitsDatum;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -97,29 +140,37 @@ public class ToDo implements Serializable // Objekte in Bytes verwandeln, und da
         this.checked = checked;
     }
 
-    public long getId() {
-        return id;
+    public boolean isFavouriteToDo() {
+        return favouriteToDo;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setFavouriteToDo(boolean favouriteToDo) {
+        this.favouriteToDo = favouriteToDo;
     }
 
-//    public boolean isFavouriteToDo() {
-//        return isFavouriteToDo;
-//    }
-//
-//    public void setFavouriteToDo(boolean favouriteToDo) {
-//        isFavouriteToDo = favouriteToDo;
-//    }
-//
-//    public LocalDateTime getFaelligkeitsdatum() {
-//        return faelligkeitsdatum;
-//    }
-//
-//    public void setFaelligkeitsdatum(LocalDateTime faelligkeitsdatum) {
-//        this.faelligkeitsdatum = faelligkeitsdatum;
-//    }
+    public long getFaelligkeitsDatumLong() {
+        return faelligkeitsDatumLong;
+    }
+
+    public void setFaelligkeitsDatumLong(long faelligkeitsDatumLong) {
+        this.faelligkeitsDatumLong = faelligkeitsDatumLong;
+    }
+
+    public LocalDateTime getFaelligkeitsDatum() {
+        return faelligkeitsDatum;
+    }
+
+    public void setFaelligkeitsDatum(LocalDateTime faelligkeitsDatum) {
+        this.faelligkeitsDatum = faelligkeitsDatum;
+    }
+
+    public Date getLocaldate() {
+        return localdate;
+    }
+
+    public void setLocaldate(Date localdate) {
+        this.localdate = localdate;
+    }
 
     public ArrayList<String> getContactIds() {
         if(contactIds == null){
@@ -134,6 +185,21 @@ public class ToDo implements Serializable // Objekte in Bytes verwandeln, und da
     }
 
     @Override
+    public String toString() {
+        return "ToDo{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", checked=" + checked +
+                ", favouriteToDo=" + favouriteToDo +
+                ", faelligkeitsDatumLong=" + faelligkeitsDatumLong +
+                ", contactIds=" + contactIds +
+                ", faelligkeitsDatum=" + faelligkeitsDatum +
+                ", localdate=" + localdate +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -142,7 +208,15 @@ public class ToDo implements Serializable // Objekte in Bytes verwandeln, und da
     }
 
     @Override
-    public int hashCode() { // -21 Min rest VK 12.5)
+    public int hashCode() {
         return Objects.hash(id);
     }
+
+    protected static long ID_GENERATOR = 0;
+
+    public static long nextId(){
+        return ++ID_GENERATOR;
+    }
+
+    protected static String logtag ="ToDo";
 }

@@ -53,7 +53,7 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
     //2tens welche Operationen brauch ich
     //3tens Struktur angeben
 
-    @Database(entities = {ToDo.class}, version = 6)
+    @Database(entities = {ToDo.class}, version = 10)
     public static abstract class RoomToDoDatabase extends RoomDatabase {
         public abstract RoomDataItemCRUDAccess getDao();
     }
