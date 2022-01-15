@@ -1,7 +1,9 @@
 package org.dieschnittstelle.mobile.android.skeleton;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
@@ -11,6 +13,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,6 +29,8 @@ import androidx.databinding.DataBindingUtil;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityDetailviewBinding;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -34,71 +39,94 @@ import model.ToDo;
 public class DetailviewActivity extends AppCompatActivity
 {
     public static final int ACTION_PICK_CONTACT = 0;
+    public static final String ARG_TODO_OBJECT = "todo";
+    public static final String ARG_TODO_INDEX = "todoIndex";
+
+    public static final String ARG_TODO_DELETE = "todoDelete";
+    public static final String ARG_TODO_DATETIME = "todoDatetime";
+    @SuppressLint("NewApi")
+    public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    @SuppressLint("NewApi")
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     public static final String ARG_ITEM = "item";               // Zur Objektentgegennahme
 
-    private ToDo item;
-    private ActivityDetailviewBinding dataBindingHandle;
+    private ToDo toDo;
+    private ActivityDetailviewBinding detailviewBinding;
+    @SuppressLint("NewApi")
+    private LocalDateTime PlaceholderDateTime = LocalDateTime.now();
+    private LocalDateTime TodoDateTime = PlaceholderDateTime;
     private String errorStatus;
 
-    EditText faelligkeitsDatum;
-    EditText faelligkeitUhrzeit;
+    private EditText editTextDatum;
+    private EditText editTextUhr;
+    private Button deleteButton;
+    private boolean itemDelete = false;
+    private int todoIndex;
+
     TextView kontaktName;
-    Button faelligkeitButton;
     Button timeButton;
     int hour, minute;
 
     Calendar c;
     DatePickerDialog datePickerDialog;
 
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);                                 //Zustand wiedeherstellen wenn man das Handy dreht
+        super.onCreate(savedInstanceState);
+        detailviewBinding = DataBindingUtil.setContentView(this, R.layout.activity_detailview);
 
-        this.dataBindingHandle = DataBindingUtil.setContentView(this, R.layout.activity_detailview); // braucht man bei DB
+        instantiateCorrectLocalDateTime();
 
-        item = (ToDo)getIntent().getSerializableExtra(ARG_ITEM);            // Hier nehme ich das Argument entgegen aus der Main-Activity und speichere es
+        editTextUhr = findViewById(R.id.editTextTime);
+        editTextUhr.setText(TodoDateTime.format(TIME_FORMATTER));
+        editTextUhr.setInputType(InputType.TYPE_NULL);
+        editTextUhr.setOnClickListener(v -> setTimePickerDialog());
 
-        if(item == null){
-            item = new ToDo();                                              // Leeres DataItem, falls keines übergeben wurde.
+        editTextDatum = findViewById(R.id.editTextDate);
+        editTextDatum.setText(TodoDateTime.format(DATE_TIME_FORMATTER));
+        editTextDatum.setInputType(InputType.TYPE_NULL);
+        editTextDatum.setOnClickListener(v -> setDatePickerDialog());
+
+        deleteButton = findViewById(R.id.btnLoeschen);
+        deleteButton.setOnClickListener(v -> deleteItem());
+
+        toDo = (ToDo)getIntent().getSerializableExtra(ARG_ITEM);            // Hier nehme ich das Argument entgegen aus der Main-Activity und speichere es
+
+        if(toDo == null){
+            toDo = new ToDo();                                              // Leeres ToDoItem erzeugen, falls keines übergeben wurde.
         }
 
-        Log.i("DetailviewActivity", "got contact ids: " + item.getContactIds());
-        item.getContactIds().forEach(id -> {
+        todoIndex = getIntent().getIntExtra(ARG_TODO_INDEX, Integer.MAX_VALUE);
+
+
+        Log.i("DetailviewActivity", "got contact ids: " + toDo.getContactIds());
+        toDo.getContactIds().forEach(id -> {
             showContactDetailsForInternal(Long.parseLong(id));
         });
 
-        this.dataBindingHandle.setController(this);
-
-        faelligkeitsDatum = (EditText) findViewById(R.id.editTextDate);
-        faelligkeitUhrzeit = (EditText) findViewById(R.id.editTextTime);
-
-        faelligkeitsDatum.setOnClickListener(v -> {
-            c = Calendar.getInstance();
-            int day = c.get(Calendar.DAY_OF_MONTH);
-            int month = c.get(Calendar.MONTH);
-            int year = c.get(Calendar.YEAR);
-
-            datePickerDialog = new DatePickerDialog(DetailviewActivity.this, (view, mYear, mMonth, mDay) -> {
-                faelligkeitsDatum.setText(mDay + "/" + (mMonth+1) + "/" + mYear);
-            }, day, month, year);
-            datePickerDialog.show();
-        });
-
+        detailviewBinding.setController(this);
     }
 
-    public void popTimePicker(View view) {
-        faelligkeitUhrzeit = (EditText) findViewById(R.id.editTextTime);
+    @SuppressLint("NewApi")
+    private void instantiateCorrectLocalDateTime() {
+        if (getIntent().getSerializableExtra(ARG_TODO_DATETIME) != null) {
+            TodoDateTime = (LocalDateTime) getIntent().getSerializableExtra(ARG_TODO_DATETIME);
+        }
+    }
 
-        TimePickerDialog.OnTimeSetListener onTimeSetListener = (view1, mHour, mMinute) -> {
-            hour = mHour;
-            minute = mMinute;
-            timeButton.setText(String.format(Locale.getDefault(), "%02d:%02d", hour, minute));
-        };
+    @SuppressLint("NewApi")
+    public void setTimePickerDialog() {
+        int hour = Integer.parseInt(editTextUhr.getText().toString().substring(0, 2));
+        int minutes = Integer.parseInt(editTextUhr.getText().toString().substring(3, 5));
 
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this, onTimeSetListener, hour, minute, true);
-        faelligkeitUhrzeit.setText(minute + " / " + hour);
-        timePickerDialog.setTitle("Select Time");
+        TimePickerDialog timePickerDialog = new TimePickerDialog(DetailviewActivity.this, R.style.Theme_MaterialComponents_Light_Dialog, (view, hourOfDay, minuteOfHour) -> {
+            TodoDateTime = this.PlaceholderDateTime
+                    .withHour(hourOfDay)
+                    .withMinute(minuteOfHour);
+            editTextUhr.setText(TodoDateTime.format(TIME_FORMATTER));
+        }, hour, minutes, true);
         timePickerDialog.show();
     }
 
@@ -106,21 +134,80 @@ public class DetailviewActivity extends AppCompatActivity
       view.setBackgroundColor(Color.RED);
     }
 
+    @SuppressLint("NewApi")
+    public void setDatePickerDialog() {
+        int day = Integer.parseInt(editTextDatum.getText().toString().substring(0, 2));
+        int month = Integer.parseInt(editTextDatum.getText().toString().substring(3, 5));
+        int year = Integer.parseInt(editTextDatum.getText().toString().substring(6, 10));
+        DatePickerDialog datePickerDialog = new DatePickerDialog(DetailviewActivity.this, R.style.Theme_MaterialComponents_Light_Dialog, (view, yearOfYear, monthOfYear, dayOfMonth) -> {
+            TodoDateTime = this.PlaceholderDateTime
+                    .withYear(yearOfYear)
+                    .withMonth(monthOfYear + 1)
+                    .withDayOfMonth(dayOfMonth);
+            editTextDatum.setText(TodoDateTime.format(DATE_TIME_FORMATTER));
+        }, year, month - 1, day);
+        datePickerDialog.show();
+    }
+
+    public void deleteItem() {
+        new AlertDialog.Builder(DetailviewActivity.this)
+                .setTitle("Löschen")
+                .setMessage("Wirklich löschen?")
+                .setPositiveButton("löschen", (dialog, which) -> {
+                    itemDelete = true;
+                    onDeleteTodo();
+                })
+                .setNegativeButton("verwerfen", (dialog, which) -> Log.d("CancelButton", "Cancel clicked"))
+                .show();
+    }
+
+    @SuppressLint("NewApi")
     public void onSaveItem(){
+        updateLocalDateTime();
+
         Intent returnIntent = new Intent();                         // Rückgabe Inteent erstellen
 
-        returnIntent.putExtra(ARG_ITEM, item);                      // Unsere Daten reinpacken
+        returnIntent.putExtra(ARG_ITEM, toDo);                      // Unsere Daten reinpacken
+        returnIntent.putExtra(ARG_TODO_INDEX, todoIndex);
+        returnIntent.putExtra(ARG_TODO_DATETIME, TodoDateTime);
+
         setResult(Activity.RESULT_OK, returnIntent);                // liefert RESULT_OK zurück, wird dann in der MainActivity geprüft
 
         finish();
     }
 
-    public ToDo getItem() {
-        return item;
+    public void onDeleteTodo() {
+        Intent returnData = new Intent();
+        returnData.putExtra(ARG_TODO_OBJECT, toDo);
+        returnData.putExtra(ARG_TODO_INDEX, todoIndex);
+        returnData.putExtra(ARG_TODO_DELETE, itemDelete);
+
+        this.setResult(Activity.RESULT_OK, returnData);
+        finish();
     }
 
-    public void setItem(ToDo item) {
-        this.item = item;
+    @SuppressLint("NewApi")
+    void updateLocalDateTime() {
+        String hour = editTextUhr.getText().toString().substring(0, 2);
+        String minute = editTextUhr.getText().toString().substring(3, 5);
+        String day = editTextDatum.getText().toString().substring(0, 2);
+        String month = editTextDatum.getText().toString().substring(3, 5);
+        String year = editTextDatum.getText().toString().substring(6, 10);
+
+        TodoDateTime = this.PlaceholderDateTime
+                .withHour(Integer.parseInt(hour))
+                .withMinute(Integer.parseInt(minute))
+                .withDayOfMonth(Integer.parseInt(day))
+                .withMonth(Integer.parseInt(month))
+                .withYear(Integer.parseInt(year));
+    }
+
+    public ToDo getToDo() {
+        return toDo;
+    }
+
+    public void setToDo(ToDo toDo) {
+        this.toDo = toDo;
     }
 
     @Override
@@ -147,8 +234,6 @@ public class DetailviewActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-
-
     protected void selectContact(){
         Intent selectContactIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
         startActivityForResult(selectContactIntent,ACTION_PICK_CONTACT);
@@ -173,9 +258,6 @@ public class DetailviewActivity extends AppCompatActivity
     }
 
     protected void showContactDetails(Uri contactId){
-
-
-
         int hasReadContactsPermission = checkSelfPermission(Manifest.permission.READ_CONTACTS);
         if(hasReadContactsPermission != PackageManager.PERMISSION_GRANTED)
         {
@@ -188,8 +270,8 @@ public class DetailviewActivity extends AppCompatActivity
             String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
             long internalContactId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
 
-            if(!item.getContactIds().contains(String.valueOf(contactId))){
-                item.getContactIds().add(String.valueOf(internalContactId));
+            if(!toDo.getContactIds().contains(String.valueOf(contactId))){
+                toDo.getContactIds().add(String.valueOf(internalContactId));
             }
 
 
@@ -227,25 +309,24 @@ public class DetailviewActivity extends AppCompatActivity
         Log.i("DetailviewActivity", "onNameInputCompleted: " + hasFocus);
 
         if(!hasFocus){
-            String name = item.getName();
+            String name = toDo.getName();
 
             if(name != null && name.length() >= 3){
-                Log.i("DetailviewActivity", "validationSuccessful: " + item.getName());
+                Log.i("DetailviewActivity", "validationSuccessful: " + toDo.getName());
                 errorStatus = null;
             }
             else{
-                Log.i("DetailviewActivity", "validation failed" + item.getName());
+                Log.i("DetailviewActivity", "validation failed" + toDo.getName());
                 errorStatus = "Name too short!";
-                dataBindingHandle.setController(this);
+                detailviewBinding.setController(this);
             }
-
         }
     }
 
     public void onNameInputChanged(){
         if(errorStatus != null){
             errorStatus = null;
-            dataBindingHandle.setController(this);
+            detailviewBinding.setController(this);
         }
     }
 
@@ -256,7 +337,7 @@ public class DetailviewActivity extends AppCompatActivity
     protected void sendSms() {
         Uri smsUri = Uri.parse("smsto:000000");
         Intent smsIntent = new Intent(Intent.ACTION_SENDTO, smsUri);
-        smsIntent.putExtra("sms body", item.getName() + ": " + item.getDescription());
+        smsIntent.putExtra("sms body", toDo.getName() + ": " + toDo.getDescription());
         startActivity(smsIntent);
     }
 
