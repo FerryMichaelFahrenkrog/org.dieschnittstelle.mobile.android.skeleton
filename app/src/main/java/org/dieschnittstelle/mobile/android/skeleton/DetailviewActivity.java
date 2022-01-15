@@ -7,35 +7,24 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.TimePicker;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
-import com.google.android.material.snackbar.Snackbar;
-
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityDetailviewBinding;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -51,8 +40,8 @@ public class DetailviewActivity extends AppCompatActivity
     private ActivityDetailviewBinding dataBindingHandle;
     private String errorStatus;
 
-    TextView faelligkeit;
-    TextView faelligkeitUhrzeit;
+    EditText faelligkeitsDatum;
+    EditText faelligkeitUhrzeit;
     TextView kontaktName;
     Button faelligkeitButton;
     Button timeButton;
@@ -80,18 +69,17 @@ public class DetailviewActivity extends AppCompatActivity
 
         this.dataBindingHandle.setController(this);
 
-        faelligkeit = (TextView)findViewById(R.id.txtFaelligkeit);
-        faelligkeitButton = (Button)findViewById(R.id.faelligkeitButton);
-        timeButton = (Button)findViewById(R.id.faelligkeitUhrzeitButton);
+        faelligkeitsDatum = (EditText) findViewById(R.id.editTextDate);
+        faelligkeitUhrzeit = (EditText) findViewById(R.id.editTextTime);
 
-        faelligkeitButton.setOnClickListener(v -> {
+        faelligkeitsDatum.setOnClickListener(v -> {
             c = Calendar.getInstance();
             int day = c.get(Calendar.DAY_OF_MONTH);
             int month = c.get(Calendar.MONTH);
             int year = c.get(Calendar.YEAR);
 
             datePickerDialog = new DatePickerDialog(DetailviewActivity.this, (view, mYear, mMonth, mDay) -> {
-                faelligkeit.setText(mDay + "/" + (mMonth+1) + "/" + mYear);
+                faelligkeitsDatum.setText(mDay + "/" + (mMonth+1) + "/" + mYear);
             }, day, month, year);
             datePickerDialog.show();
         });
@@ -99,7 +87,7 @@ public class DetailviewActivity extends AppCompatActivity
     }
 
     public void popTimePicker(View view) {
-        faelligkeitUhrzeit = (TextView)findViewById(R.id.faelligkeitUhrzeit);
+        faelligkeitUhrzeit = (EditText) findViewById(R.id.editTextTime);
 
         TimePickerDialog.OnTimeSetListener onTimeSetListener = (view1, mHour, mMinute) -> {
             hour = mHour;
