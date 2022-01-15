@@ -1,0 +1,360 @@
+Index: app/src/main/res/layout/activity_detailview.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<layout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\">\r\n    <data>\r\n        <variable\r\n            name=\"controller\"\r\n            type=\"org.dieschnittstelle.mobile.android.skeleton.DetailviewActivity\" />\r\n    </data>\r\n\r\n    <androidx.constraintlayout.widget.ConstraintLayout\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"match_parent\">\r\n\r\n        <com.google.android.material.textfield.TextInputLayout\r\n            android:id=\"@+id/itemNameWrapper\"\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:error=\"@{controller.errorStatus}\"\r\n            android:hint=\"Name\"\r\n            app:hintEnabled=\"true\"\r\n            app:layout_constraintTop_toTopOf=\"parent\">\r\n\r\n            <com.google.android.material.textfield.TextInputEditText\r\n                android:id=\"@+id/itemName\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:onFocusChange=\"@{(v, c) -> controller.onNameInputCompleted(c)}\"\r\n                android:onTextChanged=\"@{(a,s,b,c) -> controller.onNameInputChanged()}\"\r\n                android:singleLine=\"true\"\r\n                android:text=\"@={controller.item.name}\">\r\n                <!-- Request focus damit man direkt reinspringt-->\r\n                <requestFocus />\r\n            </com.google.android.material.textfield.TextInputEditText>\r\n        </com.google.android.material.textfield.TextInputLayout>\r\n\r\n        <com.google.android.material.textfield.TextInputLayout\r\n            android:id=\"@+id/itemDescriptionWrapper\"\r\n\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:hint=\"@string/beschreibung\"\r\n            app:hintEnabled=\"true\"\r\n            app:layout_constraintTop_toBottomOf=\"@id/itemNameWrapper\">\r\n\r\n            <com.google.android.material.textfield.TextInputEditText\r\n                android:id=\"@+id/itemDescription\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:gravity=\"start\"\r\n                android:lines=\"10\"\r\n                android:minLines=\"5\"\r\n                android:text=\"@={controller.item.description}\" />\r\n\r\n        </com.google.android.material.textfield.TextInputLayout>\r\n\r\n        <TextView\r\n            android:id=\"@+id/txtVerknüpfteKontakte\"\r\n            android:layout_width=\"157dp\"\r\n            android:layout_height=\"23dp\"\r\n            android:layout_marginTop=\"44dp\"\r\n            android:text=\"Verknüpfte Kontakte:\"\r\n            android:textAlignment=\"center\"\r\n            app:layout_constraintEnd_toEndOf=\"parent\"\r\n            app:layout_constraintStart_toStartOf=\"parent\"\r\n            app:layout_constraintTop_toBottomOf=\"@+id/itemChecked\" />\r\n\r\n        <TextView\r\n            android:id=\"@+id/txtVerknüpfteKontakteNummer1\"\r\n            android:layout_width=\"157dp\"\r\n            android:layout_height=\"23dp\"\r\n            android:layout_marginBottom=\"208dp\"\r\n            android:text=\"\"\r\n            app:layout_constraintBottom_toBottomOf=\"parent\"\r\n            app:layout_constraintEnd_toEndOf=\"parent\"\r\n            app:layout_constraintStart_toStartOf=\"parent\"\r\n            app:layout_constraintTop_toBottomOf=\"@+id/txtVerknüpfteKontakte\"\r\n            app:layout_constraintVertical_bias=\"0.439\" />\r\n\r\n        <TextView\r\n            android:id=\"@+id/txtVerknüpfteKontakteNummer2\"\r\n            android:layout_width=\"157dp\"\r\n            android:layout_height=\"23dp\"\r\n            android:layout_marginBottom=\"176dp\"\r\n            android:text=\"\"\r\n            app:layout_constraintBottom_toBottomOf=\"parent\"\r\n            app:layout_constraintEnd_toEndOf=\"parent\"\r\n            app:layout_constraintStart_toStartOf=\"parent\"\r\n            app:layout_constraintTop_toBottomOf=\"@+id/txtVerknüpfteKontakteNummer1\"\r\n            app:layout_constraintVertical_bias=\"0.437\" />\r\n\r\n        <TextView\r\n            android:id=\"@+id/txtVerknüpfteKontakteNummer3\"\r\n            android:layout_width=\"157dp\"\r\n            android:layout_height=\"23dp\"\r\n            android:layout_marginBottom=\"140dp\"\r\n            android:text=\"\"\r\n            app:layout_constraintBottom_toBottomOf=\"parent\"\r\n            app:layout_constraintEnd_toEndOf=\"parent\"\r\n            app:layout_constraintStart_toStartOf=\"parent\"\r\n            app:layout_constraintTop_toBottomOf=\"@+id/txtVerknüpfteKontakteNummer2\"\r\n            app:layout_constraintVertical_bias=\"0.419\" />\r\n\r\n        <CheckBox\r\n            android:id=\"@+id/itemChecked\"\r\n            android:layout_width=\"92dp\"\r\n            android:layout_height=\"30dp\"\r\n            android:layout_marginStart=\"156dp\"\r\n            android:layout_marginTop=\"8dp\"\r\n            android:checked=\"@={controller.item.checked}\"\r\n            android:text=\"Erledigt\"\r\n            app:layout_constraintStart_toStartOf=\"parent\"\r\n            app:layout_constraintTop_toBottomOf=\"@+id/editTextTime\" />\r\n\r\n        <com.google.android.material.floatingactionbutton.FloatingActionButton\r\n            android:id=\"@+id/saveButton\"\r\n            android:layout_width=\"wrap_content\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_margin=\"16dp\"\r\n            android:onClick=\"@{() -> controller.onSaveItem()}\"\r\n            app:layout_constraintBottom_toBottomOf=\"parent\"\r\n            app:layout_constraintRight_toRightOf=\"parent\"\r\n            app:srcCompat=\"@drawable/baseline_save_white_24dp\" />\r\n\r\n        <EditText\r\n            android:id=\"@+id/editTextDate\"\r\n            android:layout_width=\"wrap_content\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_marginTop=\"20dp\"\r\n            android:ems=\"10\"\r\n            android:hint=\"Fälligkeitsdatum wählen\"\r\n            android:inputType=\"date\"\r\n            android:textAlignment=\"center\"\r\n            app:layout_constraintEnd_toEndOf=\"parent\"\r\n            app:layout_constraintHorizontal_bias=\"0.497\"\r\n            app:layout_constraintStart_toStartOf=\"parent\"\r\n            app:layout_constraintTop_toBottomOf=\"@+id/itemDescriptionWrapper\" />\r\n\r\n        <EditText\r\n            android:id=\"@+id/editTextTime\"\r\n            android:layout_width=\"wrap_content\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_marginTop=\"8dp\"\r\n            android:ems=\"10\"\r\n            android:inputType=\"time\"\r\n            android:hint=\"Uhrzeit wählen\"\r\n            android:textAlignment=\"center\"\r\n            app:layout_constraintEnd_toEndOf=\"parent\"\r\n            app:layout_constraintHorizontal_bias=\"0.497\"\r\n            app:layout_constraintStart_toStartOf=\"parent\"\r\n            app:layout_constraintTop_toBottomOf=\"@+id/editTextDate\" />\r\n\r\n        <Button\r\n            android:id=\"@+id/btnLoeschen\"\r\n            android:layout_width=\"wrap_content\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_marginTop=\"28dp\"\r\n            android:text=\"To Do löschen\"\r\n            app:layout_constraintBottom_toBottomOf=\"parent\"\r\n            app:layout_constraintEnd_toEndOf=\"parent\"\r\n            app:layout_constraintHorizontal_bias=\"0.498\"\r\n            app:layout_constraintStart_toStartOf=\"parent\"\r\n            app:layout_constraintTop_toBottomOf=\"@+id/txtVerknüpfteKontakteNummer3\"\r\n            app:layout_constraintVertical_bias=\"0.121\" />\r\n    </androidx.constraintlayout.widget.ConstraintLayout>\r\n</layout>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/activity_detailview.xml b/app/src/main/res/layout/activity_detailview.xml
+--- a/app/src/main/res/layout/activity_detailview.xml	(revision a20f88430a3ce75d8928d9d5c26cd730d25d5a89)
++++ b/app/src/main/res/layout/activity_detailview.xml	(date 1642237192296)
+@@ -28,7 +28,7 @@
+                 android:onFocusChange="@{(v, c) -> controller.onNameInputCompleted(c)}"
+                 android:onTextChanged="@{(a,s,b,c) -> controller.onNameInputChanged()}"
+                 android:singleLine="true"
+-                android:text="@={controller.item.name}">
++                android:text="@={controller.toDo.name}">
+                 <!-- Request focus damit man direkt reinspringt-->
+                 <requestFocus />
+             </com.google.android.material.textfield.TextInputEditText>
+@@ -50,7 +50,7 @@
+                 android:gravity="start"
+                 android:lines="10"
+                 android:minLines="5"
+-                android:text="@={controller.item.description}" />
++                android:text="@={controller.toDo.description}" />
+ 
+         </com.google.android.material.textfield.TextInputLayout>
+ 
+@@ -107,7 +107,7 @@
+             android:layout_height="30dp"
+             android:layout_marginStart="156dp"
+             android:layout_marginTop="8dp"
+-            android:checked="@={controller.item.checked}"
++            android:checked="@={controller.toDo.checked}"
+             android:text="Erledigt"
+             app:layout_constraintStart_toStartOf="parent"
+             app:layout_constraintTop_toBottomOf="@+id/editTextTime" />
+Index: app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/DetailviewActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.dieschnittstelle.mobile.android.skeleton;\r\n\r\nimport android.Manifest;\r\nimport android.app.Activity;\r\nimport android.app.DatePickerDialog;\r\nimport android.app.TimePickerDialog;\r\nimport android.content.Intent;\r\nimport android.content.pm.PackageManager;\r\nimport android.database.Cursor;\r\nimport android.net.Uri;\r\nimport android.os.Bundle;\r\nimport android.provider.ContactsContract;\r\nimport android.util.Log;\r\nimport android.view.Menu;\r\nimport android.view.MenuItem;\r\nimport android.view.View;\r\nimport android.widget.Button;\r\nimport android.widget.EditText;\r\nimport android.widget.TextView;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.annotation.Nullable;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.databinding.DataBindingUtil;\r\n\r\nimport org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityDetailviewBinding;\r\n\r\nimport java.util.Calendar;\r\nimport java.util.Locale;\r\n\r\nimport model.ToDo;\r\n\r\npublic class DetailviewActivity extends AppCompatActivity\r\n{\r\n    public static final int ACTION_PICK_CONTACT = 0;\r\n\r\n    public static final String ARG_ITEM = \"item\";               // Zur Objektentgegennahme\r\n\r\n    private ToDo item;\r\n    private ActivityDetailviewBinding dataBindingHandle;\r\n    private String errorStatus;\r\n\r\n    EditText faelligkeitsDatum;\r\n    EditText faelligkeitUhrzeit;\r\n    TextView kontaktName;\r\n    Button faelligkeitButton;\r\n    Button timeButton;\r\n    int hour, minute;\r\n\r\n    Calendar c;\r\n    DatePickerDialog datePickerDialog;\r\n\r\n    @Override\r\n    protected void onCreate(@Nullable Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);                                 //Zustand wiedeherstellen wenn man das Handy dreht\r\n\r\n        this.dataBindingHandle = DataBindingUtil.setContentView(this, R.layout.activity_detailview); // braucht man bei DB\r\n\r\n        item = (ToDo)getIntent().getSerializableExtra(ARG_ITEM);            // Hier nehme ich das Argument entgegen aus der Main-Activity und speichere es\r\n\r\n        if(item == null){\r\n            item = new ToDo();                                              // Leeres DataItem, falls keines übergeben wurde.\r\n        }\r\n\r\n        Log.i(\"DetailviewActivity\", \"got contact ids: \" + item.getContactIds());\r\n        item.getContactIds().forEach(id -> {\r\n            showContactDetailsForInternal(Long.parseLong(id));\r\n        });\r\n\r\n        this.dataBindingHandle.setController(this);\r\n\r\n        faelligkeitsDatum = (EditText) findViewById(R.id.editTextDate);\r\n        faelligkeitUhrzeit = (EditText) findViewById(R.id.editTextTime);\r\n\r\n        faelligkeitsDatum.setOnClickListener(v -> {\r\n            c = Calendar.getInstance();\r\n            int day = c.get(Calendar.DAY_OF_MONTH);\r\n            int month = c.get(Calendar.MONTH);\r\n            int year = c.get(Calendar.YEAR);\r\n\r\n            datePickerDialog = new DatePickerDialog(DetailviewActivity.this, (view, mYear, mMonth, mDay) -> {\r\n                faelligkeitsDatum.setText(mDay + \"/\" + (mMonth+1) + \"/\" + mYear);\r\n            }, day, month, year);\r\n            datePickerDialog.show();\r\n        });\r\n\r\n    }\r\n\r\n    public void popTimePicker(View view) {\r\n        faelligkeitUhrzeit = (EditText) findViewById(R.id.editTextTime);\r\n\r\n        TimePickerDialog.OnTimeSetListener onTimeSetListener = (view1, mHour, mMinute) -> {\r\n            hour = mHour;\r\n            minute = mMinute;\r\n            timeButton.setText(String.format(Locale.getDefault(), \"%02d:%02d\", hour, minute));\r\n        };\r\n\r\n        TimePickerDialog timePickerDialog = new TimePickerDialog(this, onTimeSetListener, hour, minute, true);\r\n        faelligkeitUhrzeit.setText(minute + \" / \" + hour);\r\n        timePickerDialog.setTitle(\"Select Time\");\r\n        timePickerDialog.show();\r\n    }\r\n\r\n    public void onSaveItem(){\r\n        Intent returnIntent = new Intent();                         // Rückgabe Inteent erstellen\r\n\r\n        returnIntent.putExtra(ARG_ITEM, item);                      // Unsere Daten reinpacken\r\n        setResult(Activity.RESULT_OK, returnIntent);                // liefert RESULT_OK zurück, wird dann in der MainActivity geprüft\r\n\r\n        finish();\r\n    }\r\n\r\n    public ToDo getItem() {\r\n        return item;\r\n    }\r\n\r\n    public void setItem(ToDo item) {\r\n        this.item = item;\r\n    }\r\n\r\n    @Override\r\n    public boolean onCreateOptionsMenu(Menu menu){\r\n        getMenuInflater().inflate(R.menu.detailview_menu, menu);\r\n        return super.onCreateOptionsMenu(menu);\r\n    }\r\n\r\n    @Override\r\n    public boolean onOptionsItemSelected(@NonNull MenuItem item){\r\n        if(item.getItemId() == R.id.selectContact){\r\n            selectContact();\r\n            return true;\r\n        }\r\n        else if(item.getItemId() == R.id.sendSMS)\r\n            {\r\n                sendSms();\r\n            }\r\n        else if(item.getItemId() == R.id.deleteRemoteItems)\r\n        {\r\n\r\n        }\r\n\r\n        return super.onOptionsItemSelected(item);\r\n    }\r\n\r\n\r\n\r\n    protected void selectContact(){\r\n        Intent selectContactIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);\r\n        startActivityForResult(selectContactIntent,ACTION_PICK_CONTACT);\r\n    }\r\n\r\n    @Override\r\n    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {\r\n        if(requestCode == ACTION_PICK_CONTACT && resultCode == Activity.RESULT_OK)\r\n        {\r\n            Log.i(\"DetailviewActivity\", \"onActivityResult(): got data: \" + data);\r\n            showContactDetails(data.getData());\r\n        }\r\n        else{\r\n            super.onActivityResult(requestCode, resultCode, data);\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {\r\n        Log.i(\"DetailviewActivity\", \"onRequestPermissionsResult(): permission\");\r\n        super.onRequestPermissionsResult(requestCode, permissions, grantResults);\r\n    }\r\n\r\n    protected void showContactDetails(Uri contactId){\r\n\r\n\r\n\r\n        int hasReadContactsPermission = checkSelfPermission(Manifest.permission.READ_CONTACTS);\r\n        if(hasReadContactsPermission != PackageManager.PERMISSION_GRANTED)\r\n        {\r\n            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 1 );\r\n            return;\r\n        }\r\n\r\n        Cursor cursor = getContentResolver().query(contactId, null, null, null, null);\r\n        if(cursor.moveToFirst()){\r\n            String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));\r\n            long internalContactId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));\r\n\r\n            if(!item.getContactIds().contains(String.valueOf(contactId))){\r\n                item.getContactIds().add(String.valueOf(internalContactId));\r\n            }\r\n\r\n\r\n            Log.i(\"DetailviewActivity\", \"got contact with name \" + contactName + \" and internal id: \" + internalContactId);\r\n\r\n            showContactDetailsForInternal(internalContactId);\r\n        }\r\n        else{\r\n            Log.i(\"DetailviewActivity\", \"no contact found\");\r\n        }\r\n    }\r\n\r\n    //UI BNEFÜLLEN\r\n    public void showContactDetailsForInternal(long internalId) {\r\n        Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, ContactsContract.Contacts._ID + \"=?\", new String[]{String.valueOf(internalId)}, null);\r\n        if(cursor.moveToNext()){\r\n            String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));\r\n            Log.i(\"DetailviewActivity\", \"found display name for internal id \" + internalId + \": \" + displayName);\r\n            kontaktName = (TextView)findViewById(R.id.txtVerknüpfteKontakteNummer1);\r\n            kontaktName.setText(displayName);\r\n        }else{\r\n            Log.i(\"DetailviewActivity\", \"no contacts fount for internal id \" + internalId);\r\n        }\r\n\r\n         cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + \"=?\", new String[]{String.valueOf(internalId),}, null);\r\n        while(cursor.moveToNext()){\r\n            String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));\r\n            int phoneNumberType = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));\r\n\r\n            Log.i(\"DetailviewActivity\", \"found number of type \" + number + \", of type \" + phoneNumberType + \", mobile: \" + (phoneNumberType == ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE));\r\n        }\r\n    }\r\n\r\n    public void onNameInputCompleted(boolean hasFocus) {\r\n        Log.i(\"DetailviewActivity\", \"onNameInputCompleted: \" + hasFocus);\r\n\r\n        if(!hasFocus){\r\n            String name = item.getName();\r\n\r\n            if(name != null && name.length() >= 3){\r\n                Log.i(\"DetailviewActivity\", \"validationSuccessful: \" + item.getName());\r\n                errorStatus = null;\r\n            }\r\n            else{\r\n                Log.i(\"DetailviewActivity\", \"validation failed\" + item.getName());\r\n                errorStatus = \"Name too short!\";\r\n                dataBindingHandle.setController(this);\r\n            }\r\n\r\n        }\r\n    }\r\n\r\n    public void onNameInputChanged(){\r\n        if(errorStatus != null){\r\n            errorStatus = null;\r\n            dataBindingHandle.setController(this);\r\n        }\r\n    }\r\n\r\n    public String getErrorStatus() {\r\n        return errorStatus;\r\n    }\r\n\r\n    protected void sendSms() {\r\n        Uri smsUri = Uri.parse(\"smsto:000000\");\r\n        Intent smsIntent = new Intent(Intent.ACTION_SENDTO, smsUri);\r\n        smsIntent.putExtra(\"sms body\", item.getName() + \": \" + item.getDescription());\r\n        startActivity(smsIntent);\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/DetailviewActivity.java b/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/DetailviewActivity.java
+--- a/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/DetailviewActivity.java	(revision a20f88430a3ce75d8928d9d5c26cd730d25d5a89)
++++ b/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/DetailviewActivity.java	(date 1642237909582)
+@@ -1,7 +1,9 @@
+ package org.dieschnittstelle.mobile.android.skeleton;
+ 
+ import android.Manifest;
++import android.annotation.SuppressLint;
+ import android.app.Activity;
++import android.app.AlertDialog;
+ import android.app.DatePickerDialog;
+ import android.app.TimePickerDialog;
+ import android.content.Intent;
+@@ -10,6 +12,7 @@
+ import android.net.Uri;
+ import android.os.Bundle;
+ import android.provider.ContactsContract;
++import android.text.InputType;
+ import android.util.Log;
+ import android.view.Menu;
+ import android.view.MenuItem;
+@@ -25,6 +28,8 @@
+ 
+ import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityDetailviewBinding;
+ 
++import java.time.LocalDateTime;
++import java.time.format.DateTimeFormatter;
+ import java.util.Calendar;
+ import java.util.Locale;
+ 
+@@ -33,89 +38,171 @@
+ public class DetailviewActivity extends AppCompatActivity
+ {
+     public static final int ACTION_PICK_CONTACT = 0;
++    public static final String ARG_TODO_OBJECT = "todo";
++    public static final String ARG_TODO_INDEX = "todoIndex";
++
++    public static final String ARG_TODO_DELETE = "todoDelete";
++    public static final String ARG_TODO_DATETIME = "todoDatetime";
++    @SuppressLint("NewApi")
++    public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
++    @SuppressLint("NewApi")
++    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+ 
+     public static final String ARG_ITEM = "item";               // Zur Objektentgegennahme
+ 
+-    private ToDo item;
+-    private ActivityDetailviewBinding dataBindingHandle;
++    private ToDo toDo;
++    private ActivityDetailviewBinding detailviewBinding;
++    @SuppressLint("NewApi")
++    private LocalDateTime PlaceholderDateTime = LocalDateTime.now();
++    private LocalDateTime TodoDateTime = PlaceholderDateTime;
+     private String errorStatus;
+ 
+-    EditText faelligkeitsDatum;
+-    EditText faelligkeitUhrzeit;
++    private EditText editTextDatum;
++    private EditText editTextUhr;
++    private Button deleteButton;
++    private boolean itemDelete = false;
++    private int todoIndex;
++
+     TextView kontaktName;
+-    Button faelligkeitButton;
+     Button timeButton;
+     int hour, minute;
+ 
+     Calendar c;
+     DatePickerDialog datePickerDialog;
+ 
++    @SuppressLint("NewApi")
+     @Override
+     protected void onCreate(@Nullable Bundle savedInstanceState) {
+-        super.onCreate(savedInstanceState);                                 //Zustand wiedeherstellen wenn man das Handy dreht
++        super.onCreate(savedInstanceState);
++        detailviewBinding = DataBindingUtil.setContentView(this, R.layout.activity_detailview);
++
++        instantiateCorrectLocalDateTime();
+ 
+-        this.dataBindingHandle = DataBindingUtil.setContentView(this, R.layout.activity_detailview); // braucht man bei DB
++        editTextUhr = findViewById(R.id.editTextTime);
++        editTextUhr.setText(TodoDateTime.format(TIME_FORMATTER));
++        editTextUhr.setInputType(InputType.TYPE_NULL);
++        editTextUhr.setOnClickListener(v -> setTimePickerDialog());
+ 
+-        item = (ToDo)getIntent().getSerializableExtra(ARG_ITEM);            // Hier nehme ich das Argument entgegen aus der Main-Activity und speichere es
++        editTextDatum = findViewById(R.id.editTextTime);
++        editTextDatum.setText(TodoDateTime.format(DATE_TIME_FORMATTER));
++        editTextDatum.setInputType(InputType.TYPE_NULL);
++        editTextDatum.setOnClickListener(v -> setDatePickerDialog());
+ 
+-        if(item == null){
+-            item = new ToDo();                                              // Leeres DataItem, falls keines übergeben wurde.
++        deleteButton = findViewById(R.id.btnLoeschen);
++        deleteButton.setOnClickListener(v -> deleteItem());
++
++        toDo = (ToDo)getIntent().getSerializableExtra(ARG_ITEM);            // Hier nehme ich das Argument entgegen aus der Main-Activity und speichere es
++
++        if(toDo == null){
++            toDo = new ToDo();                                              // Leeres ToDoItem erzeugen, falls keines übergeben wurde.
+         }
+ 
+-        Log.i("DetailviewActivity", "got contact ids: " + item.getContactIds());
+-        item.getContactIds().forEach(id -> {
++        todoIndex = getIntent().getIntExtra(ARG_TODO_INDEX, Integer.MAX_VALUE);
++
++
++        Log.i("DetailviewActivity", "got contact ids: " + toDo.getContactIds());
++        toDo.getContactIds().forEach(id -> {
+             showContactDetailsForInternal(Long.parseLong(id));
+         });
+ 
+-        this.dataBindingHandle.setController(this);
+-
+-        faelligkeitsDatum = (EditText) findViewById(R.id.editTextDate);
+-        faelligkeitUhrzeit = (EditText) findViewById(R.id.editTextTime);
+-
+-        faelligkeitsDatum.setOnClickListener(v -> {
+-            c = Calendar.getInstance();
+-            int day = c.get(Calendar.DAY_OF_MONTH);
+-            int month = c.get(Calendar.MONTH);
+-            int year = c.get(Calendar.YEAR);
+-
+-            datePickerDialog = new DatePickerDialog(DetailviewActivity.this, (view, mYear, mMonth, mDay) -> {
+-                faelligkeitsDatum.setText(mDay + "/" + (mMonth+1) + "/" + mYear);
+-            }, day, month, year);
+-            datePickerDialog.show();
+-        });
++        detailviewBinding.setController(this);
++    }
+ 
++    @SuppressLint("NewApi")
++    private void instantiateCorrectLocalDateTime() {
++        if (getIntent().getSerializableExtra(ARG_TODO_DATETIME) != null) {
++            TodoDateTime = (LocalDateTime) getIntent().getSerializableExtra(ARG_TODO_DATETIME);
++        }
+     }
+ 
+-    public void popTimePicker(View view) {
+-        faelligkeitUhrzeit = (EditText) findViewById(R.id.editTextTime);
++    @SuppressLint("NewApi")
++    public void setTimePickerDialog() {
++        int hour = Integer.parseInt(editTextUhr.getText().toString().substring(0, 2));
++        int minutes = Integer.parseInt(editTextUhr.getText().toString().substring(3, 5));
+ 
+-        TimePickerDialog.OnTimeSetListener onTimeSetListener = (view1, mHour, mMinute) -> {
+-            hour = mHour;
+-            minute = mMinute;
+-            timeButton.setText(String.format(Locale.getDefault(), "%02d:%02d", hour, minute));
+-        };
+-
+-        TimePickerDialog timePickerDialog = new TimePickerDialog(this, onTimeSetListener, hour, minute, true);
+-        faelligkeitUhrzeit.setText(minute + " / " + hour);
+-        timePickerDialog.setTitle("Select Time");
++        TimePickerDialog timePickerDialog = new TimePickerDialog(DetailviewActivity.this, R.style.Theme_MaterialComponents_Light_Dialog, (view, hourOfDay, minuteOfHour) -> {
++            TodoDateTime = this.PlaceholderDateTime
++                    .withHour(hourOfDay)
++                    .withMinute(minuteOfHour);
++            editTextUhr.setText(TodoDateTime.format(TIME_FORMATTER));
++        }, hour, minutes, true);
+         timePickerDialog.show();
+     }
+ 
++    @SuppressLint("NewApi")
++    public void setDatePickerDialog() {
++        int day = Integer.parseInt(editTextDatum.getText().toString().substring(0, 2));
++        int month = Integer.parseInt(editTextDatum.getText().toString().substring(3, 5));
++        int year = Integer.parseInt(editTextDatum.getText().toString().substring(6, 10));
++        DatePickerDialog datePickerDialog = new DatePickerDialog(DetailviewActivity.this, R.style.Theme_MaterialComponents_Light_Dialog, (view, yearOfYear, monthOfYear, dayOfMonth) -> {
++            TodoDateTime = this.PlaceholderDateTime
++                    .withYear(yearOfYear)
++                    .withMonth(monthOfYear + 1)
++                    .withDayOfMonth(dayOfMonth);
++            editTextDatum.setText(TodoDateTime.format(DATE_TIME_FORMATTER));
++        }, year, month - 1, day);
++        datePickerDialog.show();
++    }
++
++    public void deleteItem() {
++        new AlertDialog.Builder(DetailviewActivity.this)
++                .setTitle("Löschen")
++                .setMessage("Wirklich löschen?")
++                .setPositiveButton("löschen", (dialog, which) -> {
++                    itemDelete = true;
++                    onDeleteTodo();
++                })
++                .setNegativeButton("verwerfen", (dialog, which) -> Log.d("CancelButton", "Cancel clicked"))
++                .show();
++    }
++
++    @SuppressLint("NewApi")
+     public void onSaveItem(){
++        updateLocalDateTime();
++
+         Intent returnIntent = new Intent();                         // Rückgabe Inteent erstellen
+ 
+-        returnIntent.putExtra(ARG_ITEM, item);                      // Unsere Daten reinpacken
++        returnIntent.putExtra(ARG_ITEM, toDo);                      // Unsere Daten reinpacken
++        returnIntent.putExtra(ARG_TODO_INDEX, todoIndex);
++        returnIntent.putExtra(ARG_TODO_DATETIME, TodoDateTime);
++
+         setResult(Activity.RESULT_OK, returnIntent);                // liefert RESULT_OK zurück, wird dann in der MainActivity geprüft
+ 
+         finish();
+     }
+ 
+-    public ToDo getItem() {
+-        return item;
++    public void onDeleteTodo() {
++        Intent returnData = new Intent();
++        returnData.putExtra(ARG_TODO_OBJECT, toDo);
++        returnData.putExtra(ARG_TODO_INDEX, todoIndex);
++        returnData.putExtra(ARG_TODO_DELETE, itemDelete);
++
++        this.setResult(Activity.RESULT_OK, returnData);
++        finish();
++    }
++
++    @SuppressLint("NewApi")
++    void updateLocalDateTime() {
++        String hour = editTextUhr.getText().toString().substring(0, 2);
++        String minute = editTextUhr.getText().toString().substring(3, 5);
++        String day = editTextDatum.getText().toString().substring(0, 2);
++        String month = editTextDatum.getText().toString().substring(3, 5);
++        String year = editTextDatum.getText().toString().substring(6, 10);
++
++        TodoDateTime = this.PlaceholderDateTime
++                .withHour(Integer.parseInt(hour))
++                .withMinute(Integer.parseInt(minute))
++                .withDayOfMonth(Integer.parseInt(day))
++                .withMonth(Integer.parseInt(month))
++                .withYear(Integer.parseInt(year));
+     }
+ 
+-    public void setItem(ToDo item) {
+-        this.item = item;
++    public ToDo getToDo() {
++        return toDo;
++    }
++
++    public void setToDo(ToDo toDo) {
++        this.toDo = toDo;
+     }
+ 
+     @Override
+@@ -142,8 +229,6 @@
+         return super.onOptionsItemSelected(item);
+     }
+ 
+-
+-
+     protected void selectContact(){
+         Intent selectContactIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+         startActivityForResult(selectContactIntent,ACTION_PICK_CONTACT);
+@@ -168,9 +253,6 @@
+     }
+ 
+     protected void showContactDetails(Uri contactId){
+-
+-
+-
+         int hasReadContactsPermission = checkSelfPermission(Manifest.permission.READ_CONTACTS);
+         if(hasReadContactsPermission != PackageManager.PERMISSION_GRANTED)
+         {
+@@ -183,8 +265,8 @@
+             String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+             long internalContactId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+ 
+-            if(!item.getContactIds().contains(String.valueOf(contactId))){
+-                item.getContactIds().add(String.valueOf(internalContactId));
++            if(!toDo.getContactIds().contains(String.valueOf(contactId))){
++                toDo.getContactIds().add(String.valueOf(internalContactId));
+             }
+ 
+ 
+@@ -222,25 +304,24 @@
+         Log.i("DetailviewActivity", "onNameInputCompleted: " + hasFocus);
+ 
+         if(!hasFocus){
+-            String name = item.getName();
++            String name = toDo.getName();
+ 
+             if(name != null && name.length() >= 3){
+-                Log.i("DetailviewActivity", "validationSuccessful: " + item.getName());
++                Log.i("DetailviewActivity", "validationSuccessful: " + toDo.getName());
+                 errorStatus = null;
+             }
+             else{
+-                Log.i("DetailviewActivity", "validation failed" + item.getName());
++                Log.i("DetailviewActivity", "validation failed" + toDo.getName());
+                 errorStatus = "Name too short!";
+-                dataBindingHandle.setController(this);
++                detailviewBinding.setController(this);
+             }
+-
+         }
+     }
+ 
+     public void onNameInputChanged(){
+         if(errorStatus != null){
+             errorStatus = null;
+-            dataBindingHandle.setController(this);
++            detailviewBinding.setController(this);
+         }
+     }
+ 
+@@ -251,7 +332,7 @@
+     protected void sendSms() {
+         Uri smsUri = Uri.parse("smsto:000000");
+         Intent smsIntent = new Intent(Intent.ACTION_SENDTO, smsUri);
+-        smsIntent.putExtra("sms body", item.getName() + ": " + item.getDescription());
++        smsIntent.putExtra("sms body", toDo.getName() + ": " + toDo.getDescription());
+         startActivity(smsIntent);
+     }
+ 

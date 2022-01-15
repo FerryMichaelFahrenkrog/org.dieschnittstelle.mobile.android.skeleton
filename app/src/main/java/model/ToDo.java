@@ -14,6 +14,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
@@ -182,6 +183,16 @@ public class ToDo implements Serializable                                       
 
     public void setContactIds(ArrayList<String> contactIds) {
         this.contactIds = contactIds;
+    }
+
+    @SuppressLint("NewApi")
+    public LocalDateTime getFinishDate() {
+        this.faelligkeitsDatum = LocalDateTime.ofEpochSecond(this.faelligkeitsDatumLong / 1000, 0, ZoneOffset.UTC);
+        return faelligkeitsDatum;
+    }
+
+    public void setFinishDate(LocalDateTime finishDate) {
+        this.faelligkeitsDatum = finishDate;
     }
 
     @Override
