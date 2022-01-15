@@ -106,9 +106,22 @@
             android:layout_width="92dp"
             android:layout_height="30dp"
             android:layout_marginStart="156dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="44dp"
             android:checked="@={controller.item.checked}"
             android:text="Erledigt"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editTextTime" />
+
+<!--        android:onClick="@{(v) -> controller.colorChange(v)}"-->
+        <CheckBox
+            android:id="@+id/itemFav"
+            android:layout_width="92dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="156dp"
+            android:layout_marginTop="8dp"
+            android:checked="@={controller.item.favouriteToDo}"
+
+            android:text="Wichtig"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editTextTime" />
 

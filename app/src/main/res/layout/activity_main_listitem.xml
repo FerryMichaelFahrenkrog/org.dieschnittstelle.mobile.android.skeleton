@@ -36,9 +36,8 @@
             <CheckBox
                 android:id="@+id/favouriteItem"
                 android:layout_width="90dp"
-
                 android:layout_height="45dp"
-                android:checked="@={item.checked}"
+                android:checked="@={item.favouriteToDo}"
                 android:focusable="false"
                 android:gravity="center"
                 android:onClick="@{() -> controller.onCheckedChangedInListView(item)}"

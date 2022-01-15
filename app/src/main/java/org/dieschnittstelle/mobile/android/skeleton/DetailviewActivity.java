@@ -7,6 +7,7 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -99,6 +100,10 @@ public class DetailviewActivity extends AppCompatActivity
         faelligkeitUhrzeit.setText(minute + " / " + hour);
         timePickerDialog.setTitle("Select Time");
         timePickerDialog.show();
+    }
+
+    public void colorChange(View view){
+      view.setBackgroundColor(Color.RED);
     }
 
     public void onSaveItem(){

@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity {               // macht die
     }
 
     protected void sortListAndScrollToItem(ToDo item) {
-        showFeedbackMessage("Sort List!");
+//        showFeedbackMessage("Sort List!");
         sortitems(items);
 
         listViewAdapter.notifyDataSetChanged(); //Aktualisierung
