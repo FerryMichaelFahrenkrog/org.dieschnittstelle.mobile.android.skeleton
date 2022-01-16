@@ -1,6 +1,7 @@
 package org.dieschnittstelle.mobile.android.skeleton;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -42,6 +43,11 @@ public class LoginActivity extends AppCompatActivity {
 
 
         editTextpassword.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+        hebeHinweismeldungHervor();
+
+
+
 
 //        btnLogin.setEnabled(false);
 
@@ -114,5 +120,11 @@ public class LoginActivity extends AppCompatActivity {
 
     public static boolean isValidEmail(CharSequence target){
         return (!TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches());
+    }
+
+    public void hebeHinweismeldungHervor(){
+        if(txtHinweis.toString() != ""){
+            txtHinweis.setTextColor(Color.RED);
+        }
     }
 }

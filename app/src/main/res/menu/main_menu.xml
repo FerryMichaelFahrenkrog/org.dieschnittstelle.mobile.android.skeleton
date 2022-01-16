@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:title="SORT" android:id="@+id/sortItems" app:showAsAction="always" android:icon="@drawable/outline_sort_24"></item>
-    <item android:title="DELETE REMOTE" android:id="@+id/deleteRemoteItems" app:showAsAction="never"/>
-    <item android:title="DELETE LOCAL" android:id="@+id/deleteLocalItems" app:showAsAction="never"/>
+    <item
+        android:id="@+id/sortItems"
+        android:icon="@drawable/outline_sort_24"
+        android:title="SORT"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/SyncTodos"
+        android:title="Sync Todos"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/deleteRemoteItems"
+        android:title="DELETE REMOTE"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/deleteLocalItems"
+        android:title="DELETE LOCAL"
+        app:showAsAction="never" />
 </menu>
