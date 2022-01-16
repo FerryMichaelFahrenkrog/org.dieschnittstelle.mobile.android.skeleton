@@ -12,14 +12,14 @@ import java.util.function.Consumer;
 import model.IDataItemCRUDOperations;
 import model.ToDo;
 
-public class CreateTodosTask extends AsyncTask<ToDo, Void, List<ToDo>> {
+public class CreateTodosTask extends AsyncTask<ToDo, Void, ToDo> {
     //Die Warning irgendwann beheben
     @SuppressLint("StaticFieldLeak")
     private ProgressBar progressBar;
     private IDataItemCRUDOperations crudOperations;
-    private Consumer<List<ToDo>> onDoneConsumer;
+    private Consumer<ToDo> onDoneConsumer;
 
-    public CreateTodosTask(ProgressBar progressBar, IDataItemCRUDOperations crudOperations, Consumer<List<ToDo>> onDoneConsumer) {
+    public CreateTodosTask(ProgressBar progressBar, IDataItemCRUDOperations crudOperations, Consumer<ToDo> onDoneConsumer) {
         this.progressBar = progressBar;
         this.crudOperations = crudOperations;
         this.onDoneConsumer = onDoneConsumer;
@@ -30,21 +30,15 @@ public class CreateTodosTask extends AsyncTask<ToDo, Void, List<ToDo>> {
         progressBar.setVisibility(View.VISIBLE);
     }
 
-
     @Override
-    protected List<ToDo> doInBackground(ToDo... todos) {
-        ArrayList<ToDo> addedTodos = new ArrayList<>();
-
-        for (ToDo todo : todos) {
-            addedTodos.add(crudOperations.createDataItem(todo));
-        }
-        return addedTodos;
+    protected ToDo doInBackground(ToDo... toDos) {
+        return crudOperations.createDataItem(toDos[0]);
     }
 
 
     @Override
-    protected void onPostExecute(List<ToDo> todos) {
-        onDoneConsumer.accept(todos);
+    protected void onPostExecute(ToDo todo) {
+        onDoneConsumer.accept(todo);
         progressBar.setVisibility(View.INVISIBLE);
     }
 }
