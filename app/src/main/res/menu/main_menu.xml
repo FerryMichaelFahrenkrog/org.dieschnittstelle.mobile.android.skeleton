@@ -13,12 +13,14 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/deleteLocalItems"
+        android:title="DELETE LOCAL"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/deleteRemoteItems"
         android:title="DELETE REMOTE"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/deleteLocalItems"
-        android:title="DELETE LOCAL"
-        app:showAsAction="never" />
+
 </menu>

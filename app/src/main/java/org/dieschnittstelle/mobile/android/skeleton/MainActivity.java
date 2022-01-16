@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -31,10 +32,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
+import impl.RetrofitRemoteDataItemCRUDOperationsImpl;
+import impl.RoomLocalDataItemCRUDOperationsImpl;
+import impl.SyncedDataItemCRUDOperationsImpl;
 import impl.ThreadedDataItemCRUDOperationsAsyncImpl;
 import model.IDataItemCRUDOperations;
 import model.IDataItemCRUDOperationsAsync;
 import model.ToDo;
+import tasks.DeleteAllToDosTask;
 
 public class MainActivity extends AppCompatActivity {               // macht die Klasse zu einer Activity
     private static String logtag = "MainActivity: ";                // Logger zur Ausgabe
@@ -161,38 +166,41 @@ public class MainActivity extends AppCompatActivity {               // macht die
     //Menues :)
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.sortItems) {
-            sortListAndScrollToItem(null);
-            return true;
-        } else if (item.getItemId() == R.id.deleteRemoteItems) {
-            crudOperations.deleteAllDataItems(true, (result) -> {
-                if (result) {
-
-                    showFeedbackMessage("Remote items were deleted!");
-                } else {
-                    showFeedbackMessage("Remote items could not be deleted, maybe we are running in local mode");
-                }
-
-            });
-            return true;
-        } else if (item.getItemId() == R.id.deleteLocalItems) {
-            crudOperations.deleteAllDataItems(true, (result) -> {
-                if (result) {
-
-                    showFeedbackMessage("Local items were deleted!");
-                } else {
-                    showFeedbackMessage("Local items could not be deleted");
-                }
-
-            });
-            return true;
-        } else {
-            return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.deleteLocalItems:
+                RoomLocalDataItemCRUDOperationsImpl roomTodoCRUDOperations = new RoomLocalDataItemCRUDOperationsImpl(this);
+                new DeleteAllToDosTask(progressBar, roomTodoCRUDOperations, v -> {
+                    Toast.makeText(getApplicationContext(), "Die lokalen ToDos wurden gelöscht", Toast.LENGTH_SHORT).show();
+                    items.clear();
+                    listViewAdapter.notifyDataSetChanged();
+                }).execute();
+                return true;
+            case R.id.deleteRemoteItems:
+                RetrofitRemoteDataItemCRUDOperationsImpl retrofitTodoCRUDOperations = new RetrofitRemoteDataItemCRUDOperationsImpl();
+                new DeleteAllToDosTask(progressBar, retrofitTodoCRUDOperations, v -> {
+                    Toast.makeText(getApplicationContext(), "Die remote ToDos wurden gelöscht", Toast.LENGTH_SHORT).show();
+                }).execute();
+                return true;
+            case R.id.SyncTodos:
+//                SyncedDataItemCRUDOperationsImpl syncTodoCRUDOperations = new SyncedDataItemCRUDOperationsImpl(this);
+//                new ReadAllTodosTask(progressBar, syncTodoCRUDOperations, v -> {
+//                    Toast.makeText(getApplicationContext(), "Sync List feddisch", Toast.LENGTH_SHORT).show();
+//                    listFragment.getTodoList().clear();
+//                    listFragment.getTodoList().addAll(v);
+//                    listFragment.resortList();
+//                    mapFragment.updateMarkers(listFragment.getTodoList());
+//                }).execute();
+//                return true;
+            case R.id.sortItems:
+                sortListAndScrollToItem(null);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
     protected void sortListAndScrollToItem(ToDo item) {
-//        showFeedbackMessage("Sort List!");
+        showFeedbackMessage("Sort List!");
         sortitems(items);
 
         listViewAdapter.notifyDataSetChanged(); //Aktualisierung
