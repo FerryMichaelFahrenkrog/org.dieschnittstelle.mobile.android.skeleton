@@ -8,6 +8,7 @@ import java.util.List;
 
 import model.IDataItemCRUDOperations;
 import model.ToDo;
+import model.User;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -41,6 +42,9 @@ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOp
         @DELETE("/api/todos")
         public Call<Boolean> deleteAllToDos();
         //1h 24 min rest, ab 30 min Blick auf alles
+
+        @PUT("api/users/auth")
+        Call<Boolean> authenticate(@Body User user);
     }
 
     private ToDoWebAPI webAPI;
@@ -109,6 +113,22 @@ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOp
     {
         try {
             return webAPI.deleteAllToDos().execute().body();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean authenticateUser(User user) {
+        try {
+            Boolean authResponse = webAPI.authenticate(user).execute().body();
+
+            if (authResponse != null) {
+                return authResponse;
+            } else {
+                return authResponse;
+            }
         } catch (IOException e) {
             e.printStackTrace();
             return false;

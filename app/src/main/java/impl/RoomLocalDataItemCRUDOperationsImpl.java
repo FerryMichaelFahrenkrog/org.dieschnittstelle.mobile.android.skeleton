@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import model.IDataItemCRUDOperations;
 import model.ToDo;
+import model.User;
 
 public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperations {
 
@@ -122,6 +123,11 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
             //TODO: delete all items in the local db
             return false;
         }
+    }
+
+    @Override
+    public boolean authenticateUser(User user) {
+        return true;
     }
 
     /*

@@ -8,12 +8,15 @@ import java.util.List;
 import model.IDataItemCRUDOperations;
 import model.IDataItemCRUDOperationsAsync;
 import model.ToDo;
+import model.User;
 
 public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations {
     private IDataItemCRUDOperations localCRUD;
     private IDataItemCRUDOperations remoteCRUD;
 
     private boolean synced;
+    private boolean remoteAvailable = false;
+
 
     public SyncedDataItemCRUDOperationsImpl(IDataItemCRUDOperations localCRUD, IDataItemCRUDOperations remoteCRUD){
         this.localCRUD = localCRUD;
@@ -87,5 +90,19 @@ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
         }else{
             return localCRUD.deleteAllDataItems(remote);
         }
+    }
+
+    @Override
+    public boolean authenticateUser(User user) {
+//        checkConnection();
+
+        if (!remoteAvailable) {
+            return localCRUD.authenticateUser(user);
+        } else {
+            if (localCRUD.authenticateUser(user)) {
+                return remoteCRUD.authenticateUser(user);
+            }
+        }
+        return false;
     }
 }

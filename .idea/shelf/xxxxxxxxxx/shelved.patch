@@ -1,0 +1,874 @@
+Index: app/src/main/java/impl/SimpleDataItemCRUDOperationsImpl.java
+===================================================================
+diff --git a/app/src/main/java/impl/SimpleDataItemCRUDOperationsImpl.java b/app/src/main/java/impl/SimpleDataItemCRUDOperationsImpl.java
+deleted file mode 100644
+--- a/app/src/main/java/impl/SimpleDataItemCRUDOperationsImpl.java	
++++ /dev/null	
+@@ -1,57 +0,0 @@
+-package impl;
+-
+-import java.util.Arrays;
+-import java.util.List;
+-import java.util.stream.Collectors;
+-
+-import model.IDataItemCRUDOperations;
+-import model.ToDo;
+-
+-public class SimpleDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
+-{
+-    @Override
+-    public ToDo createDataItem(ToDo toDo) {
+-        toDo.setId(ToDo.nextId());
+-        return toDo;
+-    }
+-
+-    @Override
+-    public List<ToDo> readAllDataItems() {
+-        try {
+-            Thread.sleep(500);
+-        } catch (InterruptedException e) {
+-            e.printStackTrace();
+-        }
+-
+-        List<ToDo> items = Arrays.asList("lorem", "ipsum", "dolor", "sit", "amet", "adipiscing", "elit", "larem", "totkopf", "druggy", "Thorsten", "Horst", "Ferraldon", "Lenox")
+-                .stream()
+-                .map(v -> {
+-                    ToDo itemobj = new ToDo(v);
+-                    itemobj.setId(ToDo.nextId());
+-                    return itemobj;
+-                })
+-                .collect(Collectors.toList());
+-
+-        return items;
+-    }
+-
+-    @Override
+-    public ToDo readDataItem(long id) {
+-        return null;
+-    }
+-
+-    @Override
+-    public ToDo updateDataItem(ToDo toDo) {
+-        return toDo;
+-    }
+-
+-    @Override
+-    public boolean deleteDataItem(long id) {
+-        return false;
+-    }
+-
+-    @Override
+-    public boolean deleteAllDataItems(boolean remote) {
+-        return false;
+-    }
+-}
+Index: app/src/main/java/impl/SyncedDataItemCRUDOperationsImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package impl;\r\n\r\nimport android.util.Log;\r\n\r\nimport java.util.Arrays;\r\nimport java.util.List;\r\n\r\nimport model.IDataItemCRUDOperations;\r\nimport model.IDataItemCRUDOperationsAsync;\r\nimport model.ToDo;\r\n\r\npublic class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations {\r\n    private IDataItemCRUDOperations localCRUD;\r\n    private IDataItemCRUDOperations remoteCRUD;\r\n\r\n    private boolean synced;\r\n\r\n    public SyncedDataItemCRUDOperationsImpl(IDataItemCRUDOperations localCRUD, IDataItemCRUDOperations remoteCRUD){\r\n        this.localCRUD = localCRUD;\r\n        this.remoteCRUD = remoteCRUD;\r\n    }\r\n\r\n    @Override\r\n    public ToDo createDataItem(ToDo toDo)\r\n    {\r\n        //erstelle lokal createDataitem\r\n        toDo = localCRUD.createDataItem(toDo);\r\n\r\n        //dann erstellt mans remote, sie nimmt die lokal zugewiesene ID\r\n        remoteCRUD.createDataItem(toDo);\r\n        return toDo;\r\n    }\r\n\r\n    @Override\r\n    public List<ToDo> readAllDataItems() {\r\n        //TODO !\r\n        if(!synced){\r\n            synclLocalandRemote();\r\n        synced = true;\r\n        }\r\n        return localCRUD.readAllDataItems();\r\n    }\r\n\r\n    private void synclLocalandRemote() {\r\n        List<ToDo> anzahlDateneinträge = localCRUD.readAllDataItems();\r\n        int eintraege = anzahlDateneinträge.size();\r\n\r\n        Log.i(\"EINTRAEGE \", \"anzahl \" + eintraege);\r\n\r\n        if(eintraege > 0){\r\n            //sind lokale ToDos da, dann lösche ich alles remote\r\n            remoteCRUD.deleteAllDataItems(true);\r\n\r\n            //wie übertrage ich jetzt die lokalen ToDos auf Remote seite?\r\n\r\n        }else{\r\n            //Jetzt sollen in die lokale DB alles von der Remote Seite\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public ToDo readDataItem(long id) {\r\n        return null;\r\n    }\r\n\r\n    @Override\r\n    public ToDo updateDataItem(ToDo toDo) {\r\n        toDo = localCRUD.updateDataItem(toDo);\r\n        remoteCRUD.updateDataItem(toDo);\r\n        return toDo;\r\n\r\n        //if (localCRUD.updateDataITem(item)){\r\n        //teturn remoteCrud.updateDataitem(item)\r\n        //return false=\r\n\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteDataItem(long id) {\r\n        return false;\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteAllDataItems(boolean remote) {\r\n        if(remote){\r\n            return remoteCRUD.deleteAllDataItems(remote);\r\n        }else{\r\n            return localCRUD.deleteAllDataItems(remote);\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/impl/SyncedDataItemCRUDOperationsImpl.java b/app/src/main/java/impl/SyncedDataItemCRUDOperationsImpl.java
+--- a/app/src/main/java/impl/SyncedDataItemCRUDOperationsImpl.java	
++++ b/app/src/main/java/impl/SyncedDataItemCRUDOperationsImpl.java	
+@@ -1,62 +1,91 @@
+ package impl;
+ 
++import android.content.Context;
+ import android.util.Log;
+ 
+-import java.util.Arrays;
++import com.google.android.material.snackbar.Snackbar;
++
+ import java.util.List;
+ 
+ import model.IDataItemCRUDOperations;
+-import model.IDataItemCRUDOperationsAsync;
+ import model.ToDo;
++import model.User;
+ 
+ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations {
+     private IDataItemCRUDOperations localCRUD;
+-    private IDataItemCRUDOperations remoteCRUD;
++    private IDataItemCRUDOperations retroCrud;
+ 
+-    private boolean synced;
++    private boolean remoteAvailable = false;
+ 
+-    public SyncedDataItemCRUDOperationsImpl(IDataItemCRUDOperations localCRUD, IDataItemCRUDOperations remoteCRUD){
+-        this.localCRUD = localCRUD;
+-        this.remoteCRUD = remoteCRUD;
++    public SyncedDataItemCRUDOperationsImpl(Context context){
++        this.localCRUD = new RoomLocalDataItemCRUDOperationsImpl(context);
++        this.retroCrud = new RetrofitRemoteDataItemCRUDOperationsImpl();
+     }
+ 
+     @Override
+     public ToDo createDataItem(ToDo toDo)
+     {
+-        //erstelle lokal createDataitem
+         toDo = localCRUD.createDataItem(toDo);
+ 
+-        //dann erstellt mans remote, sie nimmt die lokal zugewiesene ID
+-        remoteCRUD.createDataItem(toDo);
++        if(remoteAvailable){
++            retroCrud.createDataItem(toDo);
++        }
+         return toDo;
+     }
+ 
+     @Override
+     public List<ToDo> readAllDataItems() {
+-        //TODO !
+-        if(!synced){
+-            synclLocalandRemote();
+-        synced = true;
+-        }
+-        return localCRUD.readAllDataItems();
+-    }
++        List<ToDo> localToDos = localCRUD.readAllDataItems();
+ 
+-    private void synclLocalandRemote() {
+-        List<ToDo> anzahlDateneinträge = localCRUD.readAllDataItems();
+-        int eintraege = anzahlDateneinträge.size();
++        if(remoteAvailable){
++            List<ToDo> remoteToDos = retroCrud.readAllDataItems();
+ 
+-        Log.i("EINTRAEGE ", "anzahl " + eintraege);
++            if(remoteToDos != null){
++                if(!localToDos.isEmpty()){
++                    for(ToDo remoteToDo : remoteToDos){
++                        retroCrud.deleteDataItem(remoteToDo);
++                    }
+ 
+-        if(eintraege > 0){
+-            //sind lokale ToDos da, dann lösche ich alles remote
+-            remoteCRUD.deleteAllDataItems(true);
+-
+-            //wie übertrage ich jetzt die lokalen ToDos auf Remote seite?
++                    for(ToDo localToDo : localToDos){
++                        retroCrud.createDataItem(localToDo);
++                    }
+ 
+-        }else{
+-            //Jetzt sollen in die lokale DB alles von der Remote Seite
++                    return localToDos;
++                }else{
++                    for(ToDo remoteToDo : remoteToDos){
++                        localCRUD.createDataItem(remoteToDo);
++                    }
++
++                    return remoteToDos;
++                }
++            }
+         }
++
++        return localToDos;
++//        //TODO !
++//        if(!remoteAvailable){
++//            synclLocalandRemote();
++//            remoteAvailable = true;
++//        }
++//        return localCRUD.readAllDataItems();
+     }
++
++//    private void synclLocalandRemote() {
++//        List<ToDo> anzahlDateneinträge = localCRUD.readAllDataItems();
++//        int eintraege = anzahlDateneinträge.size();
++//
++//        Log.i("EINTRAEGE ", "anzahl " + eintraege);
++//
++//        if(eintraege > 0){
++//            //sind lokale ToDos da, dann lösche ich alles remote
++//            retroCrud.deleteAllDataItems(true);
++//
++//            //wie übertrage ich jetzt die lokalen ToDos auf Remote seite?
++//
++//        }else{
++//            //Jetzt sollen in die lokale DB alles von der Remote Seite
++//        }
++//    }
+ 
+     @Override
+     public ToDo readDataItem(long id) {
+@@ -64,28 +93,34 @@
+     }
+ 
+     @Override
+-    public ToDo updateDataItem(ToDo toDo) {
+-        toDo = localCRUD.updateDataItem(toDo);
+-        remoteCRUD.updateDataItem(toDo);
+-        return toDo;
+-
+-        //if (localCRUD.updateDataITem(item)){
+-        //teturn remoteCrud.updateDataitem(item)
+-        //return false=
++    public boolean updateDataItem(ToDo toDo) {
+ 
+-    }
++        if(!remoteAvailable){
++            return localCRUD.deleteDataItem(toDo);
++        }else{
++            if(localCRUD.deleteDataItem(toDo)){
++                return retroCrud.deleteDataItem(toDo);
++            }
++        }
+ 
+-    @Override
+-    public boolean deleteDataItem(long id) {
+         return false;
+     }
+ 
+     @Override
+-    public boolean deleteAllDataItems(boolean remote) {
+-        if(remote){
+-            return remoteCRUD.deleteAllDataItems(remote);
++    public boolean deleteDataItem(ToDo toDo) {
++        if(!remoteAvailable){
++            return localCRUD.deleteDataItem(toDo);
+         }else{
+-            return localCRUD.deleteAllDataItems(remote);
++            if(localCRUD.deleteDataItem(toDo)){
++                return retroCrud.deleteDataItem(toDo);
++            }
+         }
++        return false;
+     }
++
++    @Override
++    public boolean authenticateUser(User user) {
++        return false;
++    }
++
+ }
+Index: .extract/logs/access_log.2022-01-16
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>127.0.0.1 - - [16/Jan/2022:07:45:47 +0100] GET /api/todos HTTP/1.1 200 294 http-bio-8080-exec-1 326\r\n0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:45:58 +0100] GET /api/todos HTTP/1.1 200 294 http-bio-8080-exec-4 7\r\n0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:45:58 +0100] GET /favicon.ico HTTP/1.1 404 973 http-bio-8080-exec-5 3\r\n127.0.0.1 - - [16/Jan/2022:07:46:02 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-7 4\r\n127.0.0.1 - - [16/Jan/2022:07:46:15 +0100] POST /api/todos HTTP/1.1 200 121 http-bio-8080-exec-8 69\r\n0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:46:19 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-6 29\r\n0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:46:19 +0100] GET /api/todos HTTP/1.1 200 123 http-bio-8080-exec-10 2\r\n127.0.0.1 - - [16/Jan/2022:07:46:38 +0100] PUT /api/todos/13 HTTP/1.1 200 134 http-bio-8080-exec-9 6\r\n0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:46:42 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-10 1\r\n0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:46:42 +0100] GET /api/todos HTTP/1.1 200 136 http-bio-8080-exec-10 2\r\n0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:46:44 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-10 1\r\n0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:46:44 +0100] GET /api/todos HTTP/1.1 200 136 http-bio-8080-exec-10 2\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.extract/logs/access_log.2022-01-16 b/.extract/logs/access_log.2022-01-16
+--- a/.extract/logs/access_log.2022-01-16	
++++ b/.extract/logs/access_log.2022-01-16	
+@@ -10,3 +10,97 @@
+ 0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:46:42 +0100] GET /api/todos HTTP/1.1 200 136 http-bio-8080-exec-10 2
+ 0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:46:44 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-10 1
+ 0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:46:44 +0100] GET /api/todos HTTP/1.1 200 136 http-bio-8080-exec-10 2
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:04:54 +0100] GET / HTTP/1.1 200 6633 http-bio-8080-exec-2 28
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:04:55 +0100] GET /api/todos HTTP/1.1 200 294 http-bio-8080-exec-4 304
++127.0.0.1 - - [16/Jan/2022:08:05:05 +0100] GET /api/todos HTTP/1.1 200 294 http-bio-8080-exec-6 4
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:05:10 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-5 6
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:05:10 +0100] GET /api/todos HTTP/1.1 200 294 http-bio-8080-exec-8 2
++127.0.0.1 - - [16/Jan/2022:08:05:12 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-10 4
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:05:14 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-9 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:05:14 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-9 3
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:05:15 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-9 0
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:05:15 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-9 2
++127.0.0.1 - - [16/Jan/2022:08:05:23 +0100] POST /api/todos HTTP/1.1 200 112 http-bio-8080-exec-10 55
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:05:25 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-9 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:05:25 +0100] GET /api/todos HTTP/1.1 200 114 http-bio-8080-exec-9 2
++127.0.0.1 - - [16/Jan/2022:08:05:45 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-8 2
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:05:46 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-9 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:05:46 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-9 2
++127.0.0.1 - - [16/Jan/2022:08:17:38 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-10 2
++127.0.0.1 - - [16/Jan/2022:08:17:43 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-4 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:17:53 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-7 2
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:17:53 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-7 2
++127.0.0.1 - - [16/Jan/2022:08:18:47 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-8 3
++127.0.0.1 - - [16/Jan/2022:08:19:33 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-2 1
++127.0.0.1 - - [16/Jan/2022:08:19:50 +0100] POST /api/todos HTTP/1.1 200 117 http-bio-8080-exec-2 4
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:19:56 +0100] GET /api/todos HTTP/1.1 200 119 http-bio-8080-exec-3 2
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:19:57 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-3 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:19:57 +0100] GET /api/todos HTTP/1.1 200 119 http-bio-8080-exec-3 2
++127.0.0.1 - - [16/Jan/2022:08:20:01 +0100] POST /api/todos HTTP/1.1 200 114 http-bio-8080-exec-2 4
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:20:02 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-3 0
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:20:02 +0100] GET /api/todos HTTP/1.1 200 234 http-bio-8080-exec-3 2
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:20:06 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-3 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:20:06 +0100] GET /api/todos HTTP/1.1 200 234 http-bio-8080-exec-3 3
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:20:07 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-3 0
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:20:07 +0100] GET /api/todos HTTP/1.1 200 234 http-bio-8080-exec-3 2
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:20:07 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-3 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:20:07 +0100] GET /api/todos HTTP/1.1 200 234 http-bio-8080-exec-3 2
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:20:07 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-3 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:20:07 +0100] GET /api/todos HTTP/1.1 200 234 http-bio-8080-exec-3 3
++127.0.0.1 - - [16/Jan/2022:08:20:52 +0100] GET /api/todos HTTP/1.1 200 234 http-bio-8080-exec-4 3
++127.0.0.1 - - [16/Jan/2022:08:20:55 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-8 2
++127.0.0.1 - - [16/Jan/2022:08:21:01 +0100] POST /api/todos HTTP/1.1 200 112 http-bio-8080-exec-8 2
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:21:03 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-3 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:21:03 +0100] GET /api/todos HTTP/1.1 200 114 http-bio-8080-exec-3 4
++127.0.0.1 - - [16/Jan/2022:08:21:06 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-8 2
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:21:07 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-3 0
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:08:21:07 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-3 1
++127.0.0.1 - - [16/Jan/2022:08:31:28 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-1 2
++127.0.0.1 - - [16/Jan/2022:08:31:32 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-6 1
++127.0.0.1 - - [16/Jan/2022:08:32:22 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-9 2
++127.0.0.1 - - [16/Jan/2022:08:32:25 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-5 2
++127.0.0.1 - - [16/Jan/2022:10:36:49 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-8 2
++127.0.0.1 - - [16/Jan/2022:10:36:56 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-1 2
++127.0.0.1 - - [16/Jan/2022:10:37:11 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-2 2
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:37:19 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-9 2
++127.0.0.1 - - [16/Jan/2022:10:37:25 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-5 2
++127.0.0.1 - - [16/Jan/2022:10:37:37 +0100] POST /api/todos HTTP/1.1 200 116 http-bio-8080-exec-5 3
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:37:37 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-9 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:37:37 +0100] GET /api/todos HTTP/1.1 200 118 http-bio-8080-exec-9 2
++127.0.0.1 - - [16/Jan/2022:10:37:43 +0100] GET /api/todos HTTP/1.1 200 118 http-bio-8080-exec-6 2
++127.0.0.1 - - [16/Jan/2022:10:37:43 +0100] DELETE /api/todos/19 HTTP/1.1 200 4 http-bio-8080-exec-6 12
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:37:44 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-9 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:37:44 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-9 1
++127.0.0.1 - - [16/Jan/2022:10:38:06 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-7 2
++127.0.0.1 - - [16/Jan/2022:10:38:10 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-2 1
++127.0.0.1 - - [16/Jan/2022:10:38:20 +0100] POST /api/todos HTTP/1.1 200 118 http-bio-8080-exec-2 2
++127.0.0.1 - - [16/Jan/2022:10:46:16 +0100] GET /api/todos HTTP/1.1 200 120 http-bio-8080-exec-8 2
++127.0.0.1 - - [16/Jan/2022:10:47:55 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-6 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:47:59 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-10 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:47:59 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-10 2
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:47:59 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-10 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:47:59 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-10 1
++127.0.0.1 - - [16/Jan/2022:10:48:07 +0100] POST /api/todos HTTP/1.1 200 112 http-bio-8080-exec-6 2
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:48:09 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-10 0
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:48:09 +0100] GET /api/todos HTTP/1.1 200 114 http-bio-8080-exec-10 1
++127.0.0.1 - - [16/Jan/2022:10:48:13 +0100] GET /api/todos HTTP/1.1 200 114 http-bio-8080-exec-4 1
++127.0.0.1 - - [16/Jan/2022:10:48:13 +0100] DELETE /api/todos/21 HTTP/1.1 200 4 http-bio-8080-exec-4 2
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:48:14 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-10 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:48:14 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-10 2
++127.0.0.1 - - [16/Jan/2022:10:48:25 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-8 1
++127.0.0.1 - - [16/Jan/2022:10:49:52 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-3 2
++127.0.0.1 - - [16/Jan/2022:10:49:55 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-2 3
++127.0.0.1 - - [16/Jan/2022:10:50:01 +0100] POST /api/todos HTTP/1.1 200 125 http-bio-8080-exec-2 1
++127.0.0.1 - - [16/Jan/2022:10:50:16 +0100] POST /api/todos HTTP/1.1 200 111 http-bio-8080-exec-2 3
++127.0.0.1 - - [16/Jan/2022:10:50:23 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-1 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:50:26 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-7 2
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:50:26 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-7 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:50:26 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-7 0
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:50:26 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-7 2
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:50:27 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-7 0
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:50:27 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-7 1
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:50:27 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-7 0
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:50:27 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-7 2
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:50:27 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-7 0
++0:0:0:0:0:0:0:1 - - [16/Jan/2022:10:50:27 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-7 1
++127.0.0.1 - - [16/Jan/2022:11:42:06 +0100] GET /api/todos HTTP/1.1 200 2 http-bio-8080-exec-6 2
+Index: app/src/main/java/impl/RoomLocalDataItemCRUDOperationsImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package impl;\r\n\r\nimport android.content.Context;\r\n\r\nimport androidx.room.Dao;\r\nimport androidx.room.Database;\r\nimport androidx.room.Insert;\r\nimport androidx.room.Query;\r\nimport androidx.room.Room;\r\nimport androidx.room.RoomDatabase;\r\nimport androidx.room.TypeConverter;\r\nimport androidx.room.TypeConverters;\r\nimport androidx.room.Update;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.Arrays;\r\nimport java.util.List;\r\nimport java.util.stream.Collectors;\r\n\r\nimport model.IDataItemCRUDOperations;\r\nimport model.ToDo;\r\n\r\npublic class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperations {\r\n\r\n    public static class ArrayListToStringDatabaseConverter {\r\n\r\n        @TypeConverter\r\n        public static ArrayList<String> fromString(String value) {\r\n            if(value == null || value.length() == 0){\r\n                return new ArrayList<>();\r\n            }\r\n            return new ArrayList<>(Arrays.asList(value.split(\",\")));\r\n        }\r\n\r\n        @TypeConverter\r\n        public static String fromArrayList(ArrayList<String> value) {\r\n            if(value == null){\r\n                return \"\";\r\n            }\r\n            return value\r\n                    .stream()\r\n                    .collect(Collectors.joining(\",\"));\r\n        }\r\n    }\r\n\r\n    //Room ist ein Framework was Daten, die wir in unsere View als Objekte reingeben, in eine DB zu überführen\r\n    //Oder Daten aus einer DB in unser JavaCode zu überführen\r\n\r\n    //Angeben welche Inhalte ich in meiner DB Speichern will, welche Klassen meines Projekts sind Klassen deren Instanzen ich\r\n    //dauerhaft in die DB übertragen will. DataItem nicht, Activitiys nicht, nur die to_do Klasse! Dafür ne abstrakteDB Class.\r\n\r\n    //1tens Welche Daten\r\n    //2tens welche Operationen brauch ich\r\n    //3tens Struktur angeben\r\n\r\n    @Database(entities = {ToDo.class}, version = 10)\r\n    public static abstract class RoomToDoDatabase extends RoomDatabase {\r\n        public abstract RoomDataItemCRUDAccess getDao();\r\n    }\r\n\r\n    @Dao\r\n    public static interface RoomDataItemCRUDAccess {\r\n        @Insert\r\n        public long createItem(ToDo toDo); //TODO als Name!\r\n\r\n        @Query(\"select * from todo\")\r\n        public List<ToDo> readAllItems();\r\n\r\n        @Query(\"select * from todo where id = (:id)\")\r\n        public ToDo readItem(Long id);\r\n\r\n        @Update\r\n        public int updateItem(ToDo toDo);\r\n    }\r\n\r\n    private RoomDataItemCRUDAccess roomAccessor;\r\n\r\n    public RoomLocalDataItemCRUDOperationsImpl(Context databaseOwner) {\r\n        RoomToDoDatabase db = Room.databaseBuilder(databaseOwner.getApplicationContext(),\r\n                RoomToDoDatabase.class,\r\n                \"dataitems-database-mad21\").build();\r\n\r\n        roomAccessor = db.getDao();\r\n\r\n    }\r\n\r\n    @Override\r\n    public ToDo createDataItem(ToDo toDo) {\r\n        long newID = roomAccessor.createItem(toDo);\r\n        toDo.setId(newID);\r\n\r\n        return toDo;\r\n    }\r\n\r\n    @Override\r\n    public List<ToDo> readAllDataItems() {\r\n        return roomAccessor.readAllItems();\r\n    }\r\n\r\n    @Override\r\n    public ToDo readDataItem(long id) {\r\n        return null;\r\n    }\r\n\r\n    @Override\r\n    public ToDo updateDataItem(ToDo toDo) {\r\n        roomAccessor.updateItem(toDo);\r\n        return toDo;\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteDataItem(long id) {\r\n\r\n        return false;\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteAllDataItems(boolean remote) {\r\n        if(remote){\r\n            return false;\r\n        }else{\r\n            //TODO: delete all items in the local db\r\n            return false;\r\n        }\r\n    }\r\n\r\n    /*\r\n        @Override\r\n    public boolean deleteAllDataItems(boolean remote)\r\n    {\r\n        try {\r\n            return webAPI.deleteAllToDos().execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return false;\r\n        }\r\n    }\r\n     */\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/impl/RoomLocalDataItemCRUDOperationsImpl.java b/app/src/main/java/impl/RoomLocalDataItemCRUDOperationsImpl.java
+--- a/app/src/main/java/impl/RoomLocalDataItemCRUDOperationsImpl.java	
++++ b/app/src/main/java/impl/RoomLocalDataItemCRUDOperationsImpl.java	
+@@ -4,6 +4,7 @@
+ 
+ import androidx.room.Dao;
+ import androidx.room.Database;
++import androidx.room.Delete;
+ import androidx.room.Insert;
+ import androidx.room.Query;
+ import androidx.room.Room;
+@@ -19,74 +20,47 @@
+ 
+ import model.IDataItemCRUDOperations;
+ import model.ToDo;
+-
+-public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperations {
+-
+-    public static class ArrayListToStringDatabaseConverter {
+-
+-        @TypeConverter
+-        public static ArrayList<String> fromString(String value) {
+-            if(value == null || value.length() == 0){
+-                return new ArrayList<>();
+-            }
+-            return new ArrayList<>(Arrays.asList(value.split(",")));
+-        }
++import model.User;
+ 
+-        @TypeConverter
+-        public static String fromArrayList(ArrayList<String> value) {
+-            if(value == null){
+-                return "";
+-            }
+-            return value
+-                    .stream()
+-                    .collect(Collectors.joining(","));
+-        }
+-    }
+-
+-    //Room ist ein Framework was Daten, die wir in unsere View als Objekte reingeben, in eine DB zu überführen
+-    //Oder Daten aus einer DB in unser JavaCode zu überführen
+-
+-    //Angeben welche Inhalte ich in meiner DB Speichern will, welche Klassen meines Projekts sind Klassen deren Instanzen ich
+-    //dauerhaft in die DB übertragen will. DataItem nicht, Activitiys nicht, nur die to_do Klasse! Dafür ne abstrakteDB Class.
+-
+-    //1tens Welche Daten
+-    //2tens welche Operationen brauch ich
+-    //3tens Struktur angeben
+-
++public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
++{
+     @Database(entities = {ToDo.class}, version = 10)
+     public static abstract class RoomToDoDatabase extends RoomDatabase {
+         public abstract RoomDataItemCRUDAccess getDao();
+     }
+ 
+     @Dao
+-    public static interface RoomDataItemCRUDAccess {
++    public static interface RoomDataItemCRUDAccess
++    {
++        @Query("SELECT * FROM Todo")
++        List<ToDo> getAll();
++
++        @Query("SELECT * FROM Todo WHERE id LIKE :id")
++        ToDo getSingle(long id);
++
+         @Insert
+-        public long createItem(ToDo toDo); //TODO als Name!
++        long create(ToDo todo);
+ 
+-        @Query("select * from todo")
+-        public List<ToDo> readAllItems();
+-
+-        @Query("select * from todo where id = (:id)")
+-        public ToDo readItem(Long id);
++        @Delete
++        void delete(ToDo todo);
+ 
+         @Update
+-        public int updateItem(ToDo toDo);
++        void update(ToDo todo);
+     }
+ 
+     private RoomDataItemCRUDAccess roomAccessor;
+ 
+-    public RoomLocalDataItemCRUDOperationsImpl(Context databaseOwner) {
+-        RoomToDoDatabase db = Room.databaseBuilder(databaseOwner.getApplicationContext(),
++    public RoomLocalDataItemCRUDOperationsImpl(Context context) {
++        RoomToDoDatabase db = Room.databaseBuilder(context.getApplicationContext(),
+                 RoomToDoDatabase.class,
+                 "dataitems-database-mad21").build();
+ 
+         roomAccessor = db.getDao();
+-
+     }
+ 
+     @Override
+     public ToDo createDataItem(ToDo toDo) {
+-        long newID = roomAccessor.createItem(toDo);
++        long newID = roomAccessor.create(toDo);
+         toDo.setId(newID);
+ 
+         return toDo;
+@@ -94,46 +68,52 @@
+ 
+     @Override
+     public List<ToDo> readAllDataItems() {
+-        return roomAccessor.readAllItems();
++        List<ToDo> toDos = roomAccessor.getAll();
++        return toDos;
+     }
+ 
+     @Override
+     public ToDo readDataItem(long id) {
+-        return null;
+-    }
++        ToDo todo = roomAccessor.getSingle(id);
++        return todo;
+ 
+-    @Override
+-    public ToDo updateDataItem(ToDo toDo) {
+-        roomAccessor.updateItem(toDo);
+-        return toDo;
+     }
+ 
+     @Override
+-    public boolean deleteDataItem(long id) {
+-
+-        return false;
++    public boolean updateDataItem(ToDo toDo) {
++        roomAccessor.update(toDo);
++        return true;
+     }
+ 
+     @Override
+-    public boolean deleteAllDataItems(boolean remote) {
+-        if(remote){
+-            return false;
+-        }else{
+-            //TODO: delete all items in the local db
+-            return false;
+-        }
++    public boolean deleteDataItem(ToDo toDo) {
++        roomAccessor.delete(toDo);
++        return true;
+     }
+ 
+-    /*
+-        @Override
+-    public boolean deleteAllDataItems(boolean remote)
++    @Override
++    public boolean authenticateUser(User user) {
++        return true;
++    }
++
++    public static class ArrayListToStringDatabaseConverter
+     {
+-        try {
+-            return webAPI.deleteAllToDos().execute().body();
+-        } catch (IOException e) {
+-            e.printStackTrace();
+-            return false;
++        @TypeConverter
++        public static ArrayList<String> fromString(String value) {
++            if(value == null || value.length() == 0){
++                return new ArrayList<>();
++            }
++            return new ArrayList<>(Arrays.asList(value.split(",")));
+         }
++
++        @TypeConverter
++        public static String fromArrayList(ArrayList<String> value) {
++            if(value == null){
++                return "";
++            }
++            return value
++                    .stream()
++                    .collect(Collectors.joining(","));
++        }
+     }
+-     */
+ }
+Index: app/src/main/java/impl/RetrofitRemoteDataItemCRUDOperationsImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package impl;\r\n\r\nimport com.google.gson.Gson;\r\n\r\nimport java.io.IOException;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\nimport model.IDataItemCRUDOperations;\r\nimport model.ToDo;\r\nimport retrofit2.Call;\r\nimport retrofit2.Retrofit;\r\nimport retrofit2.converter.gson.GsonConverterFactory;\r\nimport retrofit2.http.Body;\r\nimport retrofit2.http.DELETE;\r\nimport retrofit2.http.GET;\r\nimport retrofit2.http.POST;\r\nimport retrofit2.http.PUT;\r\nimport retrofit2.http.Path;\r\n\r\npublic class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOperations\r\n{\r\n    public static interface ToDoWebAPI{\r\n        //Web API Dokument\r\n\r\n        @POST(\"/api/todos\")\r\n        public Call<ToDo> createToDo(@Body ToDo toDo);\r\n\r\n        @GET(\"/api/todos\")\r\n        public Call<List<ToDo>> readAllToDos();\r\n\r\n        @GET(\"/api/todos/{id}\")\r\n        public Call<ToDo> readToDo(@Path(\"id\")long id);\r\n\r\n        @PUT(\"/api/todos/{id}\")\r\n        public Call<ToDo> updateToDo(@Path(\"id\")long id,@Body ToDo toDo);\r\n\r\n        @DELETE(\"/api/todos/{id}\")\r\n        public Call<Boolean> deleteToDo(@Path(\"id\") long id);\r\n\r\n        @DELETE(\"/api/todos\")\r\n        public Call<Boolean> deleteAllToDos();\r\n        //1h 24 min rest, ab 30 min Blick auf alles\r\n    }\r\n\r\n    private ToDoWebAPI webAPI;\r\n\r\n    public RetrofitRemoteDataItemCRUDOperationsImpl()\r\n    {\r\n        Retrofit apiBase = new Retrofit.Builder()\r\n                .baseUrl(\"http://10.0.2.2:8080/\")\r\n                .addConverterFactory(GsonConverterFactory.create())\r\n                .build();\r\n        webAPI = apiBase.create(ToDoWebAPI.class);\r\n    }\r\n\r\n    @Override\r\n    public ToDo createDataItem(ToDo toDo) {\r\n        try {\r\n            return webAPI.createToDo(toDo).execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return null;\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public List<ToDo> readAllDataItems() {\r\n        try {\r\n            return webAPI.readAllToDos().execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return new ArrayList<>();\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public ToDo readDataItem(long id) {\r\n        try {\r\n            return webAPI.readToDo(id).execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return null;\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public ToDo updateDataItem(ToDo toDo) {\r\n        try {\r\n            return webAPI.updateToDo(toDo.getId(), toDo).execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return null;\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteDataItem(long id) {\r\n        try {\r\n            return webAPI.deleteToDo(id).execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return false;\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteAllDataItems(boolean remote)\r\n    {\r\n        try {\r\n            return webAPI.deleteAllToDos().execute().body();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return false;\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/impl/RetrofitRemoteDataItemCRUDOperationsImpl.java b/app/src/main/java/impl/RetrofitRemoteDataItemCRUDOperationsImpl.java
+--- a/app/src/main/java/impl/RetrofitRemoteDataItemCRUDOperationsImpl.java	
++++ b/app/src/main/java/impl/RetrofitRemoteDataItemCRUDOperationsImpl.java	
+@@ -1,13 +1,14 @@
+ package impl;
+ 
+ import com.google.gson.Gson;
++import com.google.gson.GsonBuilder;
+ 
+ import java.io.IOException;
+-import java.util.ArrayList;
+ import java.util.List;
+ 
+ import model.IDataItemCRUDOperations;
+ import model.ToDo;
++import model.User;
+ import retrofit2.Call;
+ import retrofit2.Retrofit;
+ import retrofit2.converter.gson.GsonConverterFactory;
+@@ -20,44 +21,47 @@
+ 
+ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
+ {
+-    public static interface ToDoWebAPI{
+-        //Web API Dokument
+-
+-        @POST("/api/todos")
+-        public Call<ToDo> createToDo(@Body ToDo toDo);
+-
++    public static interface ToDoWebAPI
++    {
+         @GET("/api/todos")
+-        public Call<List<ToDo>> readAllToDos();
++        Call<List<ToDo>> getAll();
+ 
+         @GET("/api/todos/{id}")
+-        public Call<ToDo> readToDo(@Path("id")long id);
++        Call<ToDo> getSingle(@Path("id") long id);
+ 
+-        @PUT("/api/todos/{id}")
+-        public Call<ToDo> updateToDo(@Path("id")long id,@Body ToDo toDo);
++        @POST("/api/todos")
++        Call<ToDo> create(@Body ToDo toDo);
+ 
+         @DELETE("/api/todos/{id}")
+-        public Call<Boolean> deleteToDo(@Path("id") long id);
++        Call<Boolean> delete(@Path("id") long id);
+ 
+-        @DELETE("/api/todos")
+-        public Call<Boolean> deleteAllToDos();
+-        //1h 24 min rest, ab 30 min Blick auf alles
++        @PUT("/api/todos/{id}")
++        Call<ToDo> update(@Path("id") long id, @Body ToDo toDo);
++
++        @PUT("api/users/auth")
++        Call<Boolean> authenticate(@Body User user);
+     }
+ 
+     private ToDoWebAPI webAPI;
+ 
+     public RetrofitRemoteDataItemCRUDOperationsImpl()
+     {
++        GsonBuilder builder = new GsonBuilder();
++        builder.excludeFieldsWithoutExposeAnnotation();
++        Gson gson = builder.create();
++
+         Retrofit apiBase = new Retrofit.Builder()
+                 .baseUrl("http://10.0.2.2:8080/")
+-                .addConverterFactory(GsonConverterFactory.create())
++                .addConverterFactory(GsonConverterFactory.create(gson))
+                 .build();
+-        webAPI = apiBase.create(ToDoWebAPI.class);
++
++        webAPI = apiBase.create(ToDoWebAPI.class);      // Mein Interface da oben!
+     }
+ 
+     @Override
+     public ToDo createDataItem(ToDo toDo) {
+         try {
+-            return webAPI.createToDo(toDo).execute().body();
++            return webAPI.create(toDo).execute().body();
+         } catch (IOException e) {
+             e.printStackTrace();
+             return null;
+@@ -67,17 +71,19 @@
+     @Override
+     public List<ToDo> readAllDataItems() {
+         try {
+-            return webAPI.readAllToDos().execute().body();
++            List<ToDo> todos = webAPI.getAll().execute().body();
++            return todos;
+         } catch (IOException e) {
+             e.printStackTrace();
+-            return new ArrayList<>();
++            return null;
+         }
+     }
+ 
+     @Override
+     public ToDo readDataItem(long id) {
+         try {
+-            return webAPI.readToDo(id).execute().body();
++            ToDo todo = webAPI.getSingle(id).execute().body();
++            return todo;
+         } catch (IOException e) {
+             e.printStackTrace();
+             return null;
+@@ -85,19 +91,23 @@
+     }
+ 
+     @Override
+-    public ToDo updateDataItem(ToDo toDo) {
++    public boolean updateDataItem(ToDo toDo) {
+         try {
+-            return webAPI.updateToDo(toDo.getId(), toDo).execute().body();
++            if(webAPI.update(toDo.getId(), toDo).execute().body() != null){
++                return true;
++            }
++            else
++                return false;
+         } catch (IOException e) {
+             e.printStackTrace();
+-            return null;
++            return false;
+         }
+     }
+ 
+     @Override
+-    public boolean deleteDataItem(long id) {
++    public boolean deleteDataItem(ToDo toDo) {
+         try {
+-            return webAPI.deleteToDo(id).execute().body();
++            return webAPI.delete(toDo.getId()).execute().body();
+         } catch (IOException e) {
+             e.printStackTrace();
+             return false;
+@@ -105,13 +115,21 @@
+     }
+ 
+     @Override
+-    public boolean deleteAllDataItems(boolean remote)
+-    {
++    public boolean authenticateUser(User user) {
+         try {
+-            return webAPI.deleteAllToDos().execute().body();
++            Boolean authResponse = webAPI.authenticate(user).execute().body();
++
++            if (authResponse != null) {
++                return authResponse;
++            } else {
++                return authResponse;
++            }
+         } catch (IOException e) {
+             e.printStackTrace();
+             return false;
+         }
+     }
++
++
++
+ }
+Index: app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/ToDoApplication.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.dieschnittstelle.mobile.android.skeleton;\r\n\r\nimport android.app.Application;\r\nimport android.util.Log;\r\nimport android.widget.Toast;\r\n\r\nimport java.io.IOException;\r\nimport java.net.HttpURLConnection;\r\nimport java.net.URL;\r\nimport java.util.concurrent.CompletableFuture;\r\nimport java.util.concurrent.Future;\r\n\r\nimport impl.RetrofitRemoteDataItemCRUDOperationsImpl;\r\nimport impl.RoomLocalDataItemCRUDOperationsImpl;\r\nimport impl.SyncedDataItemCRUDOperationsImpl;\r\nimport model.IDataItemCRUDOperations;\r\n\r\npublic class ToDoApplication extends Application {\r\n    protected static String logtag = \"ToDoApplication\";\r\n    private IDataItemCRUDOperations crudOperations;\r\n    private boolean serverAvailable;\r\n\r\n    @Override\r\n    public void onCreate() {\r\n        super.onCreate();\r\n\r\n        Toast.makeText(this, \"Checking connectivity\", Toast.LENGTH_SHORT).show();\r\n\r\n        Future<Boolean> connectivityFuture = checkConnectivityAsync();\r\n\r\n        try{\r\n            if(connectivityFuture.get())\r\n            {\r\n                Log.i(logtag, \"connectivity successful\");\r\n                Toast.makeText(this, \"Backend accessible, will use the remote access.\", Toast.LENGTH_SHORT).show();\r\n                crudOperations = new SyncedDataItemCRUDOperationsImpl(new RoomLocalDataItemCRUDOperationsImpl(this), new RetrofitRemoteDataItemCRUDOperationsImpl());\r\n                serverAvailable = true;\r\n            }\r\n            else{\r\n                Log.i(logtag, \"connectivity failed\");\r\n                Toast.makeText(this, \"Backend not accessible, will use local access only.\", Toast.LENGTH_SHORT).show();\r\n                crudOperations = new RoomLocalDataItemCRUDOperationsImpl(this);\r\n            }\r\n        }catch(Exception e){\r\n            Log.e(logtag, \"onCreate(): Got exception: \" + e,e);\r\n            Toast.makeText(this, \"Backend not accessible, got exception: \" + e + \", will use local access\", Toast.LENGTH_SHORT).show();\r\n            crudOperations = new RoomLocalDataItemCRUDOperationsImpl(this);\r\n        }\r\n    }\r\n\r\n\r\n    public IDataItemCRUDOperations getCrudOperations() {\r\n        return crudOperations;\r\n    }\r\n\r\n    public Future<Boolean> checkConnectivityAsync(){\r\n        CompletableFuture<Boolean> future = new CompletableFuture<>();\r\n\r\n        new Thread(() -> {\r\n            boolean connectionAvailable = checkConnectivity();\r\n            future.complete(connectionAvailable);\r\n        }).start();\r\n\r\n        return future; //2h 4 rest\r\n    }\r\n\r\n    public boolean checkConnectivity() {\r\n        HttpURLConnection conn = null;\r\n\r\n        try {\r\n            conn = (HttpURLConnection) new URL(\"http://10.0.2.2:8080/api/todos\").openConnection();\r\n            conn.setReadTimeout(1000);\r\n            conn.setConnectTimeout(1000);\r\n            conn.setRequestMethod(\"GET\");\r\n            conn.setDoInput(true);\r\n            conn.connect();\r\n            conn.getInputStream();\r\n            Log.e(logtag, \"checkConnectivity(): connection successful \");\r\n            return true;\r\n        } catch (Exception e) {\r\n            Log.e(logtag, \"checkConnectivity(): Got exception: \" + e,e);\r\n            return false;\r\n        } finally{\r\n            if(conn != null){\r\n                conn.disconnect();\r\n            }\r\n        }\r\n    }\r\n\r\n    public boolean isServerAvailable() {\r\n        return serverAvailable;\r\n    }\r\n\r\n    public void setServerAvailable(boolean serverAvailable) {\r\n        this.serverAvailable = serverAvailable;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/ToDoApplication.java b/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/ToDoApplication.java
+--- a/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/ToDoApplication.java	
++++ b/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/ToDoApplication.java	
+@@ -33,7 +33,7 @@
+             {
+                 Log.i(logtag, "connectivity successful");
+                 Toast.makeText(this, "Backend accessible, will use the remote access.", Toast.LENGTH_SHORT).show();
+-                crudOperations = new SyncedDataItemCRUDOperationsImpl(new RoomLocalDataItemCRUDOperationsImpl(this), new RetrofitRemoteDataItemCRUDOperationsImpl());
++                crudOperations = new SyncedDataItemCRUDOperationsImpl(getApplicationContext());
+                 serverAvailable = true;
+             }
+             else{
+Index: app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/MainActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.dieschnittstelle.mobile.android.skeleton;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.annotation.Nullable;\r\nimport androidx.annotation.RequiresApi;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.databinding.DataBindingUtil;\r\n\r\nimport android.app.Activity;\r\nimport android.content.Context;\r\nimport android.content.Intent;\r\nimport android.os.Build;\r\nimport android.os.Bundle;\r\nimport android.util.Log;\r\nimport android.view.Menu;\r\nimport android.view.MenuItem;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.widget.ArrayAdapter;\r\nimport android.widget.ListView;\r\nimport android.widget.ProgressBar;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport com.google.android.material.floatingactionbutton.FloatingActionButton;\r\nimport com.google.android.material.snackbar.Snackbar;\r\n\r\nimport org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.Comparator;\r\nimport java.util.List;\r\nimport java.util.function.Consumer;\r\n\r\nimport impl.RetrofitRemoteDataItemCRUDOperationsImpl;\r\nimport impl.RoomLocalDataItemCRUDOperationsImpl;\r\nimport impl.SyncedDataItemCRUDOperationsImpl;\r\nimport impl.ThreadedDataItemCRUDOperationsAsyncImpl;\r\nimport model.IDataItemCRUDOperations;\r\nimport model.IDataItemCRUDOperationsAsync;\r\nimport model.ToDo;\r\nimport tasks.DeleteAllToDosTask;\r\nimport tasks.ReadAllToDoTask;\r\n\r\npublic class MainActivity extends AppCompatActivity {               // macht die Klasse zu einer Activity\r\n    private static String logtag = \"MainActivity: \";                // Logger zur Ausgabe\r\n\r\n    //Bedienelemente definieren\r\n    private ListView listView;                                      // Liste in der alle ToDos drin sind\r\n    private final List<ToDo> items = new ArrayList<>();             // Hier sind die ToDos drin\r\n\r\n    private ArrayAdapter<ToDo> listViewAdapter;                     // Über einen Arrayadapter werden listenförmige Datensammlungen mit einem AdapterView verbunden. Ein AdapterView ist ein View Element dessen Kinder von einem Adapter vorgegeben werden. Ein AdapterView wird übeer einen Adapter mit einer Datenquelle verbunden. Über den Adapter erhält der AdapterView Zugang zu den Elementen der Datenquelle\r\n\r\n    private ProgressBar progressBar;\r\n\r\n    private FloatingActionButton addNewItemButton;\r\n\r\n    private static final int CALL_DETAILVIEW_FOR_CREATE = 0;        // Damit sage ich der \"startActivityForResult\" Methode, dass ich etwas erzeugen will\r\n    private static final int CALL_DETAILVIEW_FOR_EDIT = 1;          // Damit sage ich der \"startActivityForResult\" Methode, dass ich etwas editieren will\r\n\r\n    private IDataItemCRUDOperationsAsync crudOperations;            // ??\r\n\r\n    @RequiresApi(api = Build.VERSION_CODES.O)\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n\r\n        setContentView(R.layout.activity_main);                     // setzen der Hauptansicht (Layout)\r\n\r\n        //1. Access view elements\r\n        progressBar = findViewById(R.id.progressBar);\r\n        addNewItemButton = findViewById(R.id.addNewItemButton);\r\n        listView = findViewById(R.id.listView);\r\n\r\n        listViewAdapter = new ToDoAdapter(this, R.layout.activity_main_listitem, items); // Der Adapter erhält die Daten & die Art der Darstellung über das Layout.\r\n        listView.setAdapter(listViewAdapter);\r\n\r\n        //2. Prepare Elements 4 Interaction\r\n        listView.setOnItemClickListener((parent, view, position, id) -> {\r\n            ToDo selectedItem = listViewAdapter.getItem(position);\r\n            oeffneDetailansichtFuer(selectedItem);                                              // Bei Klick auf ein Item öffnet sich die Detailansicht (mit Vorbefüllung)\r\n        });\r\n\r\n        addNewItemButton.setOnClickListener(v -> this.erzeugeNeuesToDo());                      // Bei Klick auf den New Button wird ein neues To Do erstellt (ohne Vorbefüllung)\r\n\r\n        // 3. Load data into view\r\n        IDataItemCRUDOperations crudExecutor = ((ToDoApplication) this.getApplication()).getCrudOperations();                // ??\r\n        crudOperations = new ThreadedDataItemCRUDOperationsAsyncImpl(crudExecutor, this, progressBar);\r\n//        listViewAdapter.addAll(readAllDataItems());\r\n        crudOperations.readAllDataItems(items -> {\r\n            sortitems(items);\r\n            listViewAdapter.addAll(items);\r\n        }); //VK 19.5\r\n    }\r\n\r\n    protected void oeffneDetailansichtFuer(ToDo itemName) {\r\n        Intent detailviewIntent = new Intent(this, DetailviewActivity.class);\r\n        detailviewIntent.putExtra(DetailviewActivity.ARG_ITEM, itemName);                       // In das ARG_ITEM wird unser To Do was wir übergeben reingepackt.\r\n        this.startActivityForResult(detailviewIntent, CALL_DETAILVIEW_FOR_EDIT);                // Wir übergeben das Intent und sagen, dass wir auf eine Rückgabe warten\r\n    }\r\n\r\n    protected void erzeugeNeuesToDo() {\r\n        Intent detailviewForCreateIntent = new Intent(this, DetailviewActivity.class);\r\n        startActivityForResult(detailviewForCreateIntent, CALL_DETAILVIEW_FOR_CREATE);\r\n    }\r\n\r\n    @Override\r\n    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {                   // Diese Methode reagiert auf die Rückgaben, die wir über onActivityResult bekommen\r\n        super.onActivityResult(requestCode, resultCode, data);\r\n\r\n        if (requestCode == CALL_DETAILVIEW_FOR_CREATE) {\r\n            if (resultCode == Activity.RESULT_OK) {                                                             // Wenn etwas eingegeben wurde, dann rufe die Methode unten auf und übergebe das Item aus ARG_ITEM\r\n                ToDo neuesToDoItem = (ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM);\r\n                onNewItemCreated(neuesToDoItem);                                                                // Meine onXXX - Methoden werden zur Mainactivity zurückgegeben\r\n            } else {\r\n                showFeedbackMessage(\"Returning from detailview for create with \" + resultCode);           // Ansonsten ist quasi nichts passiert, trotzdem ne kleine Message zur Kontrolle\r\n            }\r\n        } else if (requestCode == CALL_DETAILVIEW_FOR_EDIT) {                                                    // In diesem Fall wird auf ein Item bearbeitet, also per Doppelklick editiert.\r\n            if (resultCode == Activity.RESULT_OK) {                                                            // Wenn es geupdatet wurde (RESULT_OK), dann schreib die Daten in das Edited Item und übergebe das der unteren Funktion\r\n                ToDo editedItem = (ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM);\r\n                showFeedbackMessage(\"Got updated item \" + editedItem.getName());\r\n                onItemEdited(editedItem);                                                                      // Meine onXXX - Methoden werden zur Mainactivity zurückgegeben\r\n            } else {\r\n                showFeedbackMessage(\"Returning from detailview for edit with: \" + resultCode);\r\n            }\r\n        } else {\r\n            showFeedbackMessage(\"Returning from detailview with \" + resultCode);\r\n        }\r\n    }\r\n\r\n    protected void onNewItemCreated(ToDo item) {                                                                // ???\r\n        showFeedbackMessage(\"created new item \" + item);\r\n\r\n        crudOperations.createDataItem(item, created -> {\r\n            items.add(created);\r\n            MainActivity.this.sortListAndScrollToItem(created);\r\n        });\r\n    }\r\n\r\n    protected void onItemEdited(ToDo editedItem) {                                                              // ???\r\n        crudOperations.updateDataItem(editedItem, updated -> {\r\n            int pos = items.indexOf(updated);\r\n//            Log.i(logtag, \"got position: \" + pos);\r\n\r\n            items.remove(pos);\r\n            items.add(pos, updated);\r\n            sortListAndScrollToItem(updated);\r\n\r\n        });\r\n    }\r\n\r\n    public void onCheckedChangedInListView(ToDo toDo) {\r\n        crudOperations.updateDataItem(toDo, updated -> {\r\n//        showFeedbackMessage(\"Checked changed to \" + updated.isChecked() + \" for \" + updated.getName());\r\n            sortListAndScrollToItem(toDo);\r\n        });\r\n    }\r\n\r\n    //Options Menu & Sorting\r\n\r\n    @Override\r\n    public boolean onCreateOptionsMenu(Menu menu) {\r\n        getMenuInflater().inflate(R.menu.main_menu, menu);\r\n        return super.onCreateOptionsMenu(menu);\r\n    }\r\n\r\n    //Menues :)\r\n    @Override\r\n    public boolean onOptionsItemSelected(@NonNull MenuItem item) {\r\n        RoomLocalDataItemCRUDOperationsImpl roomTodoCRUDOperations = new RoomLocalDataItemCRUDOperationsImpl(this);\r\n        RetrofitRemoteDataItemCRUDOperationsImpl retrofitTodoCRUDOperations = new RetrofitRemoteDataItemCRUDOperationsImpl();\r\n\r\n        switch (item.getItemId()) {\r\n            case R.id.deleteLocalItems:\r\n                new DeleteAllToDosTask(progressBar, roomTodoCRUDOperations, v -> {\r\n                    Toast.makeText(getApplicationContext(), \"Die lokalen ToDos wurden gelöscht\", Toast.LENGTH_SHORT).show();\r\n                    items.clear();\r\n                    listViewAdapter.notifyDataSetChanged();\r\n                }).execute();\r\n                return true;\r\n            case R.id.deleteRemoteItems:\r\n                new DeleteAllToDosTask(progressBar, retrofitTodoCRUDOperations, v -> {\r\n                    Toast.makeText(getApplicationContext(), \"Die remote ToDos wurden gelöscht\", Toast.LENGTH_SHORT).show();\r\n                }).execute();\r\n                return true;\r\n            case R.id.SyncTodos:\r\n//                SyncedDataItemCRUDOperationsImpl syncTodoCRUDOperations = new SyncedDataItemCRUDOperationsImpl(roomTodoCRUDOperations, retrofitTodoCRUDOperations);\r\n//                new ReadAllToDoTask(progressBar, syncTodoCRUDOperations, v -> {\r\n//                    Toast.makeText(getApplicationContext(), \"Listen wurden synchronisiert\", Toast.LENGTH_SHORT).show();\r\n//                    items.clear();\r\n//                    items.addAll(v);\r\n//                }).execute();\r\n//                return true;\r\n            case R.id.sortItems:\r\n                sortListAndScrollToItem(null);\r\n                return true;\r\n            default:\r\n                return super.onOptionsItemSelected(item);\r\n        }\r\n    }\r\n\r\n    protected void sortListAndScrollToItem(ToDo item) {\r\n        showFeedbackMessage(\"Sort List!\");\r\n        sortitems(items);\r\n\r\n        listViewAdapter.notifyDataSetChanged(); //Aktualisierung\r\n        if (item != null) {\r\n            int pos = listViewAdapter.getPosition(item);\r\n            listView.setSelection(pos);\r\n        }\r\n    }\r\n\r\n    private class ToDoAdapter extends ArrayAdapter<ToDo> {\r\n        private int layoutResource;\r\n\r\n        public ToDoAdapter(@NonNull Context context, int resource, @NonNull List<ToDo> objects) {\r\n            super(context, resource, objects);\r\n            layoutResource = resource;\r\n        }\r\n\r\n        @NonNull\r\n        @Override // 19.5 Thema\r\n        public View getView(int position, @Nullable View recycleableItemView, @NonNull ViewGroup parent) {\r\n            Log.i(logtag, \"getView(): for position \" + position + \" , and recycleableItemView: \" + recycleableItemView);\r\n\r\n            View itemView = null;\r\n            ToDo currentItem = getItem(position);   // Hier wird die korrekte Stelle ausgelesen\r\n\r\n            if (recycleableItemView != null) {\r\n                TextView textView = (TextView) recycleableItemView.findViewById(R.id.itemName);\r\n                if (textView != null) {\r\n                    Log.i(logtag, \"getView(): itemName in convertView: \" + textView);\r\n                }\r\n                itemView = recycleableItemView;\r\n                ActivityMainListitemBinding recycleBinding = (ActivityMainListitemBinding) itemView.getTag();\r\n                recycleBinding.setItem(currentItem);\r\n            } else {\r\n                ActivityMainListitemBinding currentBinding =\r\n                        DataBindingUtil.inflate(getLayoutInflater(),\r\n                                this.layoutResource,\r\n                                null,\r\n                                false);\r\n\r\n                currentBinding.setItem(currentItem);\r\n                currentBinding.setController(MainActivity.this);\r\n\r\n                itemView = currentBinding.getRoot();\r\n                itemView.setTag(currentBinding);\r\n            }\r\n            return itemView;\r\n        }\r\n    }\r\n\r\n    private void sortitems(List<ToDo> items) {\r\n        items.sort(Comparator.comparing(ToDo::isChecked).thenComparing(ToDo::getName)); // rufe die Methode der Klasse auf, Rückgabe = name!\r\n        //TODO: Hier z.B. mal ne Sortierung nach Fälligkeit --> Ich müsste dann im Model das Fälligkeitsdatum abspeichern und das Fälligkeitsdatum selbst aus dem DateTimePicker auslesen\r\n    }\r\n\r\n    protected void showFeedbackMessage(String msg) {\r\n        Snackbar.make(findViewById(R.id.rootView), msg, Snackbar.LENGTH_SHORT).show();\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/MainActivity.java b/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/MainActivity.java
+--- a/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/MainActivity.java	
++++ b/app/src/main/java/org/dieschnittstelle/mobile/android/skeleton/MainActivity.java	
+@@ -39,8 +39,10 @@
+ import model.IDataItemCRUDOperations;
+ import model.IDataItemCRUDOperationsAsync;
+ import model.ToDo;
++import tasks.CreateTodosTask;
+ import tasks.DeleteAllToDosTask;
+ import tasks.ReadAllToDoTask;
++import tasks.UpdateToDosTask;
+ 
+ public class MainActivity extends AppCompatActivity {               // macht die Klasse zu einer Activity
+     private static String logtag = "MainActivity: ";                // Logger zur Ausgabe
+@@ -59,6 +61,7 @@
+     private static final int CALL_DETAILVIEW_FOR_EDIT = 1;          // Damit sage ich der "startActivityForResult" Methode, dass ich etwas editieren will
+ 
+     private IDataItemCRUDOperationsAsync crudOperations;            // ??
++    private IDataItemCRUDOperations crudOperationsNormal;            // ??
+ 
+     @RequiresApi(api = Build.VERSION_CODES.O)
+     @Override
+@@ -85,7 +88,7 @@
+ 
+         // 3. Load data into view
+         IDataItemCRUDOperations crudExecutor = ((ToDoApplication) this.getApplication()).getCrudOperations();                // ??
+-        crudOperations = new ThreadedDataItemCRUDOperationsAsyncImpl(crudExecutor, this, progressBar);
++        crudOperationsNormal = new SyncedDataItemCRUDOperationsImpl(getApplicationContext());
+ //        listViewAdapter.addAll(readAllDataItems());
+         crudOperations.readAllDataItems(items -> {
+             sortitems(items);
+@@ -128,16 +131,29 @@
+         }
+     }
+ 
+-    protected void onNewItemCreated(ToDo item) {                                                                // ???
++    protected void onNewItemCreated(ToDo item) {
+         showFeedbackMessage("created new item " + item);
+ 
+-        crudOperations.createDataItem(item, created -> {
+-            items.add(created);
+-            MainActivity.this.sortListAndScrollToItem(created);
+-        });
++        new CreateTodosTask(progressBar,
++                crudOperationsNormal,
++                created -> {
++//                    listViewAdapter.add(created);
++                    items.add(created);
++//                    items.addAll(created);
++//                    sortListAndScrollToItem(item);
++                }
++        ).execute(item);
++
++
++//        crudOperations.createDataItem(item, created -> {
++//            items.add(created);
++//            MainActivity.this.sortListAndScrollToItem(created);
++//        });
+     }
+ 
+-    protected void onItemEdited(ToDo editedItem) {                                                              // ???
++    protected void onItemEdited(ToDo editedItem) {
++        // ???
++
+         crudOperations.updateDataItem(editedItem, updated -> {
+             int pos = items.indexOf(updated);
+ //            Log.i(logtag, "got position: " + pos);
+@@ -184,13 +200,13 @@
+                 }).execute();
+                 return true;
+             case R.id.SyncTodos:
+-//                SyncedDataItemCRUDOperationsImpl syncTodoCRUDOperations = new SyncedDataItemCRUDOperationsImpl(roomTodoCRUDOperations, retrofitTodoCRUDOperations);
+-//                new ReadAllToDoTask(progressBar, syncTodoCRUDOperations, v -> {
+-//                    Toast.makeText(getApplicationContext(), "Listen wurden synchronisiert", Toast.LENGTH_SHORT).show();
+-//                    items.clear();
+-//                    items.addAll(v);
+-//                }).execute();
+-//                return true;
++                SyncedDataItemCRUDOperationsImpl syncTodoCRUDOperations = new SyncedDataItemCRUDOperationsImpl(getApplicationContext());
++                new ReadAllToDoTask(progressBar, syncTodoCRUDOperations, v -> {
++                    Toast.makeText(getApplicationContext(), "Listen wurden synchronisiert", Toast.LENGTH_SHORT).show();
++                    items.clear();
++                    items.addAll(v);
++                }).execute();
++                return true;
+             case R.id.sortItems:
+                 sortListAndScrollToItem(null);
+                 return true;
+Index: app/src/main/java/impl/ThreadedDataItemCRUDOperationsAsyncImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package impl;\r\n\r\nimport android.app.Activity;\r\nimport android.view.View;\r\nimport android.widget.ProgressBar;\r\n\r\nimport java.util.Arrays;\r\nimport java.util.List;\r\nimport java.util.function.Consumer;\r\nimport java.util.stream.Collectors;\r\n\r\nimport model.IDataItemCRUDOperations;\r\nimport model.IDataItemCRUDOperationsAsync;\r\nimport model.ToDo;\r\n\r\npublic class ThreadedDataItemCRUDOperationsAsyncImpl implements IDataItemCRUDOperationsAsync\r\n{\r\n    IDataItemCRUDOperations crudExecutor; // Macht die eigentliche Arbeit\r\n    private Activity uiThreadProvider;\r\n    private ProgressBar progressBar;\r\n\r\n    public ThreadedDataItemCRUDOperationsAsyncImpl(IDataItemCRUDOperations crudExecutor, Activity uiThreadProvider, ProgressBar progressBar) {\r\n        this.crudExecutor = crudExecutor;\r\n        this.uiThreadProvider = uiThreadProvider;\r\n        this.progressBar = progressBar;\r\n    }\r\n\r\n    @Override\r\n    public void createDataItem(ToDo toDo, Consumer<ToDo> oncreated) {\r\n        progressBar.setVisibility(View.VISIBLE);\r\n        new Thread(() -> {\r\n            ToDo created = crudExecutor.createDataItem(toDo);\r\n            uiThreadProvider.runOnUiThread(() -> {\r\n                progressBar.setVisibility(View.GONE);\r\n                oncreated.accept(created);\r\n            });\r\n\r\n        }).start();\r\n    }\r\n\r\n    @Override\r\n    public void readAllDataItems(Consumer<List<ToDo>> onread) {\r\n        progressBar.setVisibility(View.VISIBLE);\r\n\r\n        new Thread(() -> {\r\n            List<ToDo> items = crudExecutor.readAllDataItems();\r\n\r\n            uiThreadProvider.runOnUiThread(() -> {\r\n                progressBar.setVisibility(View.GONE);\r\n                onread.accept(items);\r\n            });\r\n        }).start();\r\n    }\r\n\r\n    @Override\r\n    public void readDataItem(long id, Consumer<ToDo> onread) {\r\n\r\n    }\r\n\r\n    @Override\r\n    public void updateDataItem(ToDo toDo, Consumer<ToDo> onupdated) {\r\n        new Thread(() -> {\r\n            ToDo updated = crudExecutor.updateDataItem(toDo);\r\n            uiThreadProvider.runOnUiThread(() -> onupdated.accept(updated));\r\n        }).start();\r\n    }\r\n\r\n    @Override\r\n    public boolean deleteDataItem(long id, Consumer<Boolean> ondeleted) {\r\n        return false;\r\n    }\r\n\r\n    @Override\r\n    public void deleteAllDataItems(boolean remote, Consumer<Boolean> ondeleted) {\r\n        new Thread(() -> {\r\n            boolean result = crudExecutor.deleteAllDataItems(remote);\r\n            uiThreadProvider.runOnUiThread(() -> ondeleted.accept(result));\r\n        }).start();\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/impl/ThreadedDataItemCRUDOperationsAsyncImpl.java b/app/src/main/java/impl/ThreadedDataItemCRUDOperationsAsyncImpl.java
+--- a/app/src/main/java/impl/ThreadedDataItemCRUDOperationsAsyncImpl.java	
++++ b/app/src/main/java/impl/ThreadedDataItemCRUDOperationsAsyncImpl.java	
+@@ -59,22 +59,28 @@
+ 
+     @Override
+     public void updateDataItem(ToDo toDo, Consumer<ToDo> onupdated) {
+-        new Thread(() -> {
+-            ToDo updated = crudExecutor.updateDataItem(toDo);
+-            uiThreadProvider.runOnUiThread(() -> onupdated.accept(updated));
+-        }).start();
++
+     }
++
++//    @Override
++//    public void updateDataItem(ToDo toDo, Consumer<ToDo> onupdated) {
++//        new Thread(() -> {
++//            ToDo updated = crudExecutor.updateDataItem(toDo);
++//            uiThreadProvider.runOnUiThread(() -> onupdated.accept(updated));
++//        }).start();
++//    }
+ 
+     @Override
+     public boolean deleteDataItem(long id, Consumer<Boolean> ondeleted) {
+         return false;
+     }
+ 
+-    @Override
+-    public void deleteAllDataItems(boolean remote, Consumer<Boolean> ondeleted) {
+-        new Thread(() -> {
+-            boolean result = crudExecutor.deleteAllDataItems(remote);
+-            uiThreadProvider.runOnUiThread(() -> ondeleted.accept(result));
+-        }).start();
+-    }
++
++//    @Override
++//    public void deleteAllDataItems(boolean remote, Consumer<Boolean> ondeleted) {
++//        new Thread(() -> {
++//            boolean result = crudExecutor.deleteAllDataItems(remote);
++//            uiThreadProvider.runOnUiThread(() -> ondeleted.accept(result));
++//        }).start();
++//    }
+ }

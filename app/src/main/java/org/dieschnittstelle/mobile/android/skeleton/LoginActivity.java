@@ -10,6 +10,7 @@ import android.text.TextWatcher;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -17,11 +18,24 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.regex.Pattern;
+
+import impl.RetrofitRemoteDataItemCRUDOperationsImpl;
+import impl.RoomLocalDataItemCRUDOperationsImpl;
+import impl.SyncedDataItemCRUDOperationsImpl;
+import model.IDataItemCRUDOperations;
+import model.User;
+import tasks.AuthenticateUserTask;
+
 public class LoginActivity extends AppCompatActivity {
     private EditText editTextemailAdresse;
     private EditText editTextpassword;
+
     private Button btnLogin;
     private TextView txtHinweis;
+    private ProgressBar progressBarLogin;
+
+    public static IDataItemCRUDOperations crudOperations;
 
     private final String userName = "Admin@gmx.de";
     private final String password = "123456";
@@ -40,90 +54,127 @@ public class LoginActivity extends AppCompatActivity {
         editTextpassword = findViewById(R.id.editTextTextPassword);
         btnLogin = findViewById(R.id.btnLogin);
         txtHinweis = findViewById(R.id.txtWarnmeldung);
+        progressBarLogin = findViewById(R.id.progressBarLogin);
 
+        RoomLocalDataItemCRUDOperationsImpl roomTodoCRUDOperations = new RoomLocalDataItemCRUDOperationsImpl(this);
+        RetrofitRemoteDataItemCRUDOperationsImpl retrofitTodoCRUDOperations = new RetrofitRemoteDataItemCRUDOperationsImpl();
+
+        crudOperations = new SyncedDataItemCRUDOperationsImpl(roomTodoCRUDOperations, retrofitTodoCRUDOperations);
 
         editTextpassword.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         hebeHinweismeldungHervor();
 
-
-
-
-//        btnLogin.setEnabled(false);
-
         btnLogin.setOnClickListener(v -> {
+            //Werte auslesen und zwischenspeichern
             String inputEmail = editTextemailAdresse.getText().toString();
             String inputPassword = editTextpassword.getText().toString();
 
-            if(inputEmail.isEmpty() || inputPassword.isEmpty()){
-//              Snackbar.make(v, "Eingaben: " + inputEmail + " , " + inputPassword, Snackbar.LENGTH_SHORT).show();
-              Snackbar.make(v, "Fülle beide Felder aus!", Snackbar.LENGTH_SHORT).show();
-              txtHinweis.setText("FEHLER!");
-            }else{
-//                btnLogin.setEnabled(true);
-
+            //Checken, ob irgendein Feld leer ist, wenn ja, Snackbar + WARNMELDUNG
+            if (inputEmail.isEmpty() || inputPassword.isEmpty()) {
+                Snackbar.make(v, "Fülle beide Felder aus!", Snackbar.LENGTH_SHORT).show();
+                txtHinweis.setText("Fülle beide Felder aus!!");
+            } else {
+                //Wenn beide Felder befüllt sind - checke die Formate
                 boolean korrektesEmailFormat = isValidEmail(inputEmail);
+                boolean korrektesPWFormat = isValidPassword(inputPassword);
 
-                if(korrektesEmailFormat){
+                //Wenn die Formate korrekt sind, dann...
+                if (korrektesEmailFormat && korrektesPWFormat) {
                     isValid = validate(inputEmail, inputPassword);
 
-                    if(!isValid){
+                    if (isValid == false) {
                         counter--;
                         Snackbar.make(v, "Falscher Nutzername oder Passwort!", Snackbar.LENGTH_SHORT).show();
                         txtHinweis.setText("Versuche übrig: " + counter);
 
-                        if(counter == 0){
+                        if (counter == 0) {
                             btnLogin.setEnabled(false);
                             Snackbar.make(v, "Neu starten die Anwendung pls!", Snackbar.LENGTH_SHORT).show();
                         }
-                    }else{
-                        Snackbar.make(v, "Erfolgreich!", Snackbar.LENGTH_SHORT).show();
+                    } else {
+                        User currentUser = new User(inputEmail, inputPassword);
 
-                        Intent intent = new Intent(this, MainActivity.class);
-                        startActivity(intent);
+                        new AuthenticateUserTask(progressBarLogin, crudOperations, isAuthenticated -> {
+                            if (isAuthenticated) {
+                                Snackbar.make(v, "Erfolgreich!", Snackbar.LENGTH_SHORT).show();
+                                Intent intent = new Intent(this, MainActivity.class);
+                                startActivity(intent);
+                            } else {
+                                txtHinweis.setText("KEIN RICHTIGER USER!!!!");
+                            }
+                        }).execute(currentUser);
                     }
-                }else{
-                    txtHinweis.setText("Dies ist keine gültige Email!");
-                    editTextemailAdresse.addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                        }
-
-                        @Override
-                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-                            txtHinweis.setText("");
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable s) {
-
-                        }
-                    });
+                } else if (korrektesEmailFormat == false) {
+                    txtHinweis.setText("Dies ist keine gültige Email! (Fehlt @ oder .)?");
+                } else if (korrektesPWFormat == false) {
+                    txtHinweis.setText("Dies ist keine gültiges PW! (6 ZEICHEN!)");
+                } else {
+                    txtHinweis.setText("Format nicht korrekt!");
                 }
 
+                editTextemailAdresse.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        txtHinweis.setText("");
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
+
+                editTextpassword.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        txtHinweis.setText("");
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
             }
 
         });
-
     }
 
-    private boolean validate(String name, String password){
-        if(name.equals(userName) && password.equals(this.password)){
+    private boolean validate(String name, String password) {
+        if (name.equals(userName) && password.equals(this.password)) {
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
 
-    public static boolean isValidEmail(CharSequence target){
+    public static boolean isValidEmail(CharSequence target) {
         return (!TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches());
     }
 
-    public void hebeHinweismeldungHervor(){
-        if(txtHinweis.toString() != ""){
+    private boolean isValidPassword(String password) {
+        String emailRegex = "^[0-9]{6}$";
+
+        Pattern pat = Pattern.compile(emailRegex);
+        if (password == null)
+            return false;
+        return pat.matcher(password).matches();
+    }
+
+    public void hebeHinweismeldungHervor() {
+        if (txtHinweis.toString() != "") {
             txtHinweis.setTextColor(Color.RED);
         }
     }

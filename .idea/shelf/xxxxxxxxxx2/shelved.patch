@@ -1,0 +1,16 @@
+Index: app/src/main/java/model/IDataItemCRUDOperationsAsync.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model;\r\n\r\nimport java.util.List;\r\nimport java.util.function.Consumer;\r\n\r\npublic interface IDataItemCRUDOperationsAsync {\r\n    public void createDataItem(ToDo toDo, Consumer<ToDo> oncreated);\r\n\r\n    public void readAllDataItems(Consumer<List<ToDo>> onread);\r\n\r\n    public void readDataItem(long id, Consumer<ToDo> onread);\r\n\r\n    public void updateDataItem(ToDo toDo, Consumer<ToDo> onupdated);\r\n\r\n    public boolean deleteDataItem(long id, Consumer<Boolean> ondeleted);\r\n\r\n    public void deleteAllDataItems(boolean remote, Consumer<Boolean> ondeleted);\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/model/IDataItemCRUDOperationsAsync.java b/app/src/main/java/model/IDataItemCRUDOperationsAsync.java
+--- a/app/src/main/java/model/IDataItemCRUDOperationsAsync.java	
++++ b/app/src/main/java/model/IDataItemCRUDOperationsAsync.java	
+@@ -14,5 +14,4 @@
+ 
+     public boolean deleteDataItem(long id, Consumer<Boolean> ondeleted);
+ 
+-    public void deleteAllDataItems(boolean remote, Consumer<Boolean> ondeleted);
+ }
