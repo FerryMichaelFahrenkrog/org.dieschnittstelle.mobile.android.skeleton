@@ -1,0 +1,12 @@
+127.0.0.1 - - [16/Jan/2022:07:45:47 +0100] GET /api/todos HTTP/1.1 200 294 http-bio-8080-exec-1 326
+0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:45:58 +0100] GET /api/todos HTTP/1.1 200 294 http-bio-8080-exec-4 7
+0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:45:58 +0100] GET /favicon.ico HTTP/1.1 404 973 http-bio-8080-exec-5 3
+127.0.0.1 - - [16/Jan/2022:07:46:02 +0100] DELETE /api/todos HTTP/1.1 200 4 http-bio-8080-exec-7 4
+127.0.0.1 - - [16/Jan/2022:07:46:15 +0100] POST /api/todos HTTP/1.1 200 121 http-bio-8080-exec-8 69
+0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:46:19 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-6 29
+0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:46:19 +0100] GET /api/todos HTTP/1.1 200 123 http-bio-8080-exec-10 2
+127.0.0.1 - - [16/Jan/2022:07:46:38 +0100] PUT /api/todos/13 HTTP/1.1 200 134 http-bio-8080-exec-9 6
+0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:46:42 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-10 1
+0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:46:42 +0100] GET /api/todos HTTP/1.1 200 136 http-bio-8080-exec-10 2
+0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:46:44 +0100] GET / HTTP/1.1 304 - http-bio-8080-exec-10 1
+0:0:0:0:0:0:0:1 - - [16/Jan/2022:07:46:44 +0100] GET /api/todos HTTP/1.1 200 136 http-bio-8080-exec-10 2
