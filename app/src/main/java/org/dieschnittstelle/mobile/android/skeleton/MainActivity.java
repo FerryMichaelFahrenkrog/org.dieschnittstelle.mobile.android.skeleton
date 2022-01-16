@@ -6,9 +6,11 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,6 +29,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -68,6 +71,7 @@ public class MainActivity extends AppCompatActivity {               // macht die
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
 //        new CheckWebapiAvailableTask(webapiAvailable -> {
 //            ((SyncedDataItemCRUDOperationsImpl) crudOperationsNormal).setConnectionStatus(webapiAvailable);
@@ -112,6 +116,21 @@ public class MainActivity extends AppCompatActivity {               // macht die
             listViewAdapter.addAll(items);
         }); //VK 19.5
     }
+
+
+
+
+    /*
+       for (Todo todo : todos) {
+            if (todo.getLocation() != null && todo.getLocation().getName() != null) {
+                Marker markerForTodo = googleMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(todo.getLocation().getLatlng().getLat(), todo.getLocation().getLatlng().getLng()))
+                        .title(todo.getName()));
+                markerForTodo.setTag(todo);
+                currentMarkers.add(markerForTodo);
+            }
+        }
+     */
 
     protected void oeffneDetailansichtFuer(ToDo itemName) {
         Intent detailviewIntent = new Intent(this, DetailviewActivity.class);
@@ -238,13 +257,18 @@ public class MainActivity extends AppCompatActivity {               // macht die
             layoutResource = resource;
         }
 
+        @SuppressLint("NewApi")
         @NonNull
-        @Override // 19.5 Thema
+        @Override
         public View getView(int position, @Nullable View recycleableItemView, @NonNull ViewGroup parent) {
             Log.i(logtag, "getView(): for position " + position + " , and recycleableItemView: " + recycleableItemView);
 
             View itemView = null;
             ToDo currentItem = getItem(position);   // Hier wird die korrekte Stelle ausgelesen
+
+//            if(currentItem.getFaelligkeitsDatum().isBefore(LocalDateTime.now()) && !currentItem.isChecked()){
+//                itemView.setBackgroundColor(Color.RED);
+//            }
 
             if (recycleableItemView != null) {
                 TextView textView = (TextView) recycleableItemView.findViewById(R.id.itemName);
