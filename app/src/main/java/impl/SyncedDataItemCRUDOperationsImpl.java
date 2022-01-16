@@ -2,6 +2,8 @@ package impl;
 
 import android.util.Log;
 
+import org.dieschnittstelle.mobile.android.skeleton.LoginActivity;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,6 +18,8 @@ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
 
     private boolean synced;
     private boolean remoteAvailable = false;
+    private boolean connectionChecked = false;
+
 
 
     public SyncedDataItemCRUDOperationsImpl(IDataItemCRUDOperations localCRUD, IDataItemCRUDOperations remoteCRUD){
@@ -104,5 +108,10 @@ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
             }
         }
         return false;
+    }
+
+    public void setConnectionStatus(boolean isAvailable) {
+        this.connectionChecked = true;
+        this.remoteAvailable = isAvailable;
     }
 }

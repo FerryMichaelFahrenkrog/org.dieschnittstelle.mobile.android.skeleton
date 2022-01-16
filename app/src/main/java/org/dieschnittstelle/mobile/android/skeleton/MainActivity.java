@@ -39,6 +39,7 @@ import impl.ThreadedDataItemCRUDOperationsAsyncImpl;
 import model.IDataItemCRUDOperations;
 import model.IDataItemCRUDOperationsAsync;
 import model.ToDo;
+import tasks.CheckWebapiAvailableTask;
 import tasks.DeleteAllToDosTask;
 import tasks.ReadAllToDoTask;
 
@@ -59,11 +60,30 @@ public class MainActivity extends AppCompatActivity {               // macht die
     private static final int CALL_DETAILVIEW_FOR_EDIT = 1;          // Damit sage ich der "startActivityForResult" Methode, dass ich etwas editieren will
 
     private IDataItemCRUDOperationsAsync crudOperations;            // ??
+    private IDataItemCRUDOperations crudOperationsNormal;            // ??
+
+    private boolean SKIP_LOGIN = false;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+//        new CheckWebapiAvailableTask(webapiAvailable -> {
+//            ((SyncedDataItemCRUDOperationsImpl) crudOperationsNormal).setConnectionStatus(webapiAvailable);
+//
+//            if (webapiAvailable) {
+//                SKIP_LOGIN = true;
+//
+//                if (SKIP_LOGIN = true) {
+//                    setContentView(R.layout.activity_main);                     // setzen der Hauptansicht (Layout)
+//                } else {
+//                    showLoginDialog(); /////// ????
+//                }
+//            } else {
+//                Toast.makeText(getApplicationContext(), "WebAPI not available!", Toast.LENGTH_LONG).show();
+//            }
+//        }).execute();
 
         setContentView(R.layout.activity_main);                     // setzen der Hauptansicht (Layout)
 

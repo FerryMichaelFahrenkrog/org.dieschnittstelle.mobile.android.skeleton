@@ -64,7 +64,7 @@ public class ToDoApplication extends Application {
         return future; //2h 4 rest
     }
 
-    public boolean checkConnectivity() {
+    public static boolean checkConnectivity() {
         HttpURLConnection conn = null;
 
         try {

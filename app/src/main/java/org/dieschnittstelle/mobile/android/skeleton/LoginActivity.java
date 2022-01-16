@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -66,90 +67,95 @@ public class LoginActivity extends AppCompatActivity {
         hebeHinweismeldungHervor();
 
         btnLogin.setOnClickListener(v -> {
-            //Werte auslesen und zwischenspeichern
-            String inputEmail = editTextemailAdresse.getText().toString();
-            String inputPassword = editTextpassword.getText().toString();
+            showLoginDialog();
+        });
 
-            //Checken, ob irgendein Feld leer ist, wenn ja, Snackbar + WARNMELDUNG
-            if (inputEmail.isEmpty() || inputPassword.isEmpty()) {
-                Snackbar.make(v, "Fülle beide Felder aus!", Snackbar.LENGTH_SHORT).show();
-                txtHinweis.setText("Fülle beide Felder aus!!");
-            } else {
-                //Wenn beide Felder befüllt sind - checke die Formate
-                boolean korrektesEmailFormat = isValidEmail(inputEmail);
-                boolean korrektesPWFormat = isValidPassword(inputPassword);
+    }
 
-                //Wenn die Formate korrekt sind, dann...
-                if (korrektesEmailFormat && korrektesPWFormat) {
-                    isValid = validate(inputEmail, inputPassword);
+    public void showLoginDialog()
+    {
+        //Werte auslesen und zwischenspeichern
+        String inputEmail = editTextemailAdresse.getText().toString();
+        String inputPassword = editTextpassword.getText().toString();
 
-                    if (isValid == false) {
-                        counter--;
-                        Snackbar.make(v, "Falscher Nutzername oder Passwort!", Snackbar.LENGTH_SHORT).show();
-                        txtHinweis.setText("Versuche übrig: " + counter);
+        //Checken, ob irgendein Feld leer ist, wenn ja, Snackbar + WARNMELDUNG
+        if (inputEmail.isEmpty() || inputPassword.isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Fülle beide Felder aus!", Toast.LENGTH_SHORT).show();
+            txtHinweis.setText("Fülle beide Felder aus!!");
+        } else {
+            //Wenn beide Felder befüllt sind - checke die Formate
+            boolean korrektesEmailFormat = isValidEmail(inputEmail);
+            boolean korrektesPWFormat = isValidPassword(inputPassword);
 
-                        if (counter == 0) {
-                            btnLogin.setEnabled(false);
-                            Snackbar.make(v, "Neu starten die Anwendung pls!", Snackbar.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        User currentUser = new User(inputEmail, inputPassword);
+            //Wenn die Formate korrekt sind, dann...
+            if (korrektesEmailFormat && korrektesPWFormat) {
+                isValid = validate(inputEmail, inputPassword);
 
-                        new AuthenticateUserTask(progressBarLogin, crudOperations, isAuthenticated -> {
-                            if (isAuthenticated) {
-                                Snackbar.make(v, "Erfolgreich!", Snackbar.LENGTH_SHORT).show();
-                                Intent intent = new Intent(this, MainActivity.class);
-                                startActivity(intent);
-                            } else {
-                                txtHinweis.setText("KEIN RICHTIGER USER!!!!");
-                            }
-                        }).execute(currentUser);
+                if (isValid == false) {
+                    counter--;
+                    Toast.makeText(getApplicationContext(), "Falscher Nutzername oder Passwort!", Toast.LENGTH_SHORT).show();
+                    txtHinweis.setText("Versuche übrig: " + counter);
+
+                    if (counter == 0) {
+                        btnLogin.setEnabled(false);
+                        Toast.makeText(getApplicationContext(), "Neu starten die Anwendung pls!", Toast.LENGTH_SHORT).show();
                     }
-
-                } else if (korrektesEmailFormat == false) {
-                    txtHinweis.setText("Dies ist keine gültige Email! (Fehlt @ oder .)?");
-                } else if (korrektesPWFormat == false) {
-                    txtHinweis.setText("Dies ist keine gültiges PW! (6 ZEICHEN!)");
                 } else {
-                    txtHinweis.setText("Format nicht korrekt!");
+                    User currentUser = new User(inputEmail, inputPassword);
+
+                    new AuthenticateUserTask(progressBarLogin, crudOperations, isAuthenticated -> {
+                        if (isAuthenticated) {
+                            Toast.makeText(getApplicationContext(), "LOGIN Erfolgreich", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(this, MainActivity.class);
+                            startActivity(intent);
+                        } else {
+                            txtHinweis.setText("KEIN RICHTIGER USER!!!!");
+                        }
+                    }).execute(currentUser);
                 }
 
-                editTextemailAdresse.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        txtHinweis.setText("");
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-
-                    }
-                });
-
-                editTextpassword.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        txtHinweis.setText("");
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-
-                    }
-                });
+            } else if (korrektesEmailFormat == false) {
+                txtHinweis.setText("Dies ist keine gültige Email! (Fehlt @ oder .)?");
+            } else if (korrektesPWFormat == false) {
+                txtHinweis.setText("Dies ist keine gültiges PW! (6 ZEICHEN!)");
+            } else {
+                txtHinweis.setText("Format nicht korrekt!");
             }
 
-        });
+            editTextemailAdresse.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    txtHinweis.setText("");
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
+
+            editTextpassword.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    txtHinweis.setText("");
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
+        }
     }
 
     private boolean validate(String name, String password) {

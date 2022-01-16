@@ -2,6 +2,8 @@ package tasks;
 
 import android.os.AsyncTask;
 
+import org.dieschnittstelle.mobile.android.skeleton.ToDoApplication;
+
 import java.util.function.Consumer;
 
 public class CheckWebapiAvailableTask extends AsyncTask<Void, Void, Boolean> {
@@ -13,8 +15,9 @@ public class CheckWebapiAvailableTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... voids) {
-//        return SyncTodoCRUDOperationsImpl.isHostAvailable("10.0.2.2", 8080, 1000);
-        return null;
+        boolean remoteVerbindung = ToDoApplication.checkConnectivity();
+
+        return remoteVerbindung;
     }
 
     @Override
