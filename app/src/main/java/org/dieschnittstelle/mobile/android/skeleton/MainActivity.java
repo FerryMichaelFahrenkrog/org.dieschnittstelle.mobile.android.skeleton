@@ -40,6 +40,7 @@ import model.IDataItemCRUDOperations;
 import model.IDataItemCRUDOperationsAsync;
 import model.ToDo;
 import tasks.DeleteAllToDosTask;
+import tasks.ReadAllToDoTask;
 
 public class MainActivity extends AppCompatActivity {               // macht die Klasse zu einer Activity
     private static String logtag = "MainActivity: ";                // Logger zur Ausgabe
@@ -166,9 +167,11 @@ public class MainActivity extends AppCompatActivity {               // macht die
     //Menues :)
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        RoomLocalDataItemCRUDOperationsImpl roomTodoCRUDOperations = new RoomLocalDataItemCRUDOperationsImpl(this);
+        RetrofitRemoteDataItemCRUDOperationsImpl retrofitTodoCRUDOperations = new RetrofitRemoteDataItemCRUDOperationsImpl();
+
         switch (item.getItemId()) {
             case R.id.deleteLocalItems:
-                RoomLocalDataItemCRUDOperationsImpl roomTodoCRUDOperations = new RoomLocalDataItemCRUDOperationsImpl(this);
                 new DeleteAllToDosTask(progressBar, roomTodoCRUDOperations, v -> {
                     Toast.makeText(getApplicationContext(), "Die lokalen ToDos wurden gelöscht", Toast.LENGTH_SHORT).show();
                     items.clear();
@@ -176,19 +179,16 @@ public class MainActivity extends AppCompatActivity {               // macht die
                 }).execute();
                 return true;
             case R.id.deleteRemoteItems:
-                RetrofitRemoteDataItemCRUDOperationsImpl retrofitTodoCRUDOperations = new RetrofitRemoteDataItemCRUDOperationsImpl();
                 new DeleteAllToDosTask(progressBar, retrofitTodoCRUDOperations, v -> {
                     Toast.makeText(getApplicationContext(), "Die remote ToDos wurden gelöscht", Toast.LENGTH_SHORT).show();
                 }).execute();
                 return true;
             case R.id.SyncTodos:
-//                SyncedDataItemCRUDOperationsImpl syncTodoCRUDOperations = new SyncedDataItemCRUDOperationsImpl(this);
-//                new ReadAllTodosTask(progressBar, syncTodoCRUDOperations, v -> {
-//                    Toast.makeText(getApplicationContext(), "Sync List feddisch", Toast.LENGTH_SHORT).show();
-//                    listFragment.getTodoList().clear();
-//                    listFragment.getTodoList().addAll(v);
-//                    listFragment.resortList();
-//                    mapFragment.updateMarkers(listFragment.getTodoList());
+//                SyncedDataItemCRUDOperationsImpl syncTodoCRUDOperations = new SyncedDataItemCRUDOperationsImpl(roomTodoCRUDOperations, retrofitTodoCRUDOperations);
+//                new ReadAllToDoTask(progressBar, syncTodoCRUDOperations, v -> {
+//                    Toast.makeText(getApplicationContext(), "Listen wurden synchronisiert", Toast.LENGTH_SHORT).show();
+//                    items.clear();
+//                    items.addAll(v);
 //                }).execute();
 //                return true;
             case R.id.sortItems:
