@@ -43,6 +43,7 @@ import model.ToDo;
 import tasks.CreateTodosTask;
 import tasks.DeleteAllToDosTask;
 import tasks.ReadAllToDoTask;
+import tasks.UpdateToDoTaskWithFuture;
 import tasks.UpdateToDosTask;
 
 public class MainActivity extends AppCompatActivity {               // macht die Klasse zu einer Activity
@@ -248,11 +249,20 @@ public class MainActivity extends AppCompatActivity {               // macht die
 //        });
 //    }
 
-    public void onCheckedChangedInListView(ToDo toDo) {
-        crudOperations.updateDataItem(toDo, updated -> {
-//        showFeedbackMessage("Checked changed to " + updated.isChecked() + " for " + updated.getName());
-            sortListAndScrollToItem(toDo);
-        });
+//    public void onCheckedChangedInListView(ToDo toDo) {
+//        crudOperations.updateDataItem(toDo, updated -> {
+////        showFeedbackMessage("Checked changed to " + updated.isChecked() + " for " + updated.getName());
+//            sortListAndScrollToItem(toDo);
+//        });
+//    }
+
+    public void onListItemChangedInList(ToDo toDo){
+//        showFeedbackMessage("Updateeeeeeeeeeeed item: " + toDo.getName());
+
+        new UpdateToDoTaskWithFuture(this, crudOperations3)
+                .execute(toDo)
+                .thenAccept((updated) ->
+                        showFeedbackMessage("Item " + toDo.getName() + " HAS BEEEN UPDATED JAA"));
     }
 
     //Options Menu & Sorting

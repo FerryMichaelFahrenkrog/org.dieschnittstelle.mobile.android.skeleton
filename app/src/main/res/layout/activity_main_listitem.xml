@@ -30,7 +30,7 @@
                 android:checked="@={item.checked}"
                 android:focusable="false"
                 android:gravity="center"
-                android:onClick="@{() -> controller.onCheckedChangedInListView(item)}"
+                android:onClick="@{() -> controller.onListItemChangedInList(item)}"
                 android:text="erledigt" />
 
             <CheckBox
@@ -40,7 +40,7 @@
                 android:checked="@={item.favouriteToDo}"
                 android:focusable="false"
                 android:gravity="center"
-                android:onClick="@{() -> controller.onCheckedChangedInListView(item)}"
+                android:onClick="@{() -> controller.onListItemChangedInList(item)}"
                 android:text="Wichtig" />
         </LinearLayout>
 
