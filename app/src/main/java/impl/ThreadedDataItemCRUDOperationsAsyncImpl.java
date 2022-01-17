@@ -27,15 +27,15 @@ public class ThreadedDataItemCRUDOperationsAsyncImpl implements IDataItemCRUDOpe
 
     @Override
     public void createDataItem(ToDo toDo, Consumer<ToDo> oncreated) {
-        progressBar.setVisibility(View.VISIBLE);
-        new Thread(() -> {
-            ToDo created = crudExecutor.createDataItem(toDo);
-            uiThreadProvider.runOnUiThread(() -> {
-                progressBar.setVisibility(View.GONE);
-                oncreated.accept(created);
-            });
-
-        }).start();
+//        progressBar.setVisibility(View.VISIBLE);
+//        new Thread(() -> {
+//            ToDo created = crudExecutor.createDataItem(toDo);
+//            uiThreadProvider.runOnUiThread(() -> {
+//                progressBar.setVisibility(View.GONE);
+//                oncreated.accept(created);
+//            });
+//
+//        }).start();
     }
 
     @Override

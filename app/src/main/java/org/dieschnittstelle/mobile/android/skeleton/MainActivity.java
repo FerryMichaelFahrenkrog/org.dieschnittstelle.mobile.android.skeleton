@@ -43,6 +43,7 @@ import model.IDataItemCRUDOperations;
 import model.IDataItemCRUDOperationsAsync;
 import model.ToDo;
 import tasks.CheckWebapiAvailableTask;
+import tasks.CreateTodosTask;
 import tasks.DeleteAllToDosTask;
 import tasks.ReadAllToDoTask;
 
@@ -150,7 +151,9 @@ public class MainActivity extends AppCompatActivity {               // macht die
 
     protected void oeffneDetailansichtFuer(ToDo itemName) {
         Intent detailviewIntent = new Intent(this, DetailviewActivity.class);
-        detailviewIntent.putExtra(DetailviewActivity.ARG_ITEM, itemName);                       // In das ARG_ITEM wird unser To Do was wir übergeben reingepackt.
+        detailviewIntent.putExtra(DetailviewActivity.ARG_ITEM, itemName);// In das ARG_ITEM wird unser To Do was wir übergeben reingepackt.
+//        detailviewIntent.putExtra(DetailviewActivity.ARG_TODO_INDEX, index);
+//        detailviewIntent.putExtra(DetailviewActivity.ARG_TODO_DATETIME, localDateTime);
         this.startActivityForResult(detailviewIntent, CALL_DETAILVIEW_FOR_EDIT);                // Wir übergeben das Intent und sagen, dass wir auf eine Rückgabe warten
     }
 
@@ -159,15 +162,18 @@ public class MainActivity extends AppCompatActivity {               // macht die
         startActivityForResult(detailviewForCreateIntent, CALL_DETAILVIEW_FOR_CREATE);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {                   // Diese Methode reagiert auf die Rückgaben, die wir über onActivityResult bekommen
         super.onActivityResult(requestCode, resultCode, data);
 
-        returnCreateToDo(requestCode, resultCode, data);
+//        returnCreateToDo(requestCode, resultCode, data);
 
         if (requestCode == CALL_DETAILVIEW_FOR_CREATE) {
             if (resultCode == Activity.RESULT_OK) {                                                             // Wenn etwas eingegeben wurde, dann rufe die Methode unten auf und übergebe das Item aus ARG_ITEM
                 ToDo neuesToDoItem = (ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM);
+                LocalDateTime localDateTime = (LocalDateTime) data.getSerializableExtra(DetailviewActivity.ARG_TODO_DATETIME);
+                neuesToDoItem.setFaelligkeitsDatum(localDateTime);
                 onNewItemCreated(neuesToDoItem);                                                                // Meine onXXX - Methoden werden zur Mainactivity zurückgegeben
             } else {
                 showFeedbackMessage("Returning from detailview for create with " + resultCode);           // Ansonsten ist quasi nichts passiert, trotzdem ne kleine Message zur Kontrolle
@@ -185,16 +191,18 @@ public class MainActivity extends AppCompatActivity {               // macht die
         }
     }
 
-    private void returnCreateToDo(int requestCode, int resultCode, Intent data) {
-    }
-
-    protected void onNewItemCreated(ToDo item) {                                                                // ???
+    protected void onNewItemCreated(ToDo item) {                                                                // HIER CER CREATE TO DO TASK!!!!!!
         showFeedbackMessage("created new item " + item);
 
-        crudOperations.createDataItem(item, created -> {
+        new CreateTodosTask(progressBar, crudOperations3, created -> {
             items.add(created);
             MainActivity.this.sortListAndScrollToItem(created);
-        });
+        }).execute(item);
+//
+//        crudOperations.createDataItem(item, created -> {
+//            items.add(created);
+//            MainActivity.this.sortListAndScrollToItem(created);
+//        });
     }
 
     protected void onItemEdited(ToDo editedItem) {                                                              // ???
