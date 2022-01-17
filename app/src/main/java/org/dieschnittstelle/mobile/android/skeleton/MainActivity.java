@@ -115,7 +115,6 @@ public class MainActivity extends AppCompatActivity {               // macht die
 
         // 3. Load data into view
         IDataItemCRUDOperations crudExecutor = ((ToDoApplication) this.getApplication()).getCrudOperations();                // ??
-        crudOperations = new ThreadedDataItemCRUDOperationsAsyncImpl(crudExecutor, this, progressBar);
 
         RoomLocalDataItemCRUDOperationsImpl roomTodoCRUDOperations = new RoomLocalDataItemCRUDOperationsImpl(this);
         RetrofitRemoteDataItemCRUDOperationsImpl retrofitTodoCRUDOperations = new RetrofitRemoteDataItemCRUDOperationsImpl();
@@ -261,8 +260,10 @@ public class MainActivity extends AppCompatActivity {               // macht die
 
         new UpdateToDoTaskWithFuture(this, crudOperations3)
                 .execute(toDo)
-                .thenAccept((updated) ->
-                        showFeedbackMessage("Item " + toDo.getName() + " HAS BEEEN UPDATED JAA"));
+                .thenAccept((updated) -> {
+                    showFeedbackMessage("Item " + toDo.getName() + " HAS BEEEN UPDATED JAA");
+                    sortListAndScrollToItem(toDo);
+                });
     }
 
     //Options Menu & Sorting
