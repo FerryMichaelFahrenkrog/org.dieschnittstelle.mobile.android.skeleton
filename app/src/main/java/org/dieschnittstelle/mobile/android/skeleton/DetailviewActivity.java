@@ -101,6 +101,8 @@ public class DetailviewActivity extends AppCompatActivity
         todoIndex = getIntent().getIntExtra(ARG_TODO_INDEX, Integer.MAX_VALUE);
 
 
+
+
         Log.i("DetailviewActivity", "got contact ids: " + toDo.getContactIds());
         toDo.getContactIds().forEach(id -> {
             showContactDetailsForInternal(Long.parseLong(id));
@@ -151,7 +153,7 @@ public class DetailviewActivity extends AppCompatActivity
 
     public void deleteItem() {
         new AlertDialog.Builder(DetailviewActivity.this)
-                .setTitle("Löschen")
+                .setTitle("Lösche ToDo")
                 .setMessage("Wirklich löschen?")
                 .setPositiveButton("löschen", (dialog, which) -> {
                     itemDelete = true;
@@ -160,6 +162,17 @@ public class DetailviewActivity extends AppCompatActivity
                 .setNegativeButton("verwerfen", (dialog, which) -> Log.d("CancelButton", "Cancel clicked"))
                 .show();
     }
+
+    public void onDeleteTodo() {
+        Intent returnData = new Intent();
+        returnData.putExtra(ARG_ITEM, toDo);
+        returnData.putExtra(ARG_TODO_INDEX, todoIndex);
+        returnData.putExtra(ARG_TODO_DELETE, itemDelete);
+
+        this.setResult(Activity.RESULT_OK, returnData);
+        finish();
+    }
+
 
     @SuppressLint("NewApi")
     public void onSaveItem(){
@@ -176,15 +189,7 @@ public class DetailviewActivity extends AppCompatActivity
         finish();
     }
 
-    public void onDeleteTodo() {
-        Intent returnData = new Intent();
-        returnData.putExtra(ARG_TODO_OBJECT, toDo);
-        returnData.putExtra(ARG_TODO_INDEX, todoIndex);
-        returnData.putExtra(ARG_TODO_DELETE, itemDelete);
 
-        this.setResult(Activity.RESULT_OK, returnData);
-        finish();
-    }
 
     @SuppressLint("NewApi")
     void updateLocalDateTime() {

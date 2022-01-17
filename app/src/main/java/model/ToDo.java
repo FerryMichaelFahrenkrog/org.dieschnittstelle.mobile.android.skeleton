@@ -1,8 +1,10 @@
 package model;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.util.Log;
 
+import androidx.annotation.RequiresApi;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -52,7 +54,7 @@ public class ToDo implements Serializable                                       
     @Expose
     @SerializedName("expiry")
     @ColumnInfo(name = "finishDate")
-    private long faelligkeitsDatumLong = 0;
+    private long finishDateLong = 0;
 
     @Expose
     @SerializedName("contacts")
@@ -61,7 +63,7 @@ public class ToDo implements Serializable                                       
 
     @SuppressLint("NewApi")
     @Ignore
-    private transient LocalDateTime faelligkeitsDatum = LocalDateTime.now();
+    private transient LocalDateTime finishDate = LocalDateTime.now();
 
     @Ignore
     private transient Date localdate = new Date();
@@ -82,17 +84,17 @@ public class ToDo implements Serializable                                       
     }
 
     @Ignore
-    public ToDo(String name, String description, LocalDateTime faelligkeitsDatum) {
+    public ToDo(String name, String description, LocalDateTime finishDate) {
         this.name = name;
         this.description = description;
-        this.faelligkeitsDatum = faelligkeitsDatum;
+        this.finishDate = finishDate;
     }
 
-    public ToDo(String name, String description, boolean favouriteToDo, LocalDateTime faelligkeitsDatum) {
+    public ToDo(String name, String description, boolean favouriteToDo, LocalDateTime finishDate) {
         this.name = name;
         this.description = description;
         this.favouriteToDo = favouriteToDo;
-        this.faelligkeitsDatum = faelligkeitsDatum;
+        this.finishDate = finishDate;
     }
 
     public long getId() {
@@ -149,20 +151,12 @@ public class ToDo implements Serializable                                       
         this.favouriteToDo = favouriteToDo;
     }
 
-    public long getFaelligkeitsDatumLong() {
-        return faelligkeitsDatumLong;
+    public long getFinishDateLong() {
+        return finishDateLong;
     }
 
-    public void setFaelligkeitsDatumLong(long faelligkeitsDatumLong) {
-        this.faelligkeitsDatumLong = faelligkeitsDatumLong;
-    }
-
-    public LocalDateTime getFaelligkeitsDatum() {
-        return faelligkeitsDatum;
-    }
-
-    public void setFaelligkeitsDatum(LocalDateTime faelligkeitsDatum) {
-        this.faelligkeitsDatum = faelligkeitsDatum;
+    public void setFinishDateLong(long finishDateLong) {
+        this.finishDateLong = finishDateLong;
     }
 
     public Date getLocaldate() {
@@ -187,12 +181,12 @@ public class ToDo implements Serializable                                       
 
     @SuppressLint("NewApi")
     public LocalDateTime getFinishDate() {
-        this.faelligkeitsDatum = LocalDateTime.ofEpochSecond(this.faelligkeitsDatumLong / 1000, 0, ZoneOffset.UTC);
-        return faelligkeitsDatum;
+        this.finishDate = LocalDateTime.ofEpochSecond(this.finishDateLong / 1000, 0, ZoneOffset.UTC);
+        return finishDate;
     }
 
     public void setFinishDate(LocalDateTime finishDate) {
-        this.faelligkeitsDatum = finishDate;
+        this.finishDate = finishDate;
     }
 
     @Override
@@ -203,9 +197,9 @@ public class ToDo implements Serializable                                       
                 ", description='" + description + '\'' +
                 ", checked=" + checked +
                 ", favouriteToDo=" + favouriteToDo +
-                ", faelligkeitsDatumLong=" + faelligkeitsDatumLong +
+                ", faelligkeitsDatumLong=" + finishDateLong +
                 ", contactIds=" + contactIds +
-                ", faelligkeitsDatum=" + faelligkeitsDatum +
+                ", faelligkeitsDatum=" + finishDate +
                 ", localdate=" + localdate +
                 '}';
     }

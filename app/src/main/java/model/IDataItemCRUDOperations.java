@@ -3,17 +3,17 @@ package model;
 import java.util.List;
 
 public interface IDataItemCRUDOperations {
-    public ToDo createDataItem(ToDo toDo);
+    ToDo createDataItem(ToDo toDo);
 
-    public List<ToDo> readAllDataItems();
+    List<ToDo> readAllDataItems();
 
-    public ToDo readDataItem(long id);
+    ToDo readDataItem(long id);
 
-    public boolean updateDataItem(ToDo toDo);
+    boolean updateDataItem(ToDo toDo);
 
-    public boolean deleteDataItem(ToDo toDo);
+    boolean deleteDataItem(ToDo toDo);
 
-    public boolean deleteAllDataItems(boolean remote);
+    boolean deleteAllDataItems(boolean remote);
 
     boolean authenticateUser(User user);
 }

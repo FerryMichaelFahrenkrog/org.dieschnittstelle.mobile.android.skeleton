@@ -30,7 +30,9 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -107,8 +109,8 @@ public class MainActivity extends AppCompatActivity {               // macht die
 
         //2. Prepare Elements 4 Interaction
         listView.setOnItemClickListener((parent, view, position, id) -> {
-            ToDo selectedItem = listViewAdapter.getItem(position);
-            oeffneDetailansichtFuer(selectedItem);                                              // Bei Klick auf ein Item öffnet sich die Detailansicht (mit Vorbefüllung)
+//            ToDo selectedItem = listViewAdapter.getItem(position);
+            oeffneDetailansichtFuer(items.get(position), position, items.get(position).getFinishDate());                                              // Bei Klick auf ein Item öffnet sich die Detailansicht (mit Vorbefüllung)
         });
 
         addNewItemButton.setOnClickListener(v -> this.erzeugeNeuesToDo());                      // Bei Klick auf den New Button wird ein neues To Do erstellt (ohne Vorbefüllung)
@@ -125,6 +127,17 @@ public class MainActivity extends AppCompatActivity {               // macht die
             listViewAdapter.addAll(toDos);
             sortitems(items);
         }).execute();
+
+//        int todoLength = 0;
+//        ToDo[] tmpTodos = new ToDo[todoLength];
+//
+//        for (int i = 0; i < todoLength; i++) {
+//            ToDo tmpTodo = new ToDo("Todo " + i, "Description " + i);
+//            tmpTodo.setChecked(Math.random() < 0.5);
+//            tmpTodo.setFavouriteToDo(Math.random() < 0.5);
+//            tmpTodo.setFinishDate(LocalDateTime.of(LocalDate.ofEpochDay((long) (Math.random() * 100000)), LocalTime.now()));
+//            tmpTodos[i] = tmpTodo;
+//        }
 //        listViewAdapter.addAll(readAllDataItems());
 //        crudOperations.readAllDataItems(items -> {
 //            sortitems(items);
@@ -147,16 +160,20 @@ public class MainActivity extends AppCompatActivity {               // macht die
         }
      */
 
-    protected void oeffneDetailansichtFuer(ToDo itemName) {
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    protected void oeffneDetailansichtFuer(ToDo itemName, int index, LocalDateTime localDateTime) {
         Intent detailviewIntent = new Intent(this, DetailviewActivity.class);
         detailviewIntent.putExtra(DetailviewActivity.ARG_ITEM, itemName);// In das ARG_ITEM wird unser To Do was wir übergeben reingepackt.
-//        detailviewIntent.putExtra(DetailviewActivity.ARG_TODO_INDEX, index);
-//        detailviewIntent.putExtra(DetailviewActivity.ARG_TODO_DATETIME, localDateTime);
+        detailviewIntent.putExtra(DetailviewActivity.ARG_TODO_INDEX, index);
+        detailviewIntent.putExtra(DetailviewActivity.ARG_TODO_DATETIME, localDateTime);
         this.startActivityForResult(detailviewIntent, CALL_DETAILVIEW_FOR_EDIT);                // Wir übergeben das Intent und sagen, dass wir auf eine Rückgabe warten
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     protected void erzeugeNeuesToDo() {
         Intent detailviewForCreateIntent = new Intent(this, DetailviewActivity.class);
+        detailviewForCreateIntent.putExtra(DetailviewActivity.ARG_TODO_DATETIME, (LocalDateTime) null);
+
         startActivityForResult(detailviewForCreateIntent, CALL_DETAILVIEW_FOR_CREATE);
     }
 
@@ -171,7 +188,7 @@ public class MainActivity extends AppCompatActivity {               // macht die
             if (resultCode == Activity.RESULT_OK) {                                                             // Wenn etwas eingegeben wurde, dann rufe die Methode unten auf und übergebe das Item aus ARG_ITEM
                 ToDo neuesToDoItem = (ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM);
                 LocalDateTime localDateTime = (LocalDateTime) data.getSerializableExtra(DetailviewActivity.ARG_TODO_DATETIME);
-                neuesToDoItem.setFaelligkeitsDatum(localDateTime);
+                neuesToDoItem.setFinishDate(localDateTime);
                 onNewItemCreated(neuesToDoItem);                                                                // Meine onXXX - Methoden werden zur Mainactivity zurückgegeben
             } else {
                 showFeedbackMessage("Die Itemerstellung wurde abgebrochen");           // Ansonsten ist quasi nichts passiert, trotzdem ne kleine Message zur Kontrolle
@@ -220,7 +237,8 @@ public class MainActivity extends AppCompatActivity {               // macht die
 //                    } else {
                  */
 //                showFeedbackMessage("Got updated item " + editedItem.getName());
-
+                    LocalDateTime localDateTime = (LocalDateTime) data.getSerializableExtra(DetailviewActivity.ARG_TODO_DATETIME);
+                    editedItem.setFinishDate(localDateTime);
                     updateItemAndUpdateList(editedItem);
                 }                                                                 // Meine onXXX - Methoden werden zur Mainactivity zurückgegeben
             } else {
@@ -230,7 +248,6 @@ public class MainActivity extends AppCompatActivity {               // macht die
             showFeedbackMessage("Returning from detailview with " + resultCode);
         }
     }
-
 
 
     protected void onNewItemCreated(ToDo item) {                                                                // HIER CER CREATE TO DO TASK!!!!!!
@@ -248,6 +265,8 @@ public class MainActivity extends AppCompatActivity {               // macht die
     }
 
     protected void updateItemAndUpdateList(ToDo changedItem) {
+
+
         Toast.makeText(getApplicationContext(), "HINWEIS: " + changedItem.getName(), Toast.LENGTH_SHORT).show();
         new UpdateToDosTask(progressBar, crudOperations3, updated -> {
             handleResultFromUpdateTask(changedItem, updated);
@@ -266,11 +285,21 @@ public class MainActivity extends AppCompatActivity {               // macht die
     }
 
     private void deleteItemAndUpdateList(ToDo editedItem) {
-        Toast.makeText(getApplicationContext(), "JAAAAAAA ICH BIN DRIN" + editedItem.getName(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), "JAAAAAAA ICH BIN DRIN" + editedItem.getName(), Toast.LENGTH_SHORT).show();
 
-    }
+//        if (getIntent().getBooleanExtra(DetailviewActivity.ARG_TODO_DELETE, FALSE)) {
+            new DeleteTodosTask(progressBar, crudOperations3, deleted -> {
+                if (deleted) {
+                    items.remove(editedItem);
+                    showFeedbackMessage("DELETEEEEEED: " + editedItem.getName());
+
+                }
+            }).execute(editedItem);
+        }
+
 
     private void handleResultFromUpdateTask(ToDo changedItem, boolean updated) {
+
         if (updated = true) {
             int existingItemInListPost = listViewAdapter.getPosition(changedItem);
             if (existingItemInListPost > -1) {
@@ -278,6 +307,12 @@ public class MainActivity extends AppCompatActivity {               // macht die
                 existingItem.setName(changedItem.getName());
                 existingItem.setDescription(changedItem.getDescription());
                 existingItem.setChecked(changedItem.isChecked());
+                existingItem.setFinishDate(changedItem.getFinishDate());
+                existingItem.setFinishDateLong(changedItem.getFinishDateLong());
+                existingItem.setFavouriteToDo(changedItem.isFavouriteToDo());
+                existingItem.setLocaldate(changedItem.getLocaldate());
+                Toast.makeText(getApplicationContext(), "naaaaaaaaaaaaaaaaaaaaaaaaa: " + changedItem.getName(), Toast.LENGTH_SHORT).show();
+
                 listViewAdapter.notifyDataSetChanged();
             } else {
                 showFeedbackMessage("Updated: " + changedItem.getName() + " cannot found in list");
