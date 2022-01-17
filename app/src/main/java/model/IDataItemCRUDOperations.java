@@ -9,7 +9,7 @@ public interface IDataItemCRUDOperations {
 
     public ToDo readDataItem(long id);
 
-    public ToDo updateDataItem(ToDo toDo);
+    public boolean updateDataItem(ToDo toDo);
 
     public boolean deleteDataItem(ToDo toDo);
 

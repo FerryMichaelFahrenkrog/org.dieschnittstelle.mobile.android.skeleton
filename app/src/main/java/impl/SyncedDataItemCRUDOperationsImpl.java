@@ -71,15 +71,15 @@ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
     }
 
     @Override
-    public ToDo updateDataItem(ToDo toDo) {
-        toDo = localCRUD.updateDataItem(toDo);
-        remoteCRUD.updateDataItem(toDo);
-        return toDo;
-
-        //if (localCRUD.updateDataITem(item)){
-        //teturn remoteCrud.updateDataitem(item)
-        //return false=
-
+    public boolean updateDataItem(ToDo toDo) {
+        if(!remoteAvailable){
+            return localCRUD.updateDataItem(toDo);
+        }else{
+            if(localCRUD.updateDataItem(toDo)){
+                return remoteCRUD.updateDataItem(toDo);
+            }
+        }
+        return false;
     }
 
     @Override

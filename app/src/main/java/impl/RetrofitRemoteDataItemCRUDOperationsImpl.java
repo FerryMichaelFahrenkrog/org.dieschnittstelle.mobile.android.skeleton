@@ -89,12 +89,16 @@ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOp
     }
 
     @Override
-    public ToDo updateDataItem(ToDo toDo) {
+    public boolean updateDataItem(ToDo toDo) {
         try {
-            return webAPI.updateToDo(toDo.getId(), toDo).execute().body();
+            if (webAPI.updateToDo(toDo.getId(), toDo).execute().body() != null) {
+                return true;
+            } else {
+                return false;
+            }
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
+            return false;
         }
     }
 

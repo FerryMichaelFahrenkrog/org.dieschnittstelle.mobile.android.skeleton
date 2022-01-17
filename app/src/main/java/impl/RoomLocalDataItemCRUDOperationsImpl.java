@@ -104,9 +104,11 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
     }
 
     @Override
-    public ToDo updateDataItem(ToDo toDo) {
-        roomAccessor.updateItem(toDo);
-        return toDo;
+    public boolean updateDataItem(ToDo toDo) {
+        if(roomAccessor.updateItem(toDo) > 0 ){
+            return true;
+        }
+        return false;
     }
 
     @Override

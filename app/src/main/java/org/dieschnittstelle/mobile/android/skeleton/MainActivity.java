@@ -43,6 +43,7 @@ import model.ToDo;
 import tasks.CreateTodosTask;
 import tasks.DeleteAllToDosTask;
 import tasks.ReadAllToDoTask;
+import tasks.UpdateToDosTask;
 
 public class MainActivity extends AppCompatActivity {               // macht die Klasse zu einer Activity
     private static String logtag = "MainActivity: ";                // Logger zur Ausgabe
@@ -203,20 +204,11 @@ public class MainActivity extends AppCompatActivity {               // macht die
 //        });
     }
 
-    protected void updateItemAndUpdateList(ToDo changedItem) {
-        int existingItemInListPost = listViewAdapter.getPosition(changedItem);
-        if(existingItemInListPost > -1){
-            ToDo existingItem = listViewAdapter.getItem(existingItemInListPost);
-            existingItem.setName(changedItem.getName());
-            existingItem.setDescription(changedItem.getDescription());
-            existingItem.setChecked(changedItem.isChecked());
-            listViewAdapter.notifyDataSetChanged();
-        }else{
-            showFeedbackMessage("Updated: " + changedItem.getName() + " cannot found in list");
-        }
-
-
-
+        protected void updateItemAndUpdateList(ToDo changedItem) {
+        Toast.makeText(getApplicationContext(), "HINWEIS: " + changedItem.getName(), Toast.LENGTH_SHORT).show();
+        new UpdateToDosTask(progressBar, crudOperations3, updated -> {
+            handleResultFromUpdateTask(changedItem, updated);
+        }).execute(changedItem);
 
 //// ???
 //        crudOperations.updateDataItem(changedItem, updated -> {
@@ -229,6 +221,32 @@ public class MainActivity extends AppCompatActivity {               // macht die
 //
 //        });
     }
+
+    private void handleResultFromUpdateTask(ToDo changedItem, boolean updated){
+            if(updated = true){
+                int existingItemInListPost = listViewAdapter.getPosition(changedItem);
+                if(existingItemInListPost > -1){
+                    ToDo existingItem = listViewAdapter.getItem(existingItemInListPost);
+                    existingItem.setName(changedItem.getName());
+                    existingItem.setDescription(changedItem.getDescription());
+                    existingItem.setChecked(changedItem.isChecked());
+                    listViewAdapter.notifyDataSetChanged();
+                }else{
+                    showFeedbackMessage("Updated: " + changedItem.getName() + " cannot found in list");
+                }
+            }
+    }
+
+//        crudOperations.updateDataItem(changedItem, updated -> {
+//            int pos = items.indexOf(updated);
+////            Log.i(logtag, "got position: " + pos);
+//
+//            items.remove(pos);
+//            items.add(pos, updated);
+//            sortListAndScrollToItem(updated);
+//
+//        });
+//    }
 
     public void onCheckedChangedInListView(ToDo toDo) {
         crudOperations.updateDataItem(toDo, updated -> {
