@@ -10,7 +10,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,7 +32,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Consumer;
 
 import impl.RetrofitRemoteDataItemCRUDOperationsImpl;
 import impl.RoomLocalDataItemCRUDOperationsImpl;
@@ -42,7 +40,6 @@ import impl.ThreadedDataItemCRUDOperationsAsyncImpl;
 import model.IDataItemCRUDOperations;
 import model.IDataItemCRUDOperationsAsync;
 import model.ToDo;
-import tasks.CheckWebapiAvailableTask;
 import tasks.CreateTodosTask;
 import tasks.DeleteAllToDosTask;
 import tasks.ReadAllToDoTask;
@@ -176,13 +173,14 @@ public class MainActivity extends AppCompatActivity {               // macht die
                 neuesToDoItem.setFaelligkeitsDatum(localDateTime);
                 onNewItemCreated(neuesToDoItem);                                                                // Meine onXXX - Methoden werden zur Mainactivity zurückgegeben
             } else {
-                showFeedbackMessage("Returning from detailview for create with " + resultCode);           // Ansonsten ist quasi nichts passiert, trotzdem ne kleine Message zur Kontrolle
+                showFeedbackMessage("Die Itemerstellung wurde abgebrochen");           // Ansonsten ist quasi nichts passiert, trotzdem ne kleine Message zur Kontrolle
             }
         } else if (requestCode == CALL_DETAILVIEW_FOR_EDIT) {                                                    // In diesem Fall wird auf ein Item bearbeitet, also per Doppelklick editiert.
             if (resultCode == Activity.RESULT_OK) {                                                            // Wenn es geupdatet wurde (RESULT_OK), dann schreib die Daten in das Edited Item und übergebe das der unteren Funktion
                 ToDo editedItem = (ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM);
                 showFeedbackMessage("Got updated item " + editedItem.getName());
-                onItemEdited(editedItem);                                                                      // Meine onXXX - Methoden werden zur Mainactivity zurückgegeben
+
+                updateItemAndUpdateList(editedItem);                                                                      // Meine onXXX - Methoden werden zur Mainactivity zurückgegeben
             } else {
                 showFeedbackMessage("Returning from detailview for edit with: " + resultCode);
             }
@@ -205,16 +203,31 @@ public class MainActivity extends AppCompatActivity {               // macht die
 //        });
     }
 
-    protected void onItemEdited(ToDo editedItem) {                                                              // ???
-        crudOperations.updateDataItem(editedItem, updated -> {
-            int pos = items.indexOf(updated);
-//            Log.i(logtag, "got position: " + pos);
+    protected void updateItemAndUpdateList(ToDo changedItem) {
+        int existingItemInListPost = listViewAdapter.getPosition(changedItem);
+        if(existingItemInListPost > -1){
+            ToDo existingItem = listViewAdapter.getItem(existingItemInListPost);
+            existingItem.setName(changedItem.getName());
+            existingItem.setDescription(changedItem.getDescription());
+            existingItem.setChecked(changedItem.isChecked());
+            listViewAdapter.notifyDataSetChanged();
+        }else{
+            showFeedbackMessage("Updated: " + changedItem.getName() + " cannot found in list");
+        }
 
-            items.remove(pos);
-            items.add(pos, updated);
-            sortListAndScrollToItem(updated);
 
-        });
+
+
+//// ???
+//        crudOperations.updateDataItem(changedItem, updated -> {
+//            int pos = items.indexOf(updated);
+////            Log.i(logtag, "got position: " + pos);
+//
+//            items.remove(pos);
+//            items.add(pos, updated);
+//            sortListAndScrollToItem(updated);
+//
+//        });
     }
 
     public void onCheckedChangedInListView(ToDo toDo) {
@@ -337,11 +350,11 @@ public class MainActivity extends AppCompatActivity {               // macht die
 
 /*
 TODO:
-- THREADES UND ASYNC RAUSBALLERN überall wo es drin ist. LÖSCHEN BUTTON IN DETAIL implementieren ;) WebChecka
-- ToDo Application ??
-- Herausfinden wie ich die Fälligkeiten abspeichere und anzeigen lassen in Main
-- Sortierungen herausfinden
-- Kontakte implementierejn
-- Abgleich implementieren
-- FineTuning durch Anforerungen
+- THREADES UND ASYNC RAUSBALLERN überall wo es drin ist. LÖSCHEN BUTTON IN DETAIL implementieren ;) 17.01 VIDEO 2x!
+- Connection Klasse                                                                                 18.01 VIDEO!
+- Herausfinden wie ich die Fälligkeiten abspeichere und anzeigen lassen in Main                     19.01 Alex?
+- Kontakte implementierejn                                                                          19.01
+- Sortierungen herausfinden                                                                         20.01
+- Abgleich implementieren                                                                           21.01
+- FineTuning durch Anforerungen                                                                     22.01, 23.01
  */

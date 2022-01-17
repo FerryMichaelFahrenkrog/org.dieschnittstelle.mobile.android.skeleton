@@ -59,10 +59,10 @@ public class ThreadedDataItemCRUDOperationsAsyncImpl implements IDataItemCRUDOpe
 
     @Override
     public void updateDataItem(ToDo toDo, Consumer<ToDo> onupdated) {
-        new Thread(() -> {
-            ToDo updated = crudExecutor.updateDataItem(toDo);
-            uiThreadProvider.runOnUiThread(() -> onupdated.accept(updated));
-        }).start();
+//        new Thread(() -> {
+//            ToDo updated = crudExecutor.updateDataItem(toDo);
+//            uiThreadProvider.runOnUiThread(() -> onupdated.accept(updated));
+//        }).start();
     }
 
     @Override
