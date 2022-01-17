@@ -64,7 +64,9 @@ public class MainActivity extends AppCompatActivity {               // macht die
 
     private IDataItemCRUDOperationsAsync crudOperations;            // ??
     private IDataItemCRUDOperations crudOperationsNormal;            // ??
+    private IDataItemCRUDOperations crudOperations3;            // ??
 
+    private final LoginActivity loginActivity = new LoginActivity();
     private boolean SKIP_LOGIN = false;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -72,20 +74,24 @@ public class MainActivity extends AppCompatActivity {               // macht die
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
 //        new CheckWebapiAvailableTask(webapiAvailable -> {
 //            ((SyncedDataItemCRUDOperationsImpl) crudOperationsNormal).setConnectionStatus(webapiAvailable);
 //
-//            if (webapiAvailable) {
-//                SKIP_LOGIN = true;
+////            if (webapiAvailable) {
+////                if (SKIP_LOGIN = true) {
+////                    setContentView(R.layout.activity_main);                     // setzen der Hauptansicht (Layout)
+////                } else {
+////                    loginActivity.showLoginDialog();
+////                }
+////            } else {
+////                Toast.makeText(getApplicationContext(), "WebAPI not available!", Toast.LENGTH_LONG).show();
+////            }
 //
-//                if (SKIP_LOGIN = true) {
-//                    setContentView(R.layout.activity_main);                     // setzen der Hauptansicht (Layout)
-//                } else {
-//                    showLoginDialog(); /////// ????
-//                }
-//            } else {
-//                Toast.makeText(getApplicationContext(), "WebAPI not available!", Toast.LENGTH_LONG).show();
+//            if(webapiAvailable){
+////                loginActivity.showLoginDialog();
+//                setContentView(R.layout.activity_login);
+//            }else{
+//                setContentView(R.layout.activity_main);
 //            }
 //        }).execute();
 
@@ -110,11 +116,21 @@ public class MainActivity extends AppCompatActivity {               // macht die
         // 3. Load data into view
         IDataItemCRUDOperations crudExecutor = ((ToDoApplication) this.getApplication()).getCrudOperations();                // ??
         crudOperations = new ThreadedDataItemCRUDOperationsAsyncImpl(crudExecutor, this, progressBar);
-//        listViewAdapter.addAll(readAllDataItems());
-        crudOperations.readAllDataItems(items -> {
+
+        RoomLocalDataItemCRUDOperationsImpl roomTodoCRUDOperations = new RoomLocalDataItemCRUDOperationsImpl(this);
+        RetrofitRemoteDataItemCRUDOperationsImpl retrofitTodoCRUDOperations = new RetrofitRemoteDataItemCRUDOperationsImpl();
+
+        crudOperations3 = new SyncedDataItemCRUDOperationsImpl(roomTodoCRUDOperations, retrofitTodoCRUDOperations);
+
+        new ReadAllToDoTask(progressBar, crudOperations3, toDos -> {
+            listViewAdapter.addAll(toDos);
             sortitems(items);
-            listViewAdapter.addAll(items);
-        }); //VK 19.5
+        }).execute();
+//        listViewAdapter.addAll(readAllDataItems());
+//        crudOperations.readAllDataItems(items -> {
+//            sortitems(items);
+//            listViewAdapter.addAll(items);
+//        }); //VK 19.5
     }
 
 
@@ -147,6 +163,8 @@ public class MainActivity extends AppCompatActivity {               // macht die
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {                   // Diese Methode reagiert auf die Rückgaben, die wir über onActivityResult bekommen
         super.onActivityResult(requestCode, resultCode, data);
 
+        returnCreateToDo(requestCode, resultCode, data);
+
         if (requestCode == CALL_DETAILVIEW_FOR_CREATE) {
             if (resultCode == Activity.RESULT_OK) {                                                             // Wenn etwas eingegeben wurde, dann rufe die Methode unten auf und übergebe das Item aus ARG_ITEM
                 ToDo neuesToDoItem = (ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM);
@@ -165,6 +183,9 @@ public class MainActivity extends AppCompatActivity {               // macht die
         } else {
             showFeedbackMessage("Returning from detailview with " + resultCode);
         }
+    }
+
+    private void returnCreateToDo(int requestCode, int resultCode, Intent data) {
     }
 
     protected void onNewItemCreated(ToDo item) {                                                                // ???
@@ -304,3 +325,15 @@ public class MainActivity extends AppCompatActivity {               // macht die
         Snackbar.make(findViewById(R.id.rootView), msg, Snackbar.LENGTH_SHORT).show();
     }
 }
+
+
+/*
+TODO:
+- THREADES UND ASYNC RAUSBALLERN überall wo es drin ist. LÖSCHEN BUTTON IN DETAIL implementieren ;) WebChecka
+- ToDo Application ??
+- Herausfinden wie ich die Fälligkeiten abspeichere und anzeigen lassen in Main
+- Sortierungen herausfinden
+- Kontakte implementierejn
+- Abgleich implementieren
+- FineTuning durch Anforerungen
+ */

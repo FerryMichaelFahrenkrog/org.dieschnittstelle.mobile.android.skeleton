@@ -83,7 +83,7 @@ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
     }
 
     @Override
-    public boolean deleteDataItem(long id) {
+    public boolean deleteDataItem(ToDo toDo) {
         return false;
     }
 

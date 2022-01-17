@@ -40,16 +40,16 @@ public class ThreadedDataItemCRUDOperationsAsyncImpl implements IDataItemCRUDOpe
 
     @Override
     public void readAllDataItems(Consumer<List<ToDo>> onread) {
-        progressBar.setVisibility(View.VISIBLE);
-
-        new Thread(() -> {
-            List<ToDo> items = crudExecutor.readAllDataItems();
-
-            uiThreadProvider.runOnUiThread(() -> {
-                progressBar.setVisibility(View.GONE);
-                onread.accept(items);
-            });
-        }).start();
+//        progressBar.setVisibility(View.VISIBLE);
+//
+//        new Thread(() -> {
+//            List<ToDo> items = crudExecutor.readAllDataItems();
+//
+//            uiThreadProvider.runOnUiThread(() -> {
+//                progressBar.setVisibility(View.GONE);
+//                onread.accept(items);
+//            });
+//        }).start();
     }
 
     @Override

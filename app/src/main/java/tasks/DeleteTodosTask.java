@@ -10,17 +10,25 @@ import java.util.function.Consumer;
 import model.IDataItemCRUDOperations;
 import model.ToDo;
 
-public class UpdateToDosTask extends AsyncTask<ToDo, Void, Boolean> {
+public class DeleteTodosTask extends AsyncTask<ToDo, Void, Boolean> {
     //Die Warning irgendwann beheben
     @SuppressLint("StaticFieldLeak")
     private ProgressBar progressBar;
     private IDataItemCRUDOperations crudOperations;
     private Consumer<Boolean> onDoneConsumer;
 
-    public UpdateToDosTask(ProgressBar progressBar, IDataItemCRUDOperations crudOperations, Consumer<Boolean> onDoneConsumer) {
+    public DeleteTodosTask(ProgressBar progressBar, IDataItemCRUDOperations crudOperations, Consumer<Boolean> onDoneConsumer) {
         this.progressBar = progressBar;
         this.crudOperations = crudOperations;
         this.onDoneConsumer = onDoneConsumer;
+    }
+
+    @Override
+    protected Boolean doInBackground(ToDo... todos) {
+        for (ToDo todo : todos) {
+            crudOperations.deleteDataItem(todo);
+        }
+        return true;
     }
 
     @Override
@@ -30,16 +38,8 @@ public class UpdateToDosTask extends AsyncTask<ToDo, Void, Boolean> {
 
 
     @Override
-    protected Boolean doInBackground(ToDo... todos) {
-        for (ToDo todo : todos) {
-            crudOperations.updateDataItem(todo);
-        }
-        return true;
-    }
-
-    @Override
-    protected void onPostExecute(Boolean result) {
-        onDoneConsumer.accept(result);
+    protected void onPostExecute(Boolean aBool) {
+        onDoneConsumer.accept(aBool);
         progressBar.setVisibility(View.INVISIBLE);
     }
 }

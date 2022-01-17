@@ -110,8 +110,7 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
     }
 
     @Override
-    public boolean deleteDataItem(long id) {
-
+    public boolean deleteDataItem(ToDo toDo) {
         return false;
     }
 

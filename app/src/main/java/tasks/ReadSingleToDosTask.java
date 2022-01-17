@@ -5,19 +5,21 @@ import android.os.AsyncTask;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import model.IDataItemCRUDOperations;
 import model.ToDo;
 
-public class UpdateToDosTask extends AsyncTask<ToDo, Void, Boolean> {
+public class ReadSingleToDosTask extends AsyncTask<Long, Void, List<ToDo>> {
     //Die Warning irgendwann beheben
     @SuppressLint("StaticFieldLeak")
     private ProgressBar progressBar;
     private IDataItemCRUDOperations crudOperations;
-    private Consumer<Boolean> onDoneConsumer;
+    private Consumer<List<ToDo>> onDoneConsumer;
 
-    public UpdateToDosTask(ProgressBar progressBar, IDataItemCRUDOperations crudOperations, Consumer<Boolean> onDoneConsumer) {
+    public ReadSingleToDosTask(ProgressBar progressBar, IDataItemCRUDOperations crudOperations, Consumer<List<ToDo>> onDoneConsumer) {
         this.progressBar = progressBar;
         this.crudOperations = crudOperations;
         this.onDoneConsumer = onDoneConsumer;
@@ -28,18 +30,21 @@ public class UpdateToDosTask extends AsyncTask<ToDo, Void, Boolean> {
         progressBar.setVisibility(View.VISIBLE);
     }
 
-
     @Override
-    protected Boolean doInBackground(ToDo... todos) {
-        for (ToDo todo : todos) {
-            crudOperations.updateDataItem(todo);
+    protected List<ToDo> doInBackground(Long... ids) {
+        ArrayList<ToDo> retrievedTodos = new ArrayList<>();
+
+        for (long id : ids) {
+            ToDo todo = crudOperations.readDataItem(id);
+            retrievedTodos.add(todo);
         }
-        return true;
+
+        return retrievedTodos;
     }
 
     @Override
-    protected void onPostExecute(Boolean result) {
-        onDoneConsumer.accept(result);
+    protected void onPostExecute(List<ToDo> todos) {
+        onDoneConsumer.accept(todos);
         progressBar.setVisibility(View.INVISIBLE);
     }
 }
