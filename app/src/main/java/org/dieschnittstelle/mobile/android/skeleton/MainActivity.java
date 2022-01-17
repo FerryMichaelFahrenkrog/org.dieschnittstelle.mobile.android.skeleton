@@ -1,11 +1,5 @@
 package org.dieschnittstelle.mobile.android.skeleton;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -23,6 +17,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -36,7 +36,6 @@ import java.util.List;
 import impl.RetrofitRemoteDataItemCRUDOperationsImpl;
 import impl.RoomLocalDataItemCRUDOperationsImpl;
 import impl.SyncedDataItemCRUDOperationsImpl;
-import impl.ThreadedDataItemCRUDOperationsAsyncImpl;
 import model.IDataItemCRUDOperations;
 import model.IDataItemCRUDOperationsAsync;
 import model.ToDo;
@@ -62,7 +61,6 @@ public class MainActivity extends AppCompatActivity {               // macht die
     private static final int CALL_DETAILVIEW_FOR_CREATE = 0;        // Damit sage ich der "startActivityForResult" Methode, dass ich etwas erzeugen will
     private static final int CALL_DETAILVIEW_FOR_EDIT = 1;          // Damit sage ich der "startActivityForResult" Methode, dass ich etwas editieren will
 
-    private IDataItemCRUDOperationsAsync crudOperations;            // ??
     private IDataItemCRUDOperations crudOperationsNormal;            // ??
     private IDataItemCRUDOperations crudOperations3;            // ??
 
