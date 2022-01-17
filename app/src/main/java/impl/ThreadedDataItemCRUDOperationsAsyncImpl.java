@@ -72,9 +72,9 @@ public class ThreadedDataItemCRUDOperationsAsyncImpl implements IDataItemCRUDOpe
 
     @Override
     public void deleteAllDataItems(boolean remote, Consumer<Boolean> ondeleted) {
-        new Thread(() -> {
-            boolean result = crudExecutor.deleteAllDataItems(remote);
-            uiThreadProvider.runOnUiThread(() -> ondeleted.accept(result));
-        }).start();
+//        new Thread(() -> {
+//            boolean result = crudExecutor.deleteAllDataItems(remote);
+//            uiThreadProvider.runOnUiThread(() -> ondeleted.accept(result));
+//        }).start();
     }
 }
