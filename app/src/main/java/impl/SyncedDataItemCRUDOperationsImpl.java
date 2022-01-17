@@ -83,6 +83,15 @@ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
 
     @Override
     public boolean deleteDataItem(ToDo toDo) {
+        if(!remoteAvailable)
+        {
+            return localCRUD.deleteDataItem(toDo);
+        }else{
+            if(localCRUD.deleteDataItem(toDo)){
+                return remoteCRUD.deleteDataItem(toDo);
+            }
+        }
+
         return false;
     }
 

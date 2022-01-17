@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.room.Dao;
 import androidx.room.Database;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Room;
@@ -67,6 +68,9 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
         @Query("select * from todo")
         public List<ToDo> readAllItems();
 
+        @Delete
+        void delete(ToDo todo);
+
         @Query("select * from todo where id = (:id)")
         public ToDo readItem(Long id);
 
@@ -113,7 +117,8 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
 
     @Override
     public boolean deleteDataItem(ToDo toDo) {
-        return false;
+        roomAccessor.delete(toDo);
+        return true;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package org.dieschnittstelle.mobile.android.skeleton;
 
+import static java.lang.Boolean.FALSE;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -37,10 +39,10 @@ import impl.RetrofitRemoteDataItemCRUDOperationsImpl;
 import impl.RoomLocalDataItemCRUDOperationsImpl;
 import impl.SyncedDataItemCRUDOperationsImpl;
 import model.IDataItemCRUDOperations;
-import model.IDataItemCRUDOperationsAsync;
 import model.ToDo;
 import tasks.CreateTodosTask;
 import tasks.DeleteAllToDosTask;
+import tasks.DeleteTodosTask;
 import tasks.ReadAllToDoTask;
 import tasks.UpdateToDoTaskWithFuture;
 import tasks.UpdateToDosTask;
@@ -175,11 +177,52 @@ public class MainActivity extends AppCompatActivity {               // macht die
                 showFeedbackMessage("Die Itemerstellung wurde abgebrochen");           // Ansonsten ist quasi nichts passiert, trotzdem ne kleine Message zur Kontrolle
             }
         } else if (requestCode == CALL_DETAILVIEW_FOR_EDIT) {                                                    // In diesem Fall wird auf ein Item bearbeitet, also per Doppelklick editiert.
-            if (resultCode == Activity.RESULT_OK) {                                                            // Wenn es geupdatet wurde (RESULT_OK), dann schreib die Daten in das Edited Item und übergebe das der unteren Funktion
-                ToDo editedItem = (ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM);
-                showFeedbackMessage("Got updated item " + editedItem.getName());
+            if (resultCode == Activity.RESULT_OK) {
 
-                updateItemAndUpdateList(editedItem);                                                                      // Meine onXXX - Methoden werden zur Mainactivity zurückgegeben
+                // Wenn es geupdatet wurde (RESULT_OK), dann schreib die Daten in das Edited Item und übergebe das der unteren Funktion
+                ToDo editedItem = (ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM);
+
+                if (editedItem == null) {
+                    showFeedbackMessage("WERT IST NULL");
+                }
+
+
+                if (data.getBooleanExtra(DetailviewActivity.ARG_TODO_DELETE, FALSE)) {
+//                    deleteItemAndUpdateList(editedItem);
+//                    new DeleteTodosTask(progressBar, crudOperations3, deleted -> {
+//                        Toast.makeText(getApplicationContext(), "FIIIIIIIIIIIIIIIIIIIICK MICH", Toast.LENGTH_SHORT).show();
+////                        if(deleted){
+////                            showFeedbackMessage("JHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA MAN");
+////                            items.remove(editedItem);
+////                        }
+//                    }).execute(editedItem);
+                    deleteItemAndUpdateList(editedItem);
+                } else {
+
+                /*
+                  new DeleteAllToDosTask(progressBar, roomTodoCRUDOperations, v -> {
+                    Toast.makeText(getApplicationContext(), "Die lokalen ToDos wurden gelöscht", Toast.LENGTH_SHORT).show();
+                    items.clear();
+                    listViewAdapter.notifyDataSetChanged();
+                }).execute();
+                 */
+
+                /*
+                //                if(editedItem == null){
+//                    showFeedbackMessage("WERT IST NULL");
+//                }else{
+//                    if (data.getBooleanExtra(DetailviewActivity.ARG_TODO_DELETE, FALSE)) {
+//                        new DeleteTodosTask(progressBar, crudOperations3, deleted -> {
+//                            if (deleted) {
+//                                items.remove(editedItem);
+//                            }
+//                        }).execute(editedItem);
+//                    } else {
+                 */
+//                showFeedbackMessage("Got updated item " + editedItem.getName());
+
+                    updateItemAndUpdateList(editedItem);
+                }                                                                 // Meine onXXX - Methoden werden zur Mainactivity zurückgegeben
             } else {
                 showFeedbackMessage("Returning from detailview for edit with: " + resultCode);
             }
@@ -187,6 +230,8 @@ public class MainActivity extends AppCompatActivity {               // macht die
             showFeedbackMessage("Returning from detailview with " + resultCode);
         }
     }
+
+
 
     protected void onNewItemCreated(ToDo item) {                                                                // HIER CER CREATE TO DO TASK!!!!!!
         showFeedbackMessage("created new item " + item);
@@ -202,7 +247,7 @@ public class MainActivity extends AppCompatActivity {               // macht die
 //        });
     }
 
-        protected void updateItemAndUpdateList(ToDo changedItem) {
+    protected void updateItemAndUpdateList(ToDo changedItem) {
         Toast.makeText(getApplicationContext(), "HINWEIS: " + changedItem.getName(), Toast.LENGTH_SHORT).show();
         new UpdateToDosTask(progressBar, crudOperations3, updated -> {
             handleResultFromUpdateTask(changedItem, updated);
@@ -220,19 +265,24 @@ public class MainActivity extends AppCompatActivity {               // macht die
 //        });
     }
 
-    private void handleResultFromUpdateTask(ToDo changedItem, boolean updated){
-            if(updated = true){
-                int existingItemInListPost = listViewAdapter.getPosition(changedItem);
-                if(existingItemInListPost > -1){
-                    ToDo existingItem = listViewAdapter.getItem(existingItemInListPost);
-                    existingItem.setName(changedItem.getName());
-                    existingItem.setDescription(changedItem.getDescription());
-                    existingItem.setChecked(changedItem.isChecked());
-                    listViewAdapter.notifyDataSetChanged();
-                }else{
-                    showFeedbackMessage("Updated: " + changedItem.getName() + " cannot found in list");
-                }
+    private void deleteItemAndUpdateList(ToDo editedItem) {
+        Toast.makeText(getApplicationContext(), "JAAAAAAA ICH BIN DRIN" + editedItem.getName(), Toast.LENGTH_SHORT).show();
+
+    }
+
+    private void handleResultFromUpdateTask(ToDo changedItem, boolean updated) {
+        if (updated = true) {
+            int existingItemInListPost = listViewAdapter.getPosition(changedItem);
+            if (existingItemInListPost > -1) {
+                ToDo existingItem = listViewAdapter.getItem(existingItemInListPost);
+                existingItem.setName(changedItem.getName());
+                existingItem.setDescription(changedItem.getDescription());
+                existingItem.setChecked(changedItem.isChecked());
+                listViewAdapter.notifyDataSetChanged();
+            } else {
+                showFeedbackMessage("Updated: " + changedItem.getName() + " cannot found in list");
             }
+        }
     }
 
 //        crudOperations.updateDataItem(changedItem, updated -> {
@@ -253,7 +303,7 @@ public class MainActivity extends AppCompatActivity {               // macht die
 //        });
 //    }
 
-    public void onListItemChangedInList(ToDo toDo){
+    public void onListItemChangedInList(ToDo toDo) {
 //        showFeedbackMessage("Updateeeeeeeeeeeed item: " + toDo.getName());
 
         new UpdateToDoTaskWithFuture(this, crudOperations3)

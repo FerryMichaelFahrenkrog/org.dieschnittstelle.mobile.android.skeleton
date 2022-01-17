@@ -44,4 +44,5 @@ public class DeleteAllToDosTask extends AsyncTask<Void, Void, Boolean> {
         onDoneConsumer.accept(aBool);
         progressBar.setVisibility(View.INVISIBLE);
     }
+
 }
