@@ -30,7 +30,9 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -160,6 +162,7 @@ public class MainActivity extends AppCompatActivity {               // macht die
     }
 
 
+    @SuppressLint("NewApi")
     protected void onNewItemCreated(ToDo item) {                                                                // HIER CER CREATE TO DO TASK!!!!!!
         showFeedbackMessage("created new item " + item);
 
@@ -181,7 +184,9 @@ public class MainActivity extends AppCompatActivity {               // macht die
     private void deleteItemAndUpdateList(ToDo editedItem) {
         new DeleteTodosTask(progressBar, crudOperations, deleted -> {
             if (deleted) {
-                items.remove(editedItem);                                                                                           // was muss ich hier machen, damit das Item auch wirklich entfernt wird? 
+                items.remove(editedItem);
+                listViewAdapter.notifyDataSetChanged();
+// was muss ich hier machen, damit das Item auch wirklich entfernt wird?
                 showFeedbackMessage("DELETED: " + editedItem.getName());
             }
         }).execute(editedItem);

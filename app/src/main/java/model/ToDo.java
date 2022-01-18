@@ -70,7 +70,7 @@ public class ToDo implements Serializable                                       
 
     @Ignore
     public ToDo() {
-
+        finishDateLong = System.currentTimeMillis();
     }
 
     public ToDo(String name) {
