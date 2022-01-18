@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity {               // macht die
     private void deleteItemAndUpdateList(ToDo editedItem) {
         new DeleteTodosTask(progressBar, crudOperations, deleted -> {
             if (deleted) {
-                items.remove(editedItem);
+                items.remove(editedItem);                                                                                           // was muss ich hier machen, damit das Item auch wirklich entfernt wird? 
                 showFeedbackMessage("DELETED: " + editedItem.getName());
             }
         }).execute(editedItem);
