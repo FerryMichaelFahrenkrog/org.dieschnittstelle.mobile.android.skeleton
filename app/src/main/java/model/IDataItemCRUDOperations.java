@@ -2,7 +2,8 @@ package model;
 
 import java.util.List;
 
-public interface IDataItemCRUDOperations {
+public interface IDataItemCRUDOperations
+{
     ToDo createDataItem(ToDo toDo);
 
     List<ToDo> readAllDataItems();

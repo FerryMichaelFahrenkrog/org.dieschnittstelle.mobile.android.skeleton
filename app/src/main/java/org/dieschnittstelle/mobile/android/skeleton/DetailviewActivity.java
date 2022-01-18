@@ -36,40 +36,33 @@ import java.util.Locale;
 
 import model.ToDo;
 
-public class DetailviewActivity extends AppCompatActivity
-{
+public class DetailviewActivity extends AppCompatActivity {
     public static final int ACTION_PICK_CONTACT = 0;
-    public static final String ARG_TODO_OBJECT = "todo";
+    public static final String ARG_ITEM = "item";                               // Zur Objektentgegennahme
     public static final String ARG_TODO_INDEX = "todoIndex";
-
     public static final String ARG_TODO_DELETE = "todoDelete";
     public static final String ARG_TODO_DATETIME = "todoDatetime";
+
+    private ActivityDetailviewBinding detailviewBinding;
+
+    private ToDo toDo;
+    private String errorStatus;
+    private EditText editTextDatum;
+    private EditText editTextUhr;
+    private Button deleteButton;
+    TextView kontaktName;
+
+    private boolean itemDelete = false;
+    private int todoIndex;
+
+    @SuppressLint("NewApi")
+    private LocalDateTime PlaceholderDateTime = LocalDateTime.now();
+    private LocalDateTime TodoDateTime = PlaceholderDateTime;
+
     @SuppressLint("NewApi")
     public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     @SuppressLint("NewApi")
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-
-    public static final String ARG_ITEM = "item";               // Zur Objektentgegennahme
-
-    private ToDo toDo;
-    private ActivityDetailviewBinding detailviewBinding;
-    @SuppressLint("NewApi")
-    private LocalDateTime PlaceholderDateTime = LocalDateTime.now();
-    private LocalDateTime TodoDateTime = PlaceholderDateTime;
-    private String errorStatus;
-
-    private EditText editTextDatum;
-    private EditText editTextUhr;
-    private Button deleteButton;
-    private boolean itemDelete = false;
-    private int todoIndex;
-
-    TextView kontaktName;
-    Button timeButton;
-    int hour, minute;
-
-    Calendar c;
-    DatePickerDialog datePickerDialog;
 
     @SuppressLint("NewApi")
     @Override
@@ -92,16 +85,13 @@ public class DetailviewActivity extends AppCompatActivity
         deleteButton = findViewById(R.id.btnLoeschen);
         deleteButton.setOnClickListener(v -> deleteItem());
 
-        toDo = (ToDo)getIntent().getSerializableExtra(ARG_ITEM);            // Hier nehme ich das Argument entgegen aus der Main-Activity und speichere es
+        toDo = (ToDo) getIntent().getSerializableExtra(ARG_ITEM);            // Hier nehme ich das Argument entgegen aus der Main-Activity und speichere es
 
-        if(toDo == null){
+        if (toDo == null) {
             toDo = new ToDo();                                              // Leeres ToDoItem erzeugen, falls keines übergeben wurde.
         }
 
         todoIndex = getIntent().getIntExtra(ARG_TODO_INDEX, Integer.MAX_VALUE);
-
-
-
 
         Log.i("DetailviewActivity", "got contact ids: " + toDo.getContactIds());
         toDo.getContactIds().forEach(id -> {
@@ -130,10 +120,6 @@ public class DetailviewActivity extends AppCompatActivity
             editTextUhr.setText(TodoDateTime.format(TIME_FORMATTER));
         }, hour, minutes, true);
         timePickerDialog.show();
-    }
-
-    public void colorChange(View view){
-      view.setBackgroundColor(Color.RED);
     }
 
     @SuppressLint("NewApi")
@@ -173,9 +159,8 @@ public class DetailviewActivity extends AppCompatActivity
         finish();
     }
 
-
     @SuppressLint("NewApi")
-    public void onSaveItem(){
+    public void onSaveItem() {
         updateLocalDateTime();
 
         Intent returnIntent = new Intent();                         // Rückgabe Inteent erstellen
@@ -188,8 +173,6 @@ public class DetailviewActivity extends AppCompatActivity
 
         finish();
     }
-
-
 
     @SuppressLint("NewApi")
     void updateLocalDateTime() {
@@ -216,42 +199,36 @@ public class DetailviewActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.detailview_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item){
-        if(item.getItemId() == R.id.selectContact){
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.selectContact) {
             selectContact();
             return true;
-        }
-        else if(item.getItemId() == R.id.sendSMS)
-            {
-                sendSms();
-            }
-        else if(item.getItemId() == R.id.deleteRemoteItems)
-        {
+        } else if (item.getItemId() == R.id.sendSMS) {
+            sendSms();
+        } else if (item.getItemId() == R.id.deleteRemoteItems) {
 
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    protected void selectContact(){
+    protected void selectContact() {
         Intent selectContactIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-        startActivityForResult(selectContactIntent,ACTION_PICK_CONTACT);
+        startActivityForResult(selectContactIntent, ACTION_PICK_CONTACT);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if(requestCode == ACTION_PICK_CONTACT && resultCode == Activity.RESULT_OK)
-        {
+        if (requestCode == ACTION_PICK_CONTACT && resultCode == Activity.RESULT_OK) {
             Log.i("DetailviewActivity", "onActivityResult(): got data: " + data);
             showContactDetails(data.getData());
-        }
-        else{
+        } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -262,20 +239,19 @@ public class DetailviewActivity extends AppCompatActivity
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    protected void showContactDetails(Uri contactId){
+    protected void showContactDetails(Uri contactId) {
         int hasReadContactsPermission = checkSelfPermission(Manifest.permission.READ_CONTACTS);
-        if(hasReadContactsPermission != PackageManager.PERMISSION_GRANTED)
-        {
-            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 1 );
+        if (hasReadContactsPermission != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 1);
             return;
         }
 
         Cursor cursor = getContentResolver().query(contactId, null, null, null, null);
-        if(cursor.moveToFirst()){
+        if (cursor.moveToFirst()) {
             String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
             long internalContactId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
 
-            if(!toDo.getContactIds().contains(String.valueOf(contactId))){
+            if (!toDo.getContactIds().contains(String.valueOf(contactId))) {
                 toDo.getContactIds().add(String.valueOf(internalContactId));
             }
 
@@ -283,8 +259,7 @@ public class DetailviewActivity extends AppCompatActivity
             Log.i("DetailviewActivity", "got contact with name " + contactName + " and internal id: " + internalContactId);
 
             showContactDetailsForInternal(internalContactId);
-        }
-        else{
+        } else {
             Log.i("DetailviewActivity", "no contact found");
         }
     }
@@ -292,17 +267,17 @@ public class DetailviewActivity extends AppCompatActivity
     //UI BNEFÜLLEN
     public void showContactDetailsForInternal(long internalId) {
         Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, ContactsContract.Contacts._ID + "=?", new String[]{String.valueOf(internalId)}, null);
-        if(cursor.moveToNext()){
+        if (cursor.moveToNext()) {
             String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
             Log.i("DetailviewActivity", "found display name for internal id " + internalId + ": " + displayName);
-            kontaktName = (TextView)findViewById(R.id.txtVerknüpfteKontakteNummer1);
+            kontaktName = (TextView) findViewById(R.id.txtVerknüpfteKontakteNummer1);
             kontaktName.setText(displayName);
-        }else{
+        } else {
             Log.i("DetailviewActivity", "no contacts fount for internal id " + internalId);
         }
 
-         cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?", new String[]{String.valueOf(internalId),}, null);
-        while(cursor.moveToNext()){
+        cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?", new String[]{String.valueOf(internalId),}, null);
+        while (cursor.moveToNext()) {
             String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
             int phoneNumberType = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
 
@@ -313,14 +288,13 @@ public class DetailviewActivity extends AppCompatActivity
     public void onNameInputCompleted(boolean hasFocus) {
         Log.i("DetailviewActivity", "onNameInputCompleted: " + hasFocus);
 
-        if(!hasFocus){
+        if (!hasFocus) {
             String name = toDo.getName();
 
-            if(name != null && name.length() >= 3){
+            if (name != null && name.length() >= 3) {
                 Log.i("DetailviewActivity", "validationSuccessful: " + toDo.getName());
                 errorStatus = null;
-            }
-            else{
+            } else {
                 Log.i("DetailviewActivity", "validation failed" + toDo.getName());
                 errorStatus = "Name too short!";
                 detailviewBinding.setController(this);
@@ -328,8 +302,8 @@ public class DetailviewActivity extends AppCompatActivity
         }
     }
 
-    public void onNameInputChanged(){
-        if(errorStatus != null){
+    public void onNameInputChanged() {
+        if (errorStatus != null) {
             errorStatus = null;
             detailviewBinding.setController(this);
         }
@@ -345,5 +319,4 @@ public class DetailviewActivity extends AppCompatActivity
         smsIntent.putExtra("sms body", toDo.getName() + ": " + toDo.getDescription());
         startActivity(smsIntent);
     }
-
 }

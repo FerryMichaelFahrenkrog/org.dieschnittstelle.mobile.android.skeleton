@@ -23,7 +23,6 @@ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOp
 {
     public static interface ToDoWebAPI{
         //Web API Dokument
-
         @POST("/api/todos")
         public Call<ToDo> createToDo(@Body ToDo toDo);
 

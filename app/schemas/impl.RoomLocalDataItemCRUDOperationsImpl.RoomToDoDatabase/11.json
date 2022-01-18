@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 10,
-    "identityHash": "52a5a4c4c05e1441494c944ac05a4610",
+    "version": 11,
+    "identityHash": "6a68459793be0e88a255045a3a0c4fe8",
     "entities": [
       {
         "tableName": "ToDo",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `description` TEXT, `done` INTEGER NOT NULL, `marked` INTEGER NOT NULL, `finishDate` INTEGER NOT NULL, `contactIds` TEXT, `contacts` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `description` TEXT, `done` INTEGER NOT NULL, `marked` INTEGER NOT NULL, `finishDate` INTEGER NOT NULL, `contactIds` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -49,12 +49,6 @@
             "columnName": "contactIds",
             "affinity": "TEXT",
             "notNull": false
-          },
-          {
-            "fieldPath": "contactsString",
-            "columnName": "contacts",
-            "affinity": "TEXT",
-            "notNull": false
           }
         ],
         "primaryKey": {
@@ -70,7 +64,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '52a5a4c4c05e1441494c944ac05a4610')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6a68459793be0e88a255045a3a0c4fe8')"
     ]
   }
 }

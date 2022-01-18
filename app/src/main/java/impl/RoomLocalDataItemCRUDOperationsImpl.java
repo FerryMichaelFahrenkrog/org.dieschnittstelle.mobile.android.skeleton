@@ -22,40 +22,9 @@ import model.IDataItemCRUDOperations;
 import model.ToDo;
 import model.User;
 
-public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperations {
-
-    public static class ArrayListToStringDatabaseConverter {
-
-        @TypeConverter
-        public static ArrayList<String> fromString(String value) {
-            if(value == null || value.length() == 0){
-                return new ArrayList<>();
-            }
-            return new ArrayList<>(Arrays.asList(value.split(",")));
-        }
-
-        @TypeConverter
-        public static String fromArrayList(ArrayList<String> value) {
-            if(value == null){
-                return "";
-            }
-            return value
-                    .stream()
-                    .collect(Collectors.joining(","));
-        }
-    }
-
-    //Room ist ein Framework was Daten, die wir in unsere View als Objekte reingeben, in eine DB zu überführen
-    //Oder Daten aus einer DB in unser JavaCode zu überführen
-
-    //Angeben welche Inhalte ich in meiner DB Speichern will, welche Klassen meines Projekts sind Klassen deren Instanzen ich
-    //dauerhaft in die DB übertragen will. DataItem nicht, Activitiys nicht, nur die to_do Klasse! Dafür ne abstrakteDB Class.
-
-    //1tens Welche Daten
-    //2tens welche Operationen brauch ich
-    //3tens Struktur angeben
-
-    @Database(entities = {ToDo.class}, version = 10)
+public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
+{
+    @Database(entities = {ToDo.class}, version = 12)
     public static abstract class RoomToDoDatabase extends RoomDatabase {
         public abstract RoomDataItemCRUDAccess getDao();
     }
@@ -63,19 +32,19 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
     @Dao
     public static interface RoomDataItemCRUDAccess {
         @Insert
-        public long createItem(ToDo toDo); //TODO als Name!
+        long createItem(ToDo toDo); //TODO als Name!
 
         @Query("select * from todo")
-        public List<ToDo> readAllItems();
+        List<ToDo> readAllItems();
 
         @Delete
         void delete(ToDo todo);
 
         @Query("select * from todo where id = (:id)")
-        public ToDo readItem(Long id);
+        ToDo readItem(Long id);
 
         @Update
-        public int updateItem(ToDo toDo);
+        int updateItem(ToDo toDo);
     }
 
     private RoomDataItemCRUDAccess roomAccessor;
@@ -86,7 +55,6 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
                 "dataitems-database-mad21").build();
 
         roomAccessor = db.getDao();
-
     }
 
     @Override
@@ -135,17 +103,4 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
     public boolean authenticateUser(User user) {
         return true;
     }
-
-    /*
-        @Override
-    public boolean deleteAllDataItems(boolean remote)
-    {
-        try {
-            return webAPI.deleteAllToDos().execute().body();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-     */
 }

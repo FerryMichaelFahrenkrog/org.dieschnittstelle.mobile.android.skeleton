@@ -48,7 +48,6 @@ public class ToDoApplication extends Application {
         }
     }
 
-
     public IDataItemCRUDOperations getCrudOperations() {
         return crudOperations;
     }

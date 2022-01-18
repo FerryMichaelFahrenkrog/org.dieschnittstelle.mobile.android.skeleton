@@ -61,10 +61,6 @@ public class ToDo implements Serializable                                       
     @TypeConverters(RoomLocalDataItemCRUDOperationsImpl.ArrayListToStringDatabaseConverter.class)
     private ArrayList<String> contactIds = new ArrayList<>();
 
-    //An dieser Stelle nutzt er private transient String concactsString; wegen der persistierung
-    @ColumnInfo(name = "contacts")
-    private String contactsString = "";
-
     @SuppressLint("NewApi")
     @Ignore
     private transient LocalDateTime finishDate = LocalDateTime.now();
@@ -183,13 +179,13 @@ public class ToDo implements Serializable                                       
         this.contactIds = contactIds;
     }
 
-    public String getContactsString() {
-        return contactsString;
-    }
-
-    public void setContactsString(String contactsString) {
-        this.contactsString = contactsString;
-    }
+//    public String getContactsString() {
+//        return contactsString;
+//    }
+//
+//    public void setContactsString(String contactsString) {
+//        this.contactsString = contactsString;
+//    }
 
     @SuppressLint("NewApi")
     public LocalDateTime getFinishDate() {
