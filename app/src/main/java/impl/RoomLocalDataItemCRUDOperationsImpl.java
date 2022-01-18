@@ -103,4 +103,25 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
     public boolean authenticateUser(User user) {
         return true;
     }
+
+    public static class ArrayListToStringDatabaseConverter {
+
+        @TypeConverter
+        public static ArrayList<String> fromString(String value) {
+            if(value == null || value.length() == 0){
+                return new ArrayList<>();
+            }
+            return new ArrayList<>(Arrays.asList(value.split(",")));
+        }
+
+        @TypeConverter
+        public static String fromArrayList(ArrayList<String> value) {
+            if(value == null){
+                return "";
+            }
+            return value
+                    .stream()
+                    .collect(Collectors.joining(","));
+        }
+    }
 }
