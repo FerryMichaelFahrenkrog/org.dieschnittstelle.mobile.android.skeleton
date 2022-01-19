@@ -30,7 +30,7 @@ public class ReadAllToDoTask extends AsyncTask<Void, Void, List<ToDo>> {
 
     @Override
     protected List<ToDo> doInBackground(Void... voids) {
-        return crudOperations.readAllDataItems();
+        return crudOperations.readAllToDos();
     }
 
 

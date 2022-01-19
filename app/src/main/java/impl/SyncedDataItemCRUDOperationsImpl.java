@@ -2,9 +2,6 @@ package impl;
 
 import android.util.Log;
 
-import org.dieschnittstelle.mobile.android.skeleton.LoginActivity;
-
-import java.util.Arrays;
 import java.util.List;
 
 import model.IDataItemCRUDOperations;
@@ -20,42 +17,41 @@ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
     private boolean connectionChecked = false;
 
 
-
     public SyncedDataItemCRUDOperationsImpl(IDataItemCRUDOperations localCRUD, IDataItemCRUDOperations remoteCRUD){
         this.localCRUD = localCRUD;
         this.remoteCRUD = remoteCRUD;
     }
 
     @Override
-    public ToDo createDataItem(ToDo toDo)
+    public ToDo createToDo(ToDo toDo)
     {
         //erstelle lokal createDataitem
-        toDo = localCRUD.createDataItem(toDo);
+        toDo = localCRUD.createToDo(toDo);
 
         //dann erstellt mans remote, sie nimmt die lokal zugewiesene ID
-        remoteCRUD.createDataItem(toDo);
+        remoteCRUD.createToDo(toDo);
         return toDo;
     }
 
     @Override
-    public List<ToDo> readAllDataItems() {
+    public List<ToDo> readAllToDos() {
         //TODO !
         if(!synced){
             synclLocalandRemote();
         synced = true;
         }
-        return localCRUD.readAllDataItems();
+        return localCRUD.readAllToDos();
     }
 
     private void synclLocalandRemote() {
-        List<ToDo> anzahlDateneinträge = localCRUD.readAllDataItems();
+        List<ToDo> anzahlDateneinträge = localCRUD.readAllToDos();
         int eintraege = anzahlDateneinträge.size();
 
         Log.i("EINTRAEGE ", "anzahl " + eintraege);
 
         if(eintraege > 0){
             //sind lokale ToDos da, dann lösche ich alles remote
-            remoteCRUD.deleteAllDataItems(true);
+            remoteCRUD.deleteAllToDos(true);
 
             //wie übertrage ich jetzt die lokalen ToDos auf Remote seite?
 
@@ -65,30 +61,30 @@ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
     }
 
     @Override
-    public ToDo readDataItem(long id) {
+    public ToDo readToDo(long id) {
         return null;
     }
 
     @Override
-    public boolean updateDataItem(ToDo toDo) {
+    public boolean updateToDo(ToDo toDo) {
         if(!remoteAvailable){
-            return localCRUD.updateDataItem(toDo);
+            return localCRUD.updateToDo(toDo);
         }else{
-            if(localCRUD.updateDataItem(toDo)){
-                return remoteCRUD.updateDataItem(toDo);
+            if(localCRUD.updateToDo(toDo)){
+                return remoteCRUD.updateToDo(toDo);
             }
         }
         return false;
     }
 
     @Override
-    public boolean deleteDataItem(ToDo toDo) {
+    public boolean deleteToDo(ToDo toDo) {
         if(!remoteAvailable)
         {
-            return localCRUD.deleteDataItem(toDo);
+            return localCRUD.deleteToDo(toDo);
         }else{
-            if(localCRUD.deleteDataItem(toDo)){
-                return remoteCRUD.deleteDataItem(toDo);
+            if(localCRUD.deleteToDo(toDo)){
+                return remoteCRUD.deleteToDo(toDo);
             }
         }
 
@@ -96,11 +92,11 @@ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
     }
 
     @Override
-    public boolean deleteAllDataItems(boolean remote) {
+    public boolean deleteAllToDos(boolean remote) {
         if(remote){
-            return remoteCRUD.deleteAllDataItems(remote);
+            return remoteCRUD.deleteAllToDos(remote);
         }else{
-            return localCRUD.deleteAllDataItems(remote);
+            return localCRUD.deleteAllToDos(remote);
         }
     }
 

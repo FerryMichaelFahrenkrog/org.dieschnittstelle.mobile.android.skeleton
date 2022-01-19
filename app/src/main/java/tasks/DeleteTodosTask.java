@@ -27,7 +27,7 @@ public class DeleteTodosTask extends AsyncTask<ToDo, Void, Boolean> {
     protected Boolean doInBackground(ToDo... todos) {
 
         for (ToDo todo : todos) {
-            crudOperations.deleteDataItem(todo);
+            crudOperations.deleteToDo(todo);
         }
         return true;
     }

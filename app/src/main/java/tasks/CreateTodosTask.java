@@ -5,8 +5,6 @@ import android.os.AsyncTask;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 
 import model.IDataItemCRUDOperations;
@@ -32,7 +30,7 @@ public class CreateTodosTask extends AsyncTask<ToDo, Void, ToDo> {
 
     @Override
     protected ToDo doInBackground(ToDo... toDos) {
-        return crudOperations.createDataItem(toDos[0]);
+        return crudOperations.createToDo(toDos[0]);
     }
 
 

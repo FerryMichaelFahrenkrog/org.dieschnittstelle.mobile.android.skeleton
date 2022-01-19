@@ -35,7 +35,7 @@ public class ReadSingleToDosTask extends AsyncTask<Long, Void, List<ToDo>> {
         ArrayList<ToDo> retrievedTodos = new ArrayList<>();
 
         for (long id : ids) {
-            ToDo todo = crudOperations.readDataItem(id);
+            ToDo todo = crudOperations.readToDo(id);
             retrievedTodos.add(todo);
         }
 

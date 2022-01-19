@@ -58,7 +58,7 @@ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOp
     }
 
     @Override
-    public ToDo createDataItem(ToDo toDo) {
+    public ToDo createToDo(ToDo toDo) {
         try {
             return webAPI.createToDo(toDo).execute().body();
         } catch (IOException e) {
@@ -68,7 +68,7 @@ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOp
     }
 
     @Override
-    public List<ToDo> readAllDataItems() {
+    public List<ToDo> readAllToDos() {
         try {
             return webAPI.readAllToDos().execute().body();
         } catch (IOException e) {
@@ -78,7 +78,7 @@ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOp
     }
 
     @Override
-    public ToDo readDataItem(long id) {
+    public ToDo readToDo(long id) {
         try {
             return webAPI.readToDo(id).execute().body();
         } catch (IOException e) {
@@ -88,7 +88,7 @@ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOp
     }
 
     @Override
-    public boolean updateDataItem(ToDo toDo) {
+    public boolean updateToDo(ToDo toDo) {
         try {
             if (webAPI.updateToDo(toDo.getId(), toDo).execute().body() != null) {
                 return true;
@@ -102,7 +102,7 @@ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOp
     }
 
     @Override
-    public boolean deleteDataItem(ToDo toDo) {
+    public boolean deleteToDo(ToDo toDo) {
         try {
             return webAPI.deleteToDo(toDo.getId()).execute().body();
         } catch (IOException e) {
@@ -112,7 +112,7 @@ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOp
     }
 
     @Override
-    public boolean deleteAllDataItems(boolean remote)
+    public boolean deleteAllToDos(boolean remote)
     {
         try {
             return webAPI.deleteAllToDos().execute().body();

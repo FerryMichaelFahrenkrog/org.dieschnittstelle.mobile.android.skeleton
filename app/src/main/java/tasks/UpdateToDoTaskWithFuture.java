@@ -23,7 +23,7 @@ public class UpdateToDoTaskWithFuture {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                boolean updated = crudOperations.updateDataItem(toDo);
+                boolean updated = crudOperations.updateToDo(toDo);
                 owner.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

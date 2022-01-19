@@ -258,13 +258,13 @@ public class MainActivity extends AppCompatActivity {               // macht die
                 }).execute();
                 return true;
             case R.id.SyncTodos:
-//                SyncedDataItemCRUDOperationsImpl syncTodoCRUDOperations = new SyncedDataItemCRUDOperationsImpl(roomTodoCRUDOperations, retrofitTodoCRUDOperations);
-//                new ReadAllToDoTask(progressBar, syncTodoCRUDOperations, v -> {
-//                    Toast.makeText(getApplicationContext(), "Listen wurden synchronisiert", Toast.LENGTH_SHORT).show();
-//                    items.clear();
-//                    items.addAll(v);
-//                }).execute();
-//                return true;
+                SyncedDataItemCRUDOperationsImpl syncTodoCRUDOperations = new SyncedDataItemCRUDOperationsImpl(roomTodoCRUDOperations, retrofitTodoCRUDOperations);
+                new ReadAllToDoTask(progressBar, syncTodoCRUDOperations, v -> {
+                    Toast.makeText(getApplicationContext(), "Sync List feddisch", Toast.LENGTH_SHORT).show();
+                    items.clear();
+                    items.addAll(v);
+                }).execute();
+                return true;
             case R.id.sortItems:
                 sortListAndScrollToItem(null);
                 return true;

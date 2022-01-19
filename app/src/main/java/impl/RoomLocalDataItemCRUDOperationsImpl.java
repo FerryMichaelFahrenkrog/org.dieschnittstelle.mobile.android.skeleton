@@ -58,7 +58,7 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
     }
 
     @Override
-    public ToDo createDataItem(ToDo toDo) {
+    public ToDo createToDo(ToDo toDo) {
         long newID = roomAccessor.createItem(toDo);
         toDo.setId(newID);
 
@@ -66,17 +66,17 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
     }
 
     @Override
-    public List<ToDo> readAllDataItems() {
+    public List<ToDo> readAllToDos() {
         return roomAccessor.readAllItems();
     }
 
     @Override
-    public ToDo readDataItem(long id) {
+    public ToDo readToDo(long id) {
         return null;
     }
 
     @Override
-    public boolean updateDataItem(ToDo toDo) {
+    public boolean updateToDo(ToDo toDo) {
         if(roomAccessor.updateItem(toDo) > 0 ){
             return true;
         }
@@ -84,13 +84,13 @@ public class RoomLocalDataItemCRUDOperationsImpl implements IDataItemCRUDOperati
     }
 
     @Override
-    public boolean deleteDataItem(ToDo toDo) {
+    public boolean deleteToDo(ToDo toDo) {
         roomAccessor.delete(toDo);
         return true;
     }
 
     @Override
-    public boolean deleteAllDataItems(boolean remote) {
+    public boolean deleteAllToDos(boolean remote) {
         if(remote){
             return false;
         }else{

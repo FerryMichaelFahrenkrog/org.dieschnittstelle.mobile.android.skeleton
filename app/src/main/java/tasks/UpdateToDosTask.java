@@ -31,7 +31,7 @@ public class UpdateToDosTask extends AsyncTask<ToDo, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(ToDo... todos) {
-        return crudOperations.updateDataItem(todos[0]);
+        return crudOperations.updateToDo(todos[0]);
 
 //        for (ToDo todo : todos) {
 //            crudOperations.updateDataItem(todo);

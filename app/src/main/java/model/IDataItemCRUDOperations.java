@@ -4,17 +4,17 @@ import java.util.List;
 
 public interface IDataItemCRUDOperations
 {
-    ToDo createDataItem(ToDo toDo);
+    ToDo createToDo(ToDo toDo);
 
-    List<ToDo> readAllDataItems();
+    List<ToDo> readAllToDos();
 
-    ToDo readDataItem(long id);
+    ToDo readToDo(long id);
 
-    boolean updateDataItem(ToDo toDo);
+    boolean updateToDo(ToDo toDo);
 
-    boolean deleteDataItem(ToDo toDo);
+    boolean deleteToDo(ToDo toDo);
 
-    boolean deleteAllDataItems(boolean remote);
+    boolean deleteAllToDos(boolean remote);
 
     boolean authenticateUser(User user);
 }
