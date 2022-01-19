@@ -54,53 +54,6 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-            android:id="@+id/txtVerknüpfteKontakte"
-            android:layout_width="157dp"
-            android:layout_height="23dp"
-            android:layout_marginTop="44dp"
-            android:text="Verknüpfte Kontakte:"
-            android:textAlignment="center"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/itemChecked" />
-
-        <TextView
-            android:id="@+id/txtVerknüpfteKontakteNummer1"
-            android:layout_width="157dp"
-            android:layout_height="23dp"
-            android:layout_marginBottom="208dp"
-            android:text=""
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtVerknüpfteKontakte"
-            app:layout_constraintVertical_bias="0.439" />
-
-        <TextView
-            android:id="@+id/txtVerknüpfteKontakteNummer2"
-            android:layout_width="157dp"
-            android:layout_height="23dp"
-            android:layout_marginBottom="176dp"
-            android:text=""
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtVerknüpfteKontakteNummer1"
-            app:layout_constraintVertical_bias="0.437" />
-
-        <TextView
-            android:id="@+id/txtVerknüpfteKontakteNummer3"
-            android:layout_width="157dp"
-            android:layout_height="23dp"
-            android:layout_marginBottom="140dp"
-            android:text=""
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtVerknüpfteKontakteNummer2"
-            app:layout_constraintVertical_bias="0.419" />
-
         <CheckBox
             android:id="@+id/itemChecked"
             android:layout_width="92dp"
@@ -167,13 +120,20 @@
             android:id="@+id/btnLoeschen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
             android:text="To Do löschen"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ListView
+            android:id="@+id/contactItemListView"
+            android:layout_width="365dp"
+            android:layout_height="214dp"
+            android:orientation="vertical"
+            android:layout_marginTop="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtVerknüpfteKontakteNummer3"
-            app:layout_constraintVertical_bias="0.121" />
+            app:layout_constraintTop_toBottomOf="@+id/itemChecked" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

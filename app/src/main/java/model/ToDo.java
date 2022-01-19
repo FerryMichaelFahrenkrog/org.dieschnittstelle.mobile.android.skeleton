@@ -1,10 +1,8 @@
 package model;
 
 import android.annotation.SuppressLint;
-import android.os.Build;
 import android.util.Log;
 
-import androidx.annotation.RequiresApi;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -18,6 +16,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
 
@@ -59,7 +58,12 @@ public class ToDo implements Serializable                                       
     @Expose
     @SerializedName("contacts")
     @TypeConverters(RoomLocalDataItemCRUDOperationsImpl.ArrayListToStringDatabaseConverter.class)
-    private ArrayList<String> contactIds = new ArrayList<>();
+    @Ignore
+    private ArrayList<String> contacts = new ArrayList<>();
+
+    //An dieser Stelle nutzt er private transient String concactsString; wegen der persistierung
+    @ColumnInfo(name = "contacts")
+    private transient String contactsString = "";
 
     @SuppressLint("NewApi")
     @Ignore
@@ -167,25 +171,49 @@ public class ToDo implements Serializable                                       
         this.localdate = localdate;
     }
 
-    public ArrayList<String> getContactIds() {
-        if(contactIds == null){
-            contactIds = new ArrayList<>();
-            return contactIds;
+    public ArrayList<String> getContacts() {
+        if(contacts == null){
+            contacts = new ArrayList<>();
+            return contacts;
         }
-        return contactIds;
+        return contacts;
     }
 
-    public void setContactIds(ArrayList<String> contactIds) {
-        this.contactIds = contactIds;
+    public void setContacts(ArrayList<String> contacts) {
+        this.contacts = contacts;
     }
 
-//    public String getContactsString() {
-//        return contactsString;
-//    }
-//
-//    public void setContactsString(String contactsString) {
-//        this.contactsString = contactsString;
-//    }
+    public String getContactsString() {
+        return contactsString;
+    }
+
+    public void setContactsString(String contactsString) {
+        this.contactsString = contactsString;
+    }
+
+    private void updateListFromString() {
+        if (contactsString != null && !contactsString.equals("")) {
+            this.contacts = new ArrayList<>(Arrays.asList(this.contactsString.split("-;-")));
+        }
+    }
+
+    private void updateStringFromList() {
+        if (this.contacts == null) {
+            this.contacts = new ArrayList<>();
+        }
+
+        String newContactsString = "";
+
+        for (int i = 0; i < this.contacts.size(); i++) {
+            newContactsString += this.contacts.get(i);
+
+            if (i < this.contacts.size() - 1) {
+                newContactsString += "-;-";
+            }
+        }
+
+        this.contactsString = newContactsString;
+    }
 
     @SuppressLint("NewApi")
     public LocalDateTime getFinishDate() {
@@ -206,7 +234,7 @@ public class ToDo implements Serializable                                       
                 ", checked=" + checked +
                 ", favouriteToDo=" + favouriteToDo +
                 ", faelligkeitsDatumLong=" + finishDateLong +
-                ", contactIds=" + contactIds +
+                ", contactIds=" + contacts +
                 ", faelligkeitsDatum=" + finishDate +
                 ", localdate=" + localdate +
                 '}';

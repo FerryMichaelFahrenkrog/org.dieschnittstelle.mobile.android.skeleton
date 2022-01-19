@@ -1,5 +1,7 @@
 package org.dieschnittstelle.mobile.android.skeleton;
 
+import static org.dieschnittstelle.mobile.android.skeleton.MainActivity.REQCODE_ADD_CONTACT;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -9,30 +11,35 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.InputType;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityDetailviewBinding;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Locale;
+import java.util.ArrayList;
 
 import model.ToDo;
 
@@ -43,14 +50,18 @@ public class DetailviewActivity extends AppCompatActivity {
     public static final String ARG_TODO_DELETE = "todoDelete";
     public static final String ARG_TODO_DATETIME = "todoDatetime";
 
-    private ActivityDetailviewBinding detailviewBinding;
 
     private ToDo toDo;
     private String errorStatus;
     private EditText editTextDatum;
     private EditText editTextUhr;
     private Button deleteButton;
-    TextView kontaktName;
+//    TextView kontaktName;
+
+//    private ContactsToListItemAdapter contactListAdapter;
+//    private ListView contactListView;
+//    private String phoneNumber = "";
+//    private String email = "";
 
     private boolean itemDelete = false;
     private int todoIndex;
@@ -63,6 +74,13 @@ public class DetailviewActivity extends AppCompatActivity {
     public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     @SuppressLint("NewApi")
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
+    private ArrayList<String> contactList;
+    private ContactsToListItemAdapter contactListAdapter;
+    private ListView contactListView;
+    private String phoneNumber = "";
+    private String email = "";
+    private ActivityDetailviewBinding detailviewBinding;
 
     @SuppressLint("NewApi")
     @Override
@@ -93,12 +111,98 @@ public class DetailviewActivity extends AppCompatActivity {
 
         todoIndex = getIntent().getIntExtra(ARG_TODO_INDEX, Integer.MAX_VALUE);
 
-        Log.i("DetailviewActivity", "got contact ids: " + toDo.getContactIds());
-        toDo.getContactIds().forEach(id -> {
-            showContactDetailsForInternal(Long.parseLong(id));
-        });
+//        Log.i("DetailviewActivity", "got contact ids: " + toDo.getContacts());
+//        toDo.getContacts().forEach(id -> {
+//            showContactDetailsForInternal(Long.parseLong(id));
+//        });
+
+        contactList = new ArrayList<>();
+        contactListView = findViewById(R.id.contactItemListView);
+        registerForContextMenu(contactListView);
+        contactListAdapter = new ContactsToListItemAdapter(getApplicationContext(), contactList, this);
+        contactListView.setAdapter(contactListAdapter);
+
+        requestContactPermission();
 
         detailviewBinding.setController(this);
+    }
+
+    public void requestContactPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_CONTACTS)) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Read contacts access needed");
+                builder.setPositiveButton(android.R.string.ok, null);
+                builder.setMessage("Please enable access to contacts.");
+                builder.setOnDismissListener(dialog -> requestPermissions(
+                        new String[]{
+                                Manifest.permission.READ_CONTACTS
+                        }, REQCODE_ADD_CONTACT));
+                builder.show();
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_CONTACTS},
+                        REQCODE_ADD_CONTACT);
+            }
+        } else {
+            loadContactDetailsFromTodo();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQCODE_ADD_CONTACT) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                loadContactDetailsFromTodo();
+            } else {
+                Toast.makeText(this, "You have disabled a contacts permission", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private void loadContactDetailsFromTodo() {
+        contactList.clear();
+        for (String id : toDo.getContacts()) {
+
+            Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, ContactsContract.Contacts._ID + " = ? ", new String[]{id}, null);
+            if (cursor.moveToFirst()) {
+                String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+
+                Cursor phoneCursor = getContentResolver().query(
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                        null,
+                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "= ?",
+                        new String[]{id},
+                        null,
+                        null);
+
+                while (phoneCursor.moveToNext()) {
+                    String number = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                    int phoneNumberType = phoneCursor.getInt(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DATA2));
+
+                    if ((phoneNumberType == ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)) {
+                        phoneNumber = number;
+                    }
+                }
+
+                Cursor emailCursor = getContentResolver().query(
+                        ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                        null,
+                        ContactsContract.CommonDataKinds.Email.CONTACT_ID + "= ?",
+                        new String[]{id},
+                        null,
+                        null);
+
+                while (emailCursor.moveToNext()) {
+                    email = emailCursor.getString(emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS));
+                }
+
+                contactList.add("Contact with ID " + id + ": " + contactName);
+            }
+        }
+        contactListAdapter.notifyDataSetChanged();
     }
 
     @SuppressLint("NewApi")
@@ -198,90 +302,47 @@ public class DetailviewActivity extends AppCompatActivity {
         this.toDo = toDo;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.detailview_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.detailview_menu, menu);
+//        return super.onCreateOptionsMenu(menu);
+//    }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.selectContact) {
-            selectContact();
-            return true;
-        } else if (item.getItemId() == R.id.sendSMS) {
-            sendSms();
-        } else if (item.getItemId() == R.id.deleteRemoteItems) {
-
-        }
-
-        return super.onOptionsItemSelected(item);
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.detailview_contact_context, menu);
     }
 
-    protected void selectContact() {
-        Intent selectContactIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-        startActivityForResult(selectContactIntent, ACTION_PICK_CONTACT);
-    }
+//    @Override
+//    public boolean onContextItemSelected(@NonNull MenuItem item) {
+//        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+//
+//        switch (item.getItemId()) {
+//            case R.id.contactDelete:
+//                deleteContact(info);
+//                return true;
+//            case R.id.contactMail:
+//                if (email.equals("")) {
+//                    Toast.makeText(this, "No Email found", Toast.LENGTH_SHORT).show();
+//                } else
+//                    sendToEmail();
+//                return true;
+//            case R.id.contactSMS:
+//                if (phoneNumber.equals("")) {
+//                    Toast.makeText(this, "No Number found", Toast.LENGTH_SHORT).show();
+//                } else
+//                    sendToSMS();
+//                return true;
+//            default:
+//                return super.onContextItemSelected(item);
+//        }
+//    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == ACTION_PICK_CONTACT && resultCode == Activity.RESULT_OK) {
-            Log.i("DetailviewActivity", "onActivityResult(): got data: " + data);
-            showContactDetails(data.getData());
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.i("DetailviewActivity", "onRequestPermissionsResult(): permission");
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    protected void showContactDetails(Uri contactId) {
-        int hasReadContactsPermission = checkSelfPermission(Manifest.permission.READ_CONTACTS);
-        if (hasReadContactsPermission != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 1);
-            return;
-        }
-
-        Cursor cursor = getContentResolver().query(contactId, null, null, null, null);
-        if (cursor.moveToFirst()) {
-            String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-            long internalContactId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-
-            if (!toDo.getContactIds().contains(String.valueOf(contactId))) {
-                toDo.getContactIds().add(String.valueOf(internalContactId));
-            }
-
-
-            Log.i("DetailviewActivity", "got contact with name " + contactName + " and internal id: " + internalContactId);
-
-            showContactDetailsForInternal(internalContactId);
-        } else {
-            Log.i("DetailviewActivity", "no contact found");
-        }
-    }
-
-    //UI BNEFÜLLEN
-    public void showContactDetailsForInternal(long internalId) {
-        Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, ContactsContract.Contacts._ID + "=?", new String[]{String.valueOf(internalId)}, null);
-        if (cursor.moveToNext()) {
-            String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-            Log.i("DetailviewActivity", "found display name for internal id " + internalId + ": " + displayName);
-            kontaktName = (TextView) findViewById(R.id.txtVerknüpfteKontakteNummer1);
-            kontaktName.setText(displayName);
-        } else {
-            Log.i("DetailviewActivity", "no contacts fount for internal id " + internalId);
-        }
-
-        cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?", new String[]{String.valueOf(internalId),}, null);
-        while (cursor.moveToNext()) {
-            String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            int phoneNumberType = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
-
-            Log.i("DetailviewActivity", "found number of type " + number + ", of type " + phoneNumberType + ", mobile: " + (phoneNumberType == ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE));
+    public void onNameInputChanged() {
+        if (errorStatus != null) {
+            errorStatus = null;
+            detailviewBinding.setController(this);
         }
     }
 
@@ -302,12 +363,140 @@ public class DetailviewActivity extends AppCompatActivity {
         }
     }
 
-    public void onNameInputChanged() {
-        if (errorStatus != null) {
-            errorStatus = null;
-            detailviewBinding.setController(this);
+    private void deleteContact(AdapterView.AdapterContextMenuInfo info) {
+        contactList.remove(info.position);
+        toDo.getContacts().remove(info.position);
+
+        contactListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.detailview_menu, menu);
+        return true;
+    }
+
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.addContact:
+//                selectAndAddContact();
+//                return true;
+//
+//            default:
+//                return super.onOptionsItemSelected(item);
+//        }
+//    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+        switch (item.getItemId()) {
+            case R.id.addContact:
+                selectAndAddContact();
+                return true;
+            case R.id.contactDelete:
+                deleteContact(info);
+                return true;
+            case R.id.contactMail:
+                if (email.equals("")) {
+                    Toast.makeText(this, "No Email found", Toast.LENGTH_SHORT).show();
+                } else
+                    sendToEmail();
+                return true;
+            case R.id.contactSMS:
+                if (phoneNumber.equals("")) {
+                    Toast.makeText(this, "No Number found", Toast.LENGTH_SHORT).show();
+                } else
+                    sendToSMS();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
+
+//    @Override
+//    public boolean onContextItemSelected(@NonNull MenuItem item) {
+//        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+//
+//        switch (item.getItemId()) {
+//            case R.id.contactDelete:
+//                deleteContact(info);
+//                return true;
+//            case R.id.contactMail:
+//                if (email.equals("")) {
+//                    Toast.makeText(this, "No Email found", Toast.LENGTH_SHORT).show();
+//                } else
+//                    sendToEmail();
+//                return true;
+//            case R.id.contactSMS:
+//                if (phoneNumber.equals("")) {
+//                    Toast.makeText(this, "No Number found", Toast.LENGTH_SHORT).show();
+//                } else
+//                    sendToSMS();
+//                return true;
+//            default:
+//                return super.onContextItemSelected(item);
+//        }
+//    }
+
+    private void sendToSMS() {
+        Intent sendSMS = new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", phoneNumber, null));
+        sendSMS.putExtra("sms_body", toDo.getName() + " " + toDo.getDescription());
+        startActivity(sendSMS);
+    }
+
+    private void sendToEmail() {
+        Intent sendEmail = new Intent(Intent.ACTION_SEND);
+        sendEmail.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
+        sendEmail.putExtra(Intent.EXTRA_SUBJECT, toDo.getName());
+        sendEmail.putExtra(Intent.EXTRA_TEXT, toDo.getDescription());
+        sendEmail.setType("message/rfc822");
+        startActivity(sendEmail);
+    }
+
+    private void selectAndAddContact() {
+        Intent pickContactIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+        startActivityForResult(pickContactIntent, REQCODE_ADD_CONTACT);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        handleAddContactActivity(requestCode, resultCode, data);
+
+        if (requestCode != REQCODE_ADD_CONTACT) {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private void handleAddContactActivity(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQCODE_ADD_CONTACT) {
+            if (resultCode == Activity.RESULT_OK) {
+                if (data != null) {
+                    Uri contactId = data.getData();
+
+                    Cursor cursor = getContentResolver().query(contactId, null, null, null, null);
+                    if (cursor.moveToFirst()) {
+                        String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                        String internalContactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+
+                        if (toDo.getContacts() == null) {
+                            toDo.setContacts(new ArrayList<>());
+                        }
+
+                        if (toDo.getContacts().indexOf(internalContactId) == -1) {
+                            toDo.getContacts().add(internalContactId);
+                        }
+
+                        loadContactDetailsFromTodo();
+                    }
+                }
+            }
+        }
+    }
+
 
     public String getErrorStatus() {
         return errorStatus;

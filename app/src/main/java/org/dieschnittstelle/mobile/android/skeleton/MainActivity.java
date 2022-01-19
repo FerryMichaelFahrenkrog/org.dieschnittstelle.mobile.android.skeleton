@@ -64,6 +64,8 @@ public class MainActivity extends AppCompatActivity {               // macht die
 
     private static final int CALL_DETAILVIEW_FOR_CREATE = 0;        // Damit sage ich der "startActivityForResult" Methode, dass ich etwas erzeugen will
     private static final int CALL_DETAILVIEW_FOR_EDIT = 1;          // Damit sage ich der "startActivityForResult" Methode, dass ich etwas editieren will
+    public static final int REQCODE_ADD_CONTACT = 21;
+
 
     private IDataItemCRUDOperations crudOperationsNormal;            // ??
     private IDataItemCRUDOperations crudOperations;            // ??
@@ -176,9 +178,13 @@ public class MainActivity extends AppCompatActivity {               // macht die
 
 
         Toast.makeText(getApplicationContext(), "HINWEIS: " + changedItem.getName(), Toast.LENGTH_SHORT).show();
-        new UpdateToDosTask(progressBar, crudOperations, updated -> {
+//        new UpdateToDosTask(progressBar, crudOperations, updated -> {
+//            handleResultFromUpdateTask(changedItem, updated);
+//        }).execute(changedItem);
+
+        new UpdateToDoTaskWithFuture(this, crudOperations).execute(changedItem).thenAccept(updated -> {
             handleResultFromUpdateTask(changedItem, updated);
-        }).execute(changedItem);
+        });
     }
 
     private void deleteItemAndUpdateList(ToDo editedItem) {
@@ -194,7 +200,7 @@ public class MainActivity extends AppCompatActivity {               // macht die
 
     private void handleResultFromUpdateTask(ToDo changedItem, boolean updated) {
 
-        if (updated = true) {
+        if (updated) {
             int existingItemInListPost = listViewAdapter.getPosition(changedItem);
             if (existingItemInListPost > -1) {
                 ToDo existingItem = listViewAdapter.getItem(existingItemInListPost);

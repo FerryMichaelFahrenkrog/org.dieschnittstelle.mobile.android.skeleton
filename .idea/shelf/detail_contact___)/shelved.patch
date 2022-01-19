@@ -1,0 +1,28 @@
+Index: app/src/main/res/menu/detailview_contact_context.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/menu/detailview_contact_context.xml b/app/src/main/res/menu/detailview_contact_context.xml
+new file mode 100644
+--- /dev/null	(date 1642595830177)
++++ b/app/src/main/res/menu/detailview_contact_context.xml	(date 1642595830177)
+@@ -0,0 +1,17 @@
++<?xml version="1.0" encoding="utf-8"?>
++<menu xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto">
++
++    <item
++        android:id="@+id/contactDelete"
++        android:title="Delete" />
++
++    <item
++        android:id="@+id/contactMail"
++        android:title="Mail" />
++
++    <item
++        android:id="@+id/contactSMS"
++        android:title="SMS" />
++
++</menu>
+\ No newline at end of file
