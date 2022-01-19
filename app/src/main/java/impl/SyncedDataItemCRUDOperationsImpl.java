@@ -1,6 +1,11 @@
 package impl;
 
+import static org.dieschnittstelle.mobile.android.skeleton.ToDoApplication.checkConnectivity;
+
 import android.util.Log;
+import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -25,39 +30,49 @@ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
     @Override
     public ToDo createToDo(ToDo toDo)
     {
-        //erstelle lokal createDataitem
+        remoteAvailable = checkConnectivity();
+
         toDo = localCRUD.createToDo(toDo);
 
-        //dann erstellt mans remote, sie nimmt die lokal zugewiesene ID
-        remoteCRUD.createToDo(toDo);
+        if(remoteAvailable)
+        {
+            remoteCRUD.createToDo(toDo);
+        }
         return toDo;
     }
 
     @Override
     public List<ToDo> readAllToDos() {
-        //TODO !
-        if(!synced){
-            synclLocalandRemote();
-        synced = true;
+        remoteAvailable = checkConnectivity();
+        Log.i("CONN: " , "connectionmode: " + remoteAvailable);
+
+        List<ToDo> localTodos = localCRUD.readAllToDos();
+
+        if (remoteAvailable) {
+            List<ToDo> remoteTodos = remoteCRUD.readAllToDos();
+
+            if (remoteTodos != null) {
+                if (!localTodos.isEmpty()) {
+                    for (ToDo remoteTodo : remoteTodos) {
+                        remoteCRUD.deleteToDo(remoteTodo);
+                    }
+
+                    for (ToDo localTodo : localTodos) {
+                        remoteCRUD.createToDo(localTodo);
+                    }
+
+                    return localTodos;
+                } else {
+                    for (ToDo remoteTodo : remoteTodos) {
+                        localCRUD.createToDo(remoteTodo);
+                    }
+
+                    return remoteTodos;
+                }
+            }
         }
-        return localCRUD.readAllToDos();
-    }
 
-    private void synclLocalandRemote() {
-        List<ToDo> anzahlDateneinträge = localCRUD.readAllToDos();
-        int eintraege = anzahlDateneinträge.size();
-
-        Log.i("EINTRAEGE ", "anzahl " + eintraege);
-
-        if(eintraege > 0){
-            //sind lokale ToDos da, dann lösche ich alles remote
-            remoteCRUD.deleteAllToDos(true);
-
-            //wie übertrage ich jetzt die lokalen ToDos auf Remote seite?
-
-        }else{
-            //Jetzt sollen in die lokale DB alles von der Remote Seite
-        }
+        return localTodos;
     }
 
     @Override

@@ -8,6 +8,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Patterns;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -62,9 +63,29 @@ public class LoginActivity extends AppCompatActivity {
 
         crudOperations = new SyncedDataItemCRUDOperationsImpl(roomTodoCRUDOperations, retrofitTodoCRUDOperations);
 
-        editTextpassword.setInputType(InputType.TYPE_CLASS_NUMBER);
-
         hebeHinweismeldungHervor();
+
+        btnLogin.setEnabled(false);
+
+        editTextpassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(editTextpassword.getText().length() > 0 && editTextemailAdresse.getText().length() > 0){
+                    btnLogin.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
 
         btnLogin.setOnClickListener(v -> {
             showLoginDialog();
@@ -125,7 +146,7 @@ public class LoginActivity extends AppCompatActivity {
             editTextemailAdresse.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+//                    btnLogin.setEnabled(false);
                 }
 
                 @Override
@@ -142,7 +163,6 @@ public class LoginActivity extends AppCompatActivity {
             editTextpassword.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
                 }
 
                 @Override

@@ -21,18 +21,19 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
 
+ <!--        android:text="123456"-->-->
     <EditText
         android:id="@+id/editTextTextPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="52dp"
-        android:hint="Passwort"
-        android:text="123456"
         android:ems="10"
-        android:textAlignment="center"
-        android:inputType="textPassword"
+        android:hint="Passwort"
         android:maxLength="6"
+        android:textAlignment="center"
+        android:inputType="numberPassword"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editEmail" />
 
