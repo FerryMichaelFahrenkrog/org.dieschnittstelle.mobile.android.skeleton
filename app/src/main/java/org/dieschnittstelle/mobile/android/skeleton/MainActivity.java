@@ -134,6 +134,8 @@ public class MainActivity extends AppCompatActivity {               // macht die
                 ToDo neuesToDoItem = (ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM);
                 LocalDateTime localDateTime = (LocalDateTime) data.getSerializableExtra(DetailviewActivity.ARG_TODO_DATETIME);
                 neuesToDoItem.setFinishDate(localDateTime);
+                showFeedbackMessage("created new item " + neuesToDoItem.getFinishDate());                   // Hier kommt schon ein falsches Datum an
+
                 onNewItemCreated(neuesToDoItem);                                                                // Meine onXXX - Methoden werden zur Mainactivity zurückgegeben
             } else {
                 showFeedbackMessage("Die Itemerstellung wurde abgebrochen");           // Ansonsten ist quasi nichts passiert, trotzdem ne kleine Message zur Kontrolle
@@ -166,10 +168,12 @@ public class MainActivity extends AppCompatActivity {               // macht die
 
     @SuppressLint("NewApi")
     protected void onNewItemCreated(ToDo item) {                                                                // HIER CER CREATE TO DO TASK!!!!!!
-        showFeedbackMessage("created new item " + item);
+//        showFeedbackMessage("created new item " + item.getFinishDate());
 
         new CreateTodosTask(progressBar, crudOperations, created -> {
             items.add(created);
+
+//            showFeedbackMessage("!!!!!!!: " + item.getFinishDate());
             MainActivity.this.sortListAndScrollToItem(created);
         }).execute(item);
     }
@@ -192,7 +196,6 @@ public class MainActivity extends AppCompatActivity {               // macht die
             if (deleted) {
                 items.remove(editedItem);
                 listViewAdapter.notifyDataSetChanged();
-// was muss ich hier machen, damit das Item auch wirklich entfernt wird?
                 showFeedbackMessage("DELETED: " + editedItem.getName());
             }
         }).execute(editedItem);
@@ -271,7 +274,7 @@ public class MainActivity extends AppCompatActivity {               // macht die
     }
 
     protected void sortListAndScrollToItem(ToDo item) {
-        showFeedbackMessage("Sort List!");
+//        showFeedbackMessage("Sort List!");
         sortitems(items);
 
         listViewAdapter.notifyDataSetChanged(); //Aktualisierung
