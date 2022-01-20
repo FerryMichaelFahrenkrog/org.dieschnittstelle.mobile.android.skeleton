@@ -28,6 +28,7 @@ import impl.SyncedDataItemCRUDOperationsImpl;
 import model.IDataItemCRUDOperations;
 import model.User;
 import tasks.AuthenticateUserTask;
+import tasks.CheckWebapiAvailableTask;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText editTextemailAdresse;
@@ -46,22 +47,41 @@ public class LoginActivity extends AppCompatActivity {
 
     private int counter = 5;
 
+    private boolean SKIP_LOGIN = false;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_login);
 
+        RoomLocalDataItemCRUDOperationsImpl roomTodoCRUDOperations = new RoomLocalDataItemCRUDOperationsImpl(this);
+        RetrofitRemoteDataItemCRUDOperationsImpl retrofitTodoCRUDOperations = new RetrofitRemoteDataItemCRUDOperationsImpl();
+
+        crudOperations = new SyncedDataItemCRUDOperationsImpl(roomTodoCRUDOperations, retrofitTodoCRUDOperations);
+
+//        new CheckWebapiAvailableTask(webapiAvailable -> {
+//            ((SyncedDataItemCRUDOperationsImpl) crudOperations).setConnectionStatus(webapiAvailable);
+//
+//            if (webapiAvailable) {
+//                if (SKIP_LOGIN) {
+//                    setContentView(R.layout.activity_main);
+//                } else {
+////                    showLoginDialog();
+//                    setContentView(R.layout.activity_login);
+//
+//                }
+//            } else {
+//                setContentView(R.layout.activity_main);
+//
+//            }
+//        }).execute();
+
         editTextemailAdresse = findViewById(R.id.editEmail);
         editTextpassword = findViewById(R.id.editTextTextPassword);
         btnLogin = findViewById(R.id.btnLogin);
         txtHinweis = findViewById(R.id.txtWarnmeldung);
         progressBarLogin = findViewById(R.id.progressBarLogin);
-
-        RoomLocalDataItemCRUDOperationsImpl roomTodoCRUDOperations = new RoomLocalDataItemCRUDOperationsImpl(this);
-        RetrofitRemoteDataItemCRUDOperationsImpl retrofitTodoCRUDOperations = new RetrofitRemoteDataItemCRUDOperationsImpl();
-
-        crudOperations = new SyncedDataItemCRUDOperationsImpl(roomTodoCRUDOperations, retrofitTodoCRUDOperations);
 
         hebeHinweismeldungHervor();
 
@@ -75,9 +95,9 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(editTextpassword.getText().length() > 0 && editTextemailAdresse.getText().length() > 0){
+                if (editTextpassword.getText().length() > 0 && editTextemailAdresse.getText().length() > 0) {
                     btnLogin.setEnabled(true);
-                }else{
+                } else {
                     btnLogin.setEnabled(false);
                 }
             }
@@ -88,15 +108,13 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-
         btnLogin.setOnClickListener(v -> {
             showLoginDialog();
         });
 
     }
 
-    public void showLoginDialog()
-    {
+    public void showLoginDialog() {
         //Werte auslesen und zwischenspeichern
         String inputEmail = editTextemailAdresse.getText().toString();
         String inputPassword = editTextpassword.getText().toString();

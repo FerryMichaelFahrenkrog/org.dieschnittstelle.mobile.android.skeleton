@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {               // macht die
     private IDataItemCRUDOperations crudOperations;            // ??
 
     private final LoginActivity loginActivity = new LoginActivity();
-    private boolean SKIP_LOGIN = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,17 +95,7 @@ public class MainActivity extends AppCompatActivity {               // macht die
         listViewAdapter = new ToDoAdapter(this, R.layout.activity_main_listitem, items); // Der Adapter erhält die Daten & die Art der Darstellung über das Layout.
         listView.setAdapter(listViewAdapter);
 
-//        new CheckWebapiAvailableTask(webapiAvailable -> {
-//            // schade um das Interface, aber was solls: :)
-//            ((SyncedDataItemCRUDOperationsImpl) crudOperations).setConnectionStatus(webapiAvailable);
-//
-//            if (webapiAvailable) {
-//                if (SKIP_LOGIN) {
-//                    setContentView(R.layout.activity_main);
-//                } else {
-//                    setContentView(R.layout.activity_login);
-//                }}
-//        }).execute();
+
 
         //2. Prepare Elements 4 Interaction
         listView.setOnItemClickListener((parent, view, position, id) -> {
@@ -278,6 +268,8 @@ public class MainActivity extends AppCompatActivity {               // macht die
                     Toast.makeText(getApplicationContext(), "Sync List feddisch", Toast.LENGTH_SHORT).show();
                     items.clear();
                     items.addAll(v);
+                    listViewAdapter.notifyDataSetChanged();
+//                    items.resortList();
                 }).execute();
                 return true;
             case R.id.sortItems:
@@ -353,20 +345,15 @@ public class MainActivity extends AppCompatActivity {               // macht die
 
     public void sortWichtigkeitDatum()
     {
-        currentComparisionMode = dateBeforeImportance;
+            currentComparisionMode = ToDo.importanceBeforeDate;
+            resortList();
 
-        currentComparisionMode = ToDo.importanceBeforeDate;
-
-        resortList();
     }
 
     public void sortDatumWichtigkeit()
     {
-        currentComparisionMode = importanceBeforeDate;
-
-        currentComparisionMode = dateBeforeImportance;
-
-        resortList();
+            currentComparisionMode = dateBeforeImportance;
+            resortList();
     }
 
     public void resortList() {

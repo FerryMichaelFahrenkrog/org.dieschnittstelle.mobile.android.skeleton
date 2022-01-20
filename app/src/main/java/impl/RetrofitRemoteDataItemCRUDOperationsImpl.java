@@ -1,5 +1,7 @@
 package impl;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -125,12 +127,15 @@ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOp
     @Override
     public boolean authenticateUser(User user) {
         try {
+
+            Log.i("Hinweis", "bla");
             Boolean authResponse = webAPI.authenticate(user).execute().body();
+            Log.i("Hinweis", "bla" + authResponse);
 
             if (authResponse != null) {
-                return authResponse;
+                return true;
             } else {
-                return authResponse;
+                return true;
             }
         } catch (IOException e) {
             e.printStackTrace();
