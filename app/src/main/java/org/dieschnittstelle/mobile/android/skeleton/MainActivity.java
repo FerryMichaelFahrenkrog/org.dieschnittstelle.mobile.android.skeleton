@@ -81,7 +81,6 @@ public class MainActivity extends AppCompatActivity {               // macht die
     private final LoginActivity loginActivity = new LoginActivity();
     private boolean SKIP_LOGIN = false;
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,7 +126,6 @@ public class MainActivity extends AppCompatActivity {               // macht die
         }).execute();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     protected void oeffneDetailansichtFuer(ToDo itemName, int index, LocalDateTime localDateTime) {
         Intent detailviewIntent = new Intent(this, DetailviewActivity.class);
         detailviewIntent.putExtra(DetailviewActivity.ARG_ITEM, itemName);                       // In das ARG_ITEM wird unser To Do was wir übergeben reingepackt.
@@ -136,7 +134,6 @@ public class MainActivity extends AppCompatActivity {               // macht die
         this.startActivityForResult(detailviewIntent, CALL_DETAILVIEW_FOR_EDIT);                // Wir übergeben das Intent und sagen, dass wir auf eine Rückgabe warten
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     protected void erzeugeNeuesToDo() {
         Intent detailviewForCreateIntent = new Intent(this, DetailviewActivity.class);
         detailviewForCreateIntent.putExtra(DetailviewActivity.ARG_TODO_DATETIME, (LocalDateTime) null);
@@ -144,7 +141,6 @@ public class MainActivity extends AppCompatActivity {               // macht die
         startActivityForResult(detailviewForCreateIntent, CALL_DETAILVIEW_FOR_CREATE);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {                   // Diese Methode reagiert auf die Rückgaben, die wir über onActivityResult bekommen
         super.onActivityResult(requestCode, resultCode, data);
@@ -186,7 +182,6 @@ public class MainActivity extends AppCompatActivity {               // macht die
     }
 
 
-    @SuppressLint("NewApi")
     protected void onNewItemCreated(ToDo item) {                                                                // HIER CER CREATE TO DO TASK!!!!!!
 //        showFeedbackMessage("created new item " + item.getFinishDate());
 
@@ -319,7 +314,6 @@ public class MainActivity extends AppCompatActivity {               // macht die
             layoutResource = resource;
         }
 
-        @SuppressLint("NewApi")
         @NonNull
         @Override
         public View getView(int position, @Nullable View recycleableItemView, @NonNull ViewGroup parent) {

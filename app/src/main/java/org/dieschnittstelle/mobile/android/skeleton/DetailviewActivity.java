@@ -66,13 +66,10 @@ public class DetailviewActivity extends AppCompatActivity {
     private boolean itemDelete = false;
     private int todoIndex;
 
-    @SuppressLint("NewApi")
     private LocalDateTime PlaceholderDateTime = LocalDateTime.now();
     private LocalDateTime TodoDateTime = PlaceholderDateTime;
 
-    @SuppressLint("NewApi")
     public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
-    @SuppressLint("NewApi")
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     private ArrayList<String> contactList;
@@ -82,7 +79,6 @@ public class DetailviewActivity extends AppCompatActivity {
     private String email = "";
     private ActivityDetailviewBinding detailviewBinding;
 
-    @SuppressLint("NewApi")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -205,14 +201,12 @@ public class DetailviewActivity extends AppCompatActivity {
         contactListAdapter.notifyDataSetChanged();
     }
 
-    @SuppressLint("NewApi")
     private void instantiateCorrectLocalDateTime() {
         if (getIntent().getSerializableExtra(ARG_TODO_DATETIME) != null) {
             TodoDateTime = (LocalDateTime) getIntent().getSerializableExtra(ARG_TODO_DATETIME);
         }
     }
 
-    @SuppressLint("NewApi")
     public void setTimePickerDialog() {
         int hour = Integer.parseInt(editTextUhr.getText().toString().substring(0, 2));
         int minutes = Integer.parseInt(editTextUhr.getText().toString().substring(3, 5));
@@ -226,7 +220,6 @@ public class DetailviewActivity extends AppCompatActivity {
         timePickerDialog.show();
     }
 
-    @SuppressLint("NewApi")
     public void setDatePickerDialog() {
         int day = Integer.parseInt(editTextDatum.getText().toString().substring(0, 2));
         int month = Integer.parseInt(editTextDatum.getText().toString().substring(3, 5));
@@ -263,7 +256,6 @@ public class DetailviewActivity extends AppCompatActivity {
         finish();
     }
 
-    @SuppressLint("NewApi")
     public void onSaveItem() {
         updateLocalDateTime();
 
@@ -278,7 +270,6 @@ public class DetailviewActivity extends AppCompatActivity {
         finish();
     }
 
-    @SuppressLint("NewApi")
     void updateLocalDateTime() {
         String hour = editTextUhr.getText().toString().substring(0, 2);
         String minute = editTextUhr.getText().toString().substring(3, 5);

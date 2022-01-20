@@ -21,7 +21,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
 
- <!--        android:text="123456"-->-->
+ <!--        -->-->
     <EditText
         android:id="@+id/editTextTextPassword"
         android:layout_width="wrap_content"
@@ -29,6 +29,7 @@
         android:layout_marginTop="52dp"
         android:ems="10"
         android:hint="Passwort"
+        android:text="123456"
         android:maxLength="6"
         android:textAlignment="center"
         android:inputType="numberPassword"

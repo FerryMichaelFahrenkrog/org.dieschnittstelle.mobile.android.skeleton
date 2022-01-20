@@ -77,6 +77,8 @@ public class LoginActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(editTextpassword.getText().length() > 0 && editTextemailAdresse.getText().length() > 0){
                     btnLogin.setEnabled(true);
+                }else{
+                    btnLogin.setEnabled(false);
                 }
             }
 

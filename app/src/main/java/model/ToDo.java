@@ -1,10 +1,7 @@
 package model;
 
-import android.annotation.SuppressLint;
-import android.os.Build;
 import android.util.Log;
 
-import androidx.annotation.RequiresApi;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -68,7 +65,6 @@ public class ToDo implements Serializable                                       
     @ColumnInfo(name = "contacts")
     private transient String contactsString = "";
 
-    @SuppressLint("NewApi")
     @Ignore
     private transient LocalDateTime finishDate = LocalDateTime.now();
 
@@ -218,7 +214,6 @@ public class ToDo implements Serializable                                       
         this.contactsString = newContactsString;
     }
 
-    @SuppressLint("NewApi")
     public LocalDateTime getFinishDate() {
         this.finishDate = LocalDateTime.ofEpochSecond(this.finishDateLong / 1000, 0, ZoneOffset.UTC);
         return finishDate;
@@ -243,7 +238,31 @@ public class ToDo implements Serializable                                       
                 '}';
     }
 
-    @SuppressLint("NewApi")
+    private void updateDateFromLong() {
+        this.finishDate = LocalDateTime.ofEpochSecond(this.finishDateLong / 1000, 0, ZoneOffset.UTC);
+    }
+
+    private void updateLongFromDate() {
+        this.finishDateLong = this.finishDate.toInstant(ZoneOffset.UTC).toEpochMilli();
+    }
+
+
+    public void readingTodoFromRoom() {
+        this.updateDateFromLong();
+        this.updateListFromString();
+    }
+
+    public void readingTodoFromRetrofit() {
+        this.updateDateFromLong();
+        this.updateStringFromList();
+    }
+
+    public void whenUpdatingTodo() {
+        this.updateLongFromDate();
+        this.updateStringFromList();
+    }
+
+
     public static Comparator<ToDo> importanceBeforeDate = (objekt_eins, objekt_zwei) -> {
         int o1Greater = 1;
         int o1Smaller = -1;
@@ -269,7 +288,6 @@ public class ToDo implements Serializable                                       
         }
     };
 
-    @SuppressLint("NewApi")
     public static Comparator<ToDo> dateBeforeImportance = (o1, o2) -> {
         int o1Greater = 1;
         int o1Smaller = -1;
