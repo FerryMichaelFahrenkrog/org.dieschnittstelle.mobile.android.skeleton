@@ -22,5 +22,13 @@
         android:title="DELETE REMOTE"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/sort_wichtigkeitDatum"
+        android:title="Sort: Wichtigkeit/Datum"
+        app:showAsAction="never" />
 
+    <item
+        android:id="@+id/sort_DatumWichtigkeit"
+        android:title="Sort: Datum/Wichtigkeit"
+        app:showAsAction="never" />
 </menu>
