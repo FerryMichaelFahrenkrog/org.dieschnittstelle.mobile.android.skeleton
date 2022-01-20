@@ -2,6 +2,9 @@ package org.dieschnittstelle.mobile.android.skeleton;
 
 import static java.lang.Boolean.FALSE;
 
+import static model.ToDo.dateBeforeImportance;
+import static model.ToDo.importanceBeforeDate;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -34,6 +37,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -42,6 +46,7 @@ import impl.RoomLocalDataItemCRUDOperationsImpl;
 import impl.SyncedDataItemCRUDOperationsImpl;
 import model.IDataItemCRUDOperations;
 import model.ToDo;
+import tasks.CheckWebapiAvailableTask;
 import tasks.CreateTodosTask;
 import tasks.DeleteAllToDosTask;
 import tasks.DeleteTodosTask;
@@ -66,8 +71,11 @@ public class MainActivity extends AppCompatActivity {               // macht die
     private static final int CALL_DETAILVIEW_FOR_EDIT = 1;          // Damit sage ich der "startActivityForResult" Methode, dass ich etwas editieren will
     public static final int REQCODE_ADD_CONTACT = 21;
 
+//    private Comparator<ToDo> currentComparisionMode = ToDo.importanceBeforeDate;
+//    private Comparator<ToDo> currentComparisionMode2 = ToDo.dateBeforeImportance;
 
-    private IDataItemCRUDOperations crudOperationsNormal;            // ??
+    private Comparator<ToDo> currentComparisionMode = null;
+
     private IDataItemCRUDOperations crudOperations;            // ??
 
     private final LoginActivity loginActivity = new LoginActivity();
@@ -87,6 +95,18 @@ public class MainActivity extends AppCompatActivity {               // macht die
 
         listViewAdapter = new ToDoAdapter(this, R.layout.activity_main_listitem, items); // Der Adapter erhält die Daten & die Art der Darstellung über das Layout.
         listView.setAdapter(listViewAdapter);
+
+//        new CheckWebapiAvailableTask(webapiAvailable -> {
+//            // schade um das Interface, aber was solls: :)
+//            ((SyncedDataItemCRUDOperationsImpl) crudOperations).setConnectionStatus(webapiAvailable);
+//
+//            if (webapiAvailable) {
+//                if (SKIP_LOGIN) {
+//                    setContentView(R.layout.activity_main);
+//                } else {
+//                    setContentView(R.layout.activity_login);
+//                }}
+//        }).execute();
 
         //2. Prepare Elements 4 Interaction
         listView.setOnItemClickListener((parent, view, position, id) -> {
@@ -268,6 +288,13 @@ public class MainActivity extends AppCompatActivity {               // macht die
             case R.id.sortItems:
                 sortListAndScrollToItem(null);
                 return true;
+            case R.id.sort_wichtigkeitDatum:
+                sortWichtigkeitDatum();
+                return true;
+            case R.id.sort_DatumWichtigkeit:
+                sortDatumWichtigkeit();
+            return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -328,6 +355,29 @@ public class MainActivity extends AppCompatActivity {               // macht die
             }
             return itemView;
         }
+    }
+
+    public void sortWichtigkeitDatum()
+    {
+        currentComparisionMode = dateBeforeImportance;
+
+        currentComparisionMode = ToDo.importanceBeforeDate;
+
+        resortList();
+    }
+
+    public void sortDatumWichtigkeit()
+    {
+        currentComparisionMode = importanceBeforeDate;
+
+        currentComparisionMode = dateBeforeImportance;
+
+        resortList();
+    }
+
+    public void resortList() {
+        Collections.sort(items, currentComparisionMode);
+        listViewAdapter.notifyDataSetChanged();
     }
 
     private void sortitems(List<ToDo> items) {

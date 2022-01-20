@@ -1,8 +1,10 @@
 package model;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.util.Log;
 
+import androidx.annotation.RequiresApi;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Objects;
 
@@ -239,6 +242,61 @@ public class ToDo implements Serializable                                       
                 ", localdate=" + localdate +
                 '}';
     }
+
+    @SuppressLint("NewApi")
+    public static Comparator<ToDo> importanceBeforeDate = (objekt_eins, objekt_zwei) -> {
+        int o1Greater = 1;
+        int o1Smaller = -1;
+        int equal = 0;
+
+        //Wenn Objekt 1 Checked ist und Objekt 2 nicht
+        if (objekt_eins.isChecked() && !objekt_zwei.isChecked()) {
+            // Dann ist Objekt 1 größer
+            return o1Greater;
+            //Wenn Objekt 1 nicht checked ist, Objekt 2 aber schon
+        } else if (!objekt_eins.isChecked() && objekt_zwei.isChecked()) {
+            //Dann ist Objekt 1 kleiner
+            return o1Smaller;
+        } else {
+            //
+            if (objekt_eins.isChecked() && !objekt_zwei.isChecked()) {
+                return o1Smaller;
+            } else if (!objekt_eins.isChecked() && objekt_zwei.isChecked()) {
+                return o1Greater;
+            } else {
+                return objekt_eins.getFinishDate().compareTo(objekt_zwei.getFinishDate());
+            }
+        }
+    };
+
+    @SuppressLint("NewApi")
+    public static Comparator<ToDo> dateBeforeImportance = (o1, o2) -> {
+        int o1Greater = 1;
+        int o1Smaller = -1;
+        int equal = 0;
+
+        if (o1.isChecked() && !o2.isChecked()) {
+            return o1Greater;
+        } else if (!o1.isChecked() && o2.isChecked()) {
+            return o1Smaller;
+        } else {
+            int dateComparison = o1.getFinishDate().compareTo(o2.getFinishDate());
+
+            if (dateComparison > 0) {
+                return o1Greater;
+            } else if (dateComparison < 0) {
+                return o1Smaller;
+            } else {
+                if (o1.isChecked() && !o2.isChecked()) {
+                    return o1Smaller;
+                } else if (!o1.isChecked() && o2.isChecked()) {
+                    return o1Greater;
+                } else {
+                    return equal;
+                }
+            }
+        }
+    };
 
     @Override
     public boolean equals(Object o) {
