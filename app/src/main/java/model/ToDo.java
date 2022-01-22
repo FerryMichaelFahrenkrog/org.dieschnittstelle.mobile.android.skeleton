@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
 import impl.RoomLocalDataItemCRUDOperationsImpl;
@@ -314,6 +315,45 @@ public class ToDo implements Serializable                                       
             }
         }
     };
+
+    public boolean isUeberfallig(){
+        if(System.currentTimeMillis() % 2 == 0){
+            return true;
+        }
+        return false;
+    }
+
+    public static Comparator<ToDo> SORT_BY_NAME = new Comparator<ToDo>() {
+        @Override
+        public int compare(ToDo o1, ToDo o2) {
+            return String.valueOf(o1.getName()).toLowerCase().compareTo(String.valueOf(o2.getName()));
+        }
+    };
+
+        public static Comparator<ToDo> SORT_BY_DESC = new Comparator<ToDo>() {
+        @Override
+        public int compare(ToDo o1, ToDo o2) {
+            return (o1.getDescription().compareTo(o2.getDescription()));
+        }
+    };
+
+
+
+
+
+//    public static Comparator<ToDo> SORT_BY_Faelligkeit = new Comparator<ToDo>() {
+//        @Override
+//        public int compare(ToDo o1, ToDo o2) {
+//            return (o1.getFinishDate().compareTo(o2.getFinishDate());
+//        }
+//    };
+//
+//    public static Comparator<ToDo> SORT_BY_WICHTIGKEIT = new Comparator<ToDo>() {
+//        @Override
+//       public int compare(ToDo o1, ToDo o2) {
+//           return (o1.isFavouriteToDo().compareTo(o2.isFavouriteToDo()));
+//        }
+//    };
 
     @Override
     public boolean equals(Object o) {

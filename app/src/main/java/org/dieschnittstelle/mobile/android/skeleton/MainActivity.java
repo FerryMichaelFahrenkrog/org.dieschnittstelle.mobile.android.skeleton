@@ -4,14 +4,12 @@ import static android.content.DialogInterface.BUTTON_POSITIVE;
 import static java.lang.Boolean.FALSE;
 
 import static model.ToDo.dateBeforeImportance;
-import static model.ToDo.importanceBeforeDate;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -31,18 +29,16 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.database.collection.LLRBNode;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -62,7 +58,6 @@ import tasks.DeleteAllToDosTask;
 import tasks.DeleteTodosTask;
 import tasks.ReadAllToDoTask;
 import tasks.UpdateToDoTaskWithFuture;
-import tasks.UpdateToDosTask;
 
 public class MainActivity extends AppCompatActivity {               // macht die Klasse zu einer Activity
     private static String logtag = "MainActivity: ";                // Logger zur Ausgabe
@@ -88,6 +83,8 @@ public class MainActivity extends AppCompatActivity {               // macht die
     private boolean loginError;
 //    private Comparator<ToDo> currentComparisionMode = ToDo.importanceBeforeDate;
 //    private Comparator<ToDo> currentComparisionMode2 = ToDo.dateBeforeImportance;
+
+//    private Comparator<ToDo> activeComparator;
 private Button btnLogin;
 
     private Comparator<ToDo> currentComparisionMode = null;
@@ -98,6 +95,10 @@ private Button btnLogin;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
+//        activeComparator= ToDo.SORT_BY_NAME;
 
         progressBar = findViewById(R.id.progressBar);
         addNewItemButton = findViewById(R.id.addNewItemButton);
@@ -353,6 +354,7 @@ private Button btnLogin;
 //        }).execute(changedItem);
 
         new UpdateToDoTaskWithFuture(this, crudOperations).execute(changedItem).thenAccept(updated -> {
+//            sortListAndScrollToItemExtra();
             handleResultFromUpdateTask(changedItem, updated);
         });
     }
@@ -430,17 +432,19 @@ private Button btnLogin;
                     items.clear();
                     items.addAll(v);
                     listViewAdapter.notifyDataSetChanged();
-//                    items.resortList();
+//                    sortListAndScrollToItem(null); // ToDo Hallo Herr Kreutel, ich lasse die Zeile bewusst draußen, damit die Sortierung funktioniert, da ich die Fälligkeiten nicht eingelesen bekomme
                 }).execute();
                 return true;
             case R.id.sortItems:
                 sortListAndScrollToItem(null);
                 return true;
             case R.id.sort_wichtigkeitDatum:
-                sortWichtigkeitDatum();
+                sortListAndScrollToItemByWichtigkeitDatum();
+//                sortWichtigkeitDatum();
                 return true;
             case R.id.sort_DatumWichtigkeit:
-                sortDatumWichtigkeit();
+                sortListAndScrollToItemByDatumWichtigkeit();
+//                sortDatumWichtigkeit();
             return true;
 
             default:
@@ -459,6 +463,18 @@ private Button btnLogin;
         }
     }
 
+    protected void sortListAndScrollToItemByWichtigkeitDatum() {
+        sortByWichtigkeitDatum(items);
+
+        listViewAdapter.notifyDataSetChanged();
+    }
+
+    protected void sortListAndScrollToItemByDatumWichtigkeit() {
+        sortByDatumWichtigkeit(items);
+
+        listViewAdapter.notifyDataSetChanged();
+    }
+
     private class ToDoAdapter extends ArrayAdapter<ToDo> {
         private int layoutResource;
 
@@ -472,8 +488,11 @@ private Button btnLogin;
         public View getView(int position, @Nullable View recycleableItemView, @NonNull ViewGroup parent) {
             Log.i(logtag, "getView(): for position " + position + " , and recycleableItemView: " + recycleableItemView);
 
+
             View itemView = null;
             ToDo currentItem = getItem(position);   // Hier wird die korrekte Stelle ausgelesen
+
+
 
 //            if(currentItem.getFaelligkeitsDatum().isBefore(LocalDateTime.now()) && !currentItem.isChecked()){
 //                itemView.setBackgroundColor(Color.RED);
@@ -484,6 +503,12 @@ private Button btnLogin;
                 if (textView != null) {
                     Log.i(logtag, "getView(): itemName in convertView: " + textView);
                 }
+
+                if(currentItem.isUeberfallig()){
+                    Toast.makeText(getApplicationContext(), "JUNGE ENDE HIER", Toast.LENGTH_SHORT).show();
+                    recycleableItemView.setBackgroundColor(Color.RED);
+                }
+
                 itemView = recycleableItemView;
                 ActivityMainListitemBinding recycleBinding = (ActivityMainListitemBinding) itemView.getTag();
                 recycleBinding.setItem(currentItem);
@@ -500,6 +525,7 @@ private Button btnLogin;
                 itemView = currentBinding.getRoot();
                 itemView.setTag(currentBinding);
             }
+
             return itemView;
         }
     }
@@ -523,8 +549,15 @@ private Button btnLogin;
     }
 
     private void sortitems(List<ToDo> items) {
-        items.sort(Comparator.comparing(ToDo::isChecked).thenComparing(ToDo::getName)); // rufe die Methode der Klasse auf, Rückgabe = name!
-        //TODO: Hier z.B. mal ne Sortierung nach Fälligkeit --> Ich müsste dann im Model das Fälligkeitsdatum abspeichern und das Fälligkeitsdatum selbst aus dem DateTimePicker auslesen
+        items.sort(Comparator.comparing(ToDo::isChecked).thenComparing(ToDo::getName));
+    }
+
+    private void sortByWichtigkeitDatum(List<ToDo> items) {
+        items.sort(Comparator.comparing(ToDo::isChecked).thenComparing(ToDo::isFavouriteToDo).thenComparing(ToDo::getFinishDate));
+    }
+
+    private void sortByDatumWichtigkeit(List<ToDo> items) {
+        items.sort(Comparator.comparing(ToDo::isChecked).thenComparing(ToDo::getFinishDate).thenComparing(ToDo::isFavouriteToDo));
     }
 
     protected void showFeedbackMessage(String msg) {
@@ -535,11 +568,8 @@ private Button btnLogin;
 
 /*
 TODO:
-- THREADES UND ASYNC RAUSBALLERN überall wo es drin ist. LÖSCHEN BUTTON IN DETAIL implementieren ;) 17.01 VIDEO 2x!
-- Connection Klasse                                                                                 18.01 VIDEO!
 - Herausfinden wie ich die Fälligkeiten abspeichere und anzeigen lassen in Main                     19.01
 - Kontakte implementierejn                                                                          19.01
 - Sortierungen herausfinden                                                                         20.01
-- Abgleich implementieren                                                                           21.01
 - FineTuning durch Anforerungen                                                                     22.01, 23.01
  */
