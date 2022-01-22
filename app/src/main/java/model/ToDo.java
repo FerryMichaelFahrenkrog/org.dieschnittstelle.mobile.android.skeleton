@@ -61,7 +61,6 @@ public class ToDo implements Serializable                                       
     @Ignore
     private ArrayList<String> contacts = new ArrayList<>();
 
-    //An dieser Stelle nutzt er private transient String concactsString; wegen der persistierung
     @ColumnInfo(name = "contacts")
     private transient String contactsString = "";
 

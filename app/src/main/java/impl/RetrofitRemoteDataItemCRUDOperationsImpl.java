@@ -127,15 +127,12 @@ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOp
     @Override
     public boolean authenticateUser(User user) {
         try {
-
-            Log.i("Hinweis", "bla");
             Boolean authResponse = webAPI.authenticate(user).execute().body();
-            Log.i("Hinweis", "bla" + authResponse);
 
             if (authResponse != null) {
-                return true;
+                return authResponse;
             } else {
-                return true;
+                return authResponse;
             }
         } catch (IOException e) {
             e.printStackTrace();

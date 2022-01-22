@@ -4,11 +4,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Patterns;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -18,8 +16,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.snackbar.Snackbar;
-
 import java.util.regex.Pattern;
 
 import impl.RetrofitRemoteDataItemCRUDOperationsImpl;
@@ -28,7 +24,6 @@ import impl.SyncedDataItemCRUDOperationsImpl;
 import model.IDataItemCRUDOperations;
 import model.User;
 import tasks.AuthenticateUserTask;
-import tasks.CheckWebapiAvailableTask;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText editTextemailAdresse;
@@ -55,8 +50,8 @@ public class LoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_login);
 
-        editTextemailAdresse = findViewById(R.id.editEmail);
-        editTextpassword = findViewById(R.id.editTextTextPassword);
+        editTextemailAdresse = findViewById(R.id.userName);
+        editTextpassword = findViewById(R.id.emailpassword);
         btnLogin = findViewById(R.id.btnLogin);
         txtHinweis = findViewById(R.id.txtWarnmeldung);
         progressBarLogin = findViewById(R.id.progressBarLogin);

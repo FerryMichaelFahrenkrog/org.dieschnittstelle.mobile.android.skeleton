@@ -4,11 +4,12 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/MobileApplicationDevelopment_SS21_FerryFahrenkrog/toDoList/app/src/main/res/drawable/outline_sort_24.xml" value="0.33489583333333334" />
-        <entry key="..\:/MobileApplicationDevelopment_SS21_FerryFahrenkrog/toDoList/app/src/main/res/layout/activity_detailview.xml" value="0.3776041666666667" />
+        <entry key="..\:/MobileApplicationDevelopment_SS21_FerryFahrenkrog/toDoList/app/src/main/res/layout/activity_detailview.xml" value="0.9" />
         <entry key="..\:/MobileApplicationDevelopment_SS21_FerryFahrenkrog/toDoList/app/src/main/res/layout/activity_detailview_listitem.xml" value="0.3921875" />
-        <entry key="..\:/MobileApplicationDevelopment_SS21_FerryFahrenkrog/toDoList/app/src/main/res/layout/activity_login.xml" value="0.30833333333333335" />
+        <entry key="..\:/MobileApplicationDevelopment_SS21_FerryFahrenkrog/toDoList/app/src/main/res/layout/activity_login.xml" value="0.5" />
         <entry key="..\:/MobileApplicationDevelopment_SS21_FerryFahrenkrog/toDoList/app/src/main/res/layout/activity_main.xml" value="0.30572916666666666" />
         <entry key="..\:/MobileApplicationDevelopment_SS21_FerryFahrenkrog/toDoList/app/src/main/res/layout/activity_main_listitem.xml" value="0.5421875" />
+        <entry key="..\:/MobileApplicationDevelopment_SS21_FerryFahrenkrog/toDoList/app/src/main/res/layout/login_dialog2.xml" value="0.9" />
         <entry key="..\:/MobileApplicationDevelopment_SS21_FerryFahrenkrog/toDoList/app/src/main/res/menu/detailview_contact_context.xml" value="0.5421875" />
         <entry key="..\:/MobileApplicationDevelopment_SS21_FerryFahrenkrog/toDoList/app/src/main/res/menu/detailview_menu.xml" value="0.3453125" />
         <entry key="..\:/MobileApplicationDevelopment_SS21_FerryFahrenkrog/toDoList/app/src/main/res/menu/main_menu.xml" value="0.24537037037037038" />

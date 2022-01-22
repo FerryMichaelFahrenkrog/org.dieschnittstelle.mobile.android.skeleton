@@ -54,27 +54,28 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <CheckBox
-            android:id="@+id/itemChecked"
-            android:layout_width="92dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="156dp"
-            android:layout_marginTop="44dp"
-            android:checked="@={controller.toDo.checked}"
-            android:text="Erledigt"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextTime" />
+        <!--        android:onClick="@{(v) -> controller.colorChange(v)}"-->
 
-<!--        android:onClick="@{(v) -> controller.colorChange(v)}"-->
         <CheckBox
             android:id="@+id/itemFav"
             android:layout_width="92dp"
             android:layout_height="30dp"
-            android:layout_marginStart="156dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="204dp"
+            android:layout_marginTop="12dp"
             android:checked="@={controller.toDo.favouriteToDo}"
 
             android:text="Wichtig"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editTextTime" />
+
+        <CheckBox
+            android:id="@+id/itemChecked"
+            android:layout_width="92dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="112dp"
+            android:layout_marginTop="12dp"
+            android:checked="@={controller.toDo.checked}"
+            android:text="Erledigt"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editTextTime" />
 
@@ -123,17 +124,18 @@
             android:text="To Do löschen"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/itemFav"
+            app:layout_constraintVertical_bias="0.038" />
 
         <ListView
             android:id="@+id/contactItemListView"
             android:layout_width="365dp"
             android:layout_height="214dp"
+            android:layout_marginTop="88dp"
             android:orientation="vertical"
-            android:layout_marginTop="24dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/itemChecked" />
+            app:layout_constraintTop_toBottomOf="@+id/btnLoeschen" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

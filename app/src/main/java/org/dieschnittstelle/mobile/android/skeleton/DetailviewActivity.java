@@ -195,7 +195,7 @@ public class DetailviewActivity extends AppCompatActivity {
                     email = emailCursor.getString(emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS));
                 }
 
-                contactList.add("Contact with ID " + id + ": " + contactName);
+                contactList.add("Kontakt: " + contactName);
             }
         }
         contactListAdapter.notifyDataSetChanged();

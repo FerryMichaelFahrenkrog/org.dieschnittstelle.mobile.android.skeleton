@@ -1,5 +1,6 @@
 package org.dieschnittstelle.mobile.android.skeleton;
 
+import static android.content.DialogInterface.BUTTON_POSITIVE;
 import static java.lang.Boolean.FALSE;
 
 import static model.ToDo.dateBeforeImportance;
@@ -7,16 +8,22 @@ import static model.ToDo.importanceBeforeDate;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -40,12 +47,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import impl.RetrofitRemoteDataItemCRUDOperationsImpl;
 import impl.RoomLocalDataItemCRUDOperationsImpl;
 import impl.SyncedDataItemCRUDOperationsImpl;
 import model.IDataItemCRUDOperations;
 import model.ToDo;
+import model.User;
+import tasks.AuthenticateUserTask;
 import tasks.CheckWebapiAvailableTask;
 import tasks.CreateTodosTask;
 import tasks.DeleteAllToDosTask;
@@ -64,40 +74,53 @@ public class MainActivity extends AppCompatActivity {               // macht die
     private ArrayAdapter<ToDo> listViewAdapter;                     // Über einen Arrayadapter werden listenförmige Datensammlungen mit einem AdapterView verbunden. Ein AdapterView ist ein View Element dessen Kinder von einem Adapter vorgegeben werden. Ein AdapterView wird übeer einen Adapter mit einer Datenquelle verbunden. Über den Adapter erhält der AdapterView Zugang zu den Elementen der Datenquelle
 
     private ProgressBar progressBar;
+    private AlertDialog dialog;
+    private ProgressBar progressBarLogin;
 
     private FloatingActionButton addNewItemButton;
-
+    private EditText username;
+    private EditText password;
     private static final int CALL_DETAILVIEW_FOR_CREATE = 0;        // Damit sage ich der "startActivityForResult" Methode, dass ich etwas erzeugen will
     private static final int CALL_DETAILVIEW_FOR_EDIT = 1;          // Damit sage ich der "startActivityForResult" Methode, dass ich etwas editieren will
     public static final int REQCODE_ADD_CONTACT = 21;
-
+    private TextView loginErrorText;
+    private boolean emailError;
+    private boolean loginError;
 //    private Comparator<ToDo> currentComparisionMode = ToDo.importanceBeforeDate;
 //    private Comparator<ToDo> currentComparisionMode2 = ToDo.dateBeforeImportance;
+private Button btnLogin;
 
     private Comparator<ToDo> currentComparisionMode = null;
 
     private IDataItemCRUDOperations crudOperations;            // ??
 
-    private final LoginActivity loginActivity = new LoginActivity();
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        setContentView(R.layout.activity_main);                     // setzen der Hauptansicht (Layout)
-
-        //1. Access view elements
         progressBar = findViewById(R.id.progressBar);
         addNewItemButton = findViewById(R.id.addNewItemButton);
         listView = findViewById(R.id.listView);
 
-        listViewAdapter = new ToDoAdapter(this, R.layout.activity_main_listitem, items); // Der Adapter erhält die Daten & die Art der Darstellung über das Layout.
+        RoomLocalDataItemCRUDOperationsImpl roomTodoCRUDOperations = new RoomLocalDataItemCRUDOperationsImpl(this);
+        RetrofitRemoteDataItemCRUDOperationsImpl retrofitTodoCRUDOperations = new RetrofitRemoteDataItemCRUDOperationsImpl();
+        crudOperations = new SyncedDataItemCRUDOperationsImpl(roomTodoCRUDOperations, retrofitTodoCRUDOperations);
+
+        new CheckWebapiAvailableTask(webapiAvailable -> {
+            ((SyncedDataItemCRUDOperationsImpl) crudOperations).setConnectionStatus(webapiAvailable);
+
+            if(webapiAvailable) {
+                Toast.makeText(getApplicationContext(), "WEB IST DA ", Toast.LENGTH_SHORT).show();
+                showLoginDialog();
+            } else{
+                Toast.makeText(getApplicationContext(), "WEB API is not available", Toast.LENGTH_SHORT).show();
+            }
+        }).execute();
+
+        listViewAdapter = new ToDoAdapter(this, R.layout.activity_main_listitem, items);
         listView.setAdapter(listViewAdapter);
 
-
-
-        //2. Prepare Elements 4 Interaction
         listView.setOnItemClickListener((parent, view, position, id) -> {
 //            ToDo selectedItem = listViewAdapter.getItem(position);
             oeffneDetailansichtFuer(items.get(position), position, items.get(position).getFinishDate());                                              // Bei Klick auf ein Item öffnet sich die Detailansicht (mit Vorbefüllung)
@@ -105,15 +128,153 @@ public class MainActivity extends AppCompatActivity {               // macht die
 
         addNewItemButton.setOnClickListener(v -> this.erzeugeNeuesToDo());                      // Bei Klick auf den New Button wird ein neues To Do erstellt (ohne Vorbefüllung)
 
-        RoomLocalDataItemCRUDOperationsImpl roomTodoCRUDOperations = new RoomLocalDataItemCRUDOperationsImpl(this);
-        RetrofitRemoteDataItemCRUDOperationsImpl retrofitTodoCRUDOperations = new RetrofitRemoteDataItemCRUDOperationsImpl();
-
-        crudOperations = new SyncedDataItemCRUDOperationsImpl(roomTodoCRUDOperations, retrofitTodoCRUDOperations);
-
         new ReadAllToDoTask(progressBar, crudOperations, toDos -> {
             listViewAdapter.addAll(toDos);
             sortitems(items);
         }).execute();
+    }
+
+    private void showLoginDialog() {
+        btnLogin = findViewById(R.id.btnLogin);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+
+        builder.setView(inflater.inflate(R.layout.login_dialog2, null)).setPositiveButton("Login", null);
+
+        dialog = builder.create();
+        dialog.setCancelable(false);
+        dialog.show();
+
+        dialog.getButton(BUTTON_POSITIVE).setOnClickListener(v -> {
+//        btnLogin.setOnClickListener(v -> {
+            String usernameInput = username.getText().toString();
+            String passwordInput = password.getText().toString();
+
+            if (isValidPassword(passwordInput))
+            {
+                User currentUser = new User(usernameInput, passwordInput);
+
+                new AuthenticateUserTask(progressBarLogin, crudOperations, isAuthenticated -> {
+                    if (isAuthenticated) {
+                        Toast.makeText(getApplicationContext(), "JAAAAAAAAAAAAAAAA", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    } else {
+                        loginErrorText.setText("Invalid username and/or password.");
+                        loginError = true;
+                    }
+                }).execute(currentUser);
+            } else {
+                loginErrorText.setText("Password too short.");
+                loginError = true;
+            }
+        });
+
+        dialog.getButton(BUTTON_POSITIVE).setEnabled(false);
+//        btnLogin.setEnabled(false);
+        username = dialog.findViewById(R.id.username);
+        password = dialog.findViewById(R.id.password);
+        loginErrorText = dialog.findViewById(R.id.loginError);
+        progressBarLogin = dialog.findViewById(R.id.progressBarLogin);
+
+
+        username.setOnFocusChangeListener((v, hasFocus) -> handleLoginFocusChange(v, hasFocus));
+        username.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (emailError || loginError) {
+                    loginErrorText.setText("");
+                    emailError = false;
+                    loginError = false;
+                }
+                if (!username.getText().toString().equals("") && !password.getText().toString().equals("")) {
+                    dialog.getButton(BUTTON_POSITIVE).setEnabled(true);
+//                    btnLogin.setEnabled(true);
+                } else {
+                    dialog.getButton(BUTTON_POSITIVE).setEnabled(false);
+//                    btnLogin.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        password.setOnFocusChangeListener((v, hasFocus) -> handleLoginFocusChange(v, hasFocus));
+        password.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (loginError) {
+                    loginErrorText.setText("");
+                    loginError = false;
+                }
+                if (!username.getText().toString().equals("") && !password.getText().toString().equals("")) {
+                    dialog.getButton(BUTTON_POSITIVE).setEnabled(true);
+//                    btnLogin.setEnabled(true);
+                } else {
+                    dialog.getButton(BUTTON_POSITIVE).setEnabled(false);
+//                    btnLogin.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+    }
+
+    private void handleLoginFocusChange(View v, boolean hasFocus) {
+        if (!hasFocus) {
+            verfiyUsernameInput();
+        }
+    }
+
+    private void verfiyUsernameInput() {
+        String usernameInput = username.getText().toString();
+        String passwordInput = password.getText().toString();
+
+        if (usernameInput.equals("")) {
+            loginErrorText.setText("");
+        } else if (!isValidEmail(usernameInput)) {
+            loginErrorText.setText("Username needs to be a valid email-address.");
+            emailError = true;
+        } else {
+            loginErrorText.setText("");
+        }
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
+                "[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+
+        Pattern pat = Pattern.compile(emailRegex);
+        if (email == null)
+            return false;
+        return pat.matcher(email).matches();
+    }
+
+    private boolean isValidPassword(String password) {
+        String emailRegex = "^[0-9]{6}$";
+
+        Pattern pat = Pattern.compile(emailRegex);
+        if (password == null)
+            return false;
+        return pat.matcher(password).matches();
     }
 
     protected void oeffneDetailansichtFuer(ToDo itemName, int index, LocalDateTime localDateTime) {
