@@ -504,10 +504,10 @@ private Button btnLogin;
                     Log.i(logtag, "getView(): itemName in convertView: " + textView);
                 }
 
-                if(currentItem.isUeberfallig()){
-                    Toast.makeText(getApplicationContext(), "JUNGE ENDE HIER", Toast.LENGTH_SHORT).show();
-                    recycleableItemView.setBackgroundColor(Color.RED);
-                }
+//                if(currentItem.isUeberfallig()){
+//                    Toast.makeText(getApplicationContext(), "JUNGE ENDE HIER", Toast.LENGTH_SHORT).show();
+//                    recycleableItemView.setBackgroundColor(Color.RED);
+//                }
 
                 itemView = recycleableItemView;
                 ActivityMainListitemBinding recycleBinding = (ActivityMainListitemBinding) itemView.getTag();
@@ -568,8 +568,10 @@ private Button btnLogin;
 
 /*
 TODO:
-- Herausfinden wie ich die Fälligkeiten abspeichere und anzeigen lassen in Main                     19.01
-- Kontakte implementierejn                                                                          19.01
-- Sortierungen herausfinden                                                                         20.01
-- FineTuning durch Anforerungen                                                                     22.01, 23.01
+- FÄLLIGKEITEN UND KONTAKTE LANGFRISTIG! (AN KONTAKTEN PRÜFEN ;))!!!!!!!!!!!!!!!!!!!!!!!!!!
+- Wichtigkeit oben?
+- Neue ToDos nach Algorithmus sortieren
+- Überfällige ToDos funktioniert nicht so
+- EMAILS richtig darstellen
+- Aufräumen
  */

@@ -14,6 +14,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.text.Html;
 import android.text.InputType;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -354,10 +355,14 @@ public class DetailviewActivity extends AppCompatActivity {
         }
     }
 
-    private void deleteContact(AdapterView.AdapterContextMenuInfo info) {
-        contactList.remove(info.position);
-        toDo.getContacts().remove(info.position);
+    private void deleteContact(AdapterView.AdapterContextMenuInfo info)
+    {
+        Log.i("Größe vorher: " , String.valueOf(contactList.size()));
 
+        contactList.remove(info.position);
+        Log.i("Größe nachher: " , String.valueOf(contactList.size()));
+
+        toDo.getContacts().remove(info.position);
         contactListAdapter.notifyDataSetChanged();
     }
 
@@ -387,32 +392,6 @@ public class DetailviewActivity extends AppCompatActivity {
             case R.id.addContact:
                 selectAndAddContact();
                 return true;
-            case R.id.contactDelete:
-                deleteContact(info);
-                return true;
-            case R.id.contactMail:
-                if (email.equals("")) {
-                    Toast.makeText(this, "No Email found", Toast.LENGTH_SHORT).show();
-                } else
-                    sendToEmail();
-                return true;
-            case R.id.contactSMS:
-                if (phoneNumber.equals("")) {
-                    Toast.makeText(this, "No Number found", Toast.LENGTH_SHORT).show();
-                } else
-                    sendToSMS();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-//    @Override
-//    public boolean onContextItemSelected(@NonNull MenuItem item) {
-//        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-//
-//        switch (item.getItemId()) {
 //            case R.id.contactDelete:
 //                deleteContact(info);
 //                return true;
@@ -428,24 +407,66 @@ public class DetailviewActivity extends AppCompatActivity {
 //                } else
 //                    sendToSMS();
 //                return true;
-//            default:
-//                return super.onContextItemSelected(item);
-//        }
-//    }
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+        switch (item.getItemId()) {
+            case R.id.contactDelete:
+                deleteContact(info);
+                return true;
+            case R.id.contactMail:
+                if (email.equals("")) {
+                    Toast.makeText(this, "No Email found", Toast.LENGTH_SHORT).show();
+                } else
+                    sendToEmail();
+                return true;
+            case R.id.contactSMS:
+                if (phoneNumber.equals("")) {
+                    Toast.makeText(this, "No Number found", Toast.LENGTH_SHORT).show();
+                } else
+                    sendToSMS();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
 
     private void sendToSMS() {
-        Intent sendSMS = new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", phoneNumber, null));
-        sendSMS.putExtra("sms_body", toDo.getName() + " " + toDo.getDescription());
-        startActivity(sendSMS);
+        Intent smsIntent = new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", phoneNumber, null));
+        smsIntent.putExtra("sms_body", toDo.getName() + " " + toDo.getDescription());
+        startActivity(smsIntent);
     }
 
     private void sendToEmail() {
-        Intent sendEmail = new Intent(Intent.ACTION_SEND);
-        sendEmail.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
-        sendEmail.putExtra(Intent.EXTRA_SUBJECT, toDo.getName());
-        sendEmail.putExtra(Intent.EXTRA_TEXT, toDo.getDescription());
-        sendEmail.setType("message/rfc822");
-        startActivity(sendEmail);
+//        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+//        emailIntent.setType("plain/text");
+//
+//        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
+//        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, Html.fromHtml("hy"));
+//
+//        emailIntent.putExtra(Intent.EXTRA_SUBJECT, toDo.getName());
+//        emailIntent.putExtra(Intent.EXTRA_TEXT, toDo.getDescription());
+//
+//        startActivity(emailIntent);
+
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("message/rfc822");
+//        i.setType("image/*");
+        i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"recipient@example.com"});
+        i.putExtra(Intent.EXTRA_SUBJECT, "subject of email");
+        i.putExtra(Intent.EXTRA_TEXT   , "body of email");
+        try {
+            startActivity(Intent.createChooser(i, "Send mail"));
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(this, "There are no email applications installed.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void selectAndAddContact() {
