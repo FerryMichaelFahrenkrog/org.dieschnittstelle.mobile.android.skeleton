@@ -37,6 +37,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.collection.LLRBNode;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;
+import org.w3c.dom.Text;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -349,6 +350,7 @@ private Button btnLogin;
 
 
         Toast.makeText(getApplicationContext(), "HINWEIS: " + changedItem.getName(), Toast.LENGTH_SHORT).show();
+
 //        new UpdateToDosTask(progressBar, crudOperations, updated -> {
 //            handleResultFromUpdateTask(changedItem, updated);
 //        }).execute(changedItem);
@@ -485,50 +487,45 @@ private Button btnLogin;
 
         @NonNull
         @Override
-        public View getView(int position, @Nullable View recycleableItemView, @NonNull ViewGroup parent) {
-            Log.i(logtag, "getView(): for position " + position + " , and recycleableItemView: " + recycleableItemView);
+        public View getView(int position, @Nullable View existingView, @NonNull ViewGroup parent)
+        {
+            Log.i(logtag, "getView(): for position " + position + " , and existingView: " + existingView);
 
-
-            View itemView = null;
-            ToDo currentItem = getItem(position);   // Hier wird die korrekte Stelle ausgelesen
-
-
+            ActivityMainListitemBinding binding = null;
+            View currentView = null;
 
 //            if(currentItem.getFaelligkeitsDatum().isBefore(LocalDateTime.now()) && !currentItem.isChecked()){
 //                itemView.setBackgroundColor(Color.RED);
 //            }
 
-            if (recycleableItemView != null) {
-                TextView textView = (TextView) recycleableItemView.findViewById(R.id.itemName);
-                if (textView != null) {
-                    Log.i(logtag, "getView(): itemName in convertView: " + textView);
-                }
-
-//                if(currentItem.isUeberfallig()){
-//                    Toast.makeText(getApplicationContext(), "JUNGE ENDE HIER", Toast.LENGTH_SHORT).show();
-//                    recycleableItemView.setBackgroundColor(Color.RED);
-//                }
-
-                itemView = recycleableItemView;
-                ActivityMainListitemBinding recycleBinding = (ActivityMainListitemBinding) itemView.getTag();
-                recycleBinding.setItem(currentItem);
-            } else {
-                ActivityMainListitemBinding currentBinding =
-                        DataBindingUtil.inflate(getLayoutInflater(),
-                                this.layoutResource,
-                                null,
-                                false);
-
-                currentBinding.setItem(currentItem);
-                currentBinding.setController(MainActivity.this);
-
-                itemView = currentBinding.getRoot();
-                itemView.setTag(currentBinding);
+            if (existingView != null)
+            {
+                currentView = existingView;
+                binding = (ActivityMainListitemBinding) existingView.getTag();
             }
 
-            return itemView;
-        }
-    }
+            else
+                {
+                binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.activity_main_listitem, null, false);
+                currentView = binding.getRoot();
+                currentView.setTag(binding);
+            }
+
+            ToDo toDo = getItem(position);
+            binding.setItem(toDo);
+            binding.setController(MainActivity.this);
+
+            TextView itemName = binding.getRoot().findViewById(R.id.itemName);
+
+            if(toDo.getFinishDate().isAfter(LocalDateTime.now())){
+                itemName.setTextColor(Color.BLACK);
+            }
+            else{
+                itemName.setTextColor(Color.RED);
+            }
+
+            return currentView;
+    }}
 
     public void sortWichtigkeitDatum()
     {

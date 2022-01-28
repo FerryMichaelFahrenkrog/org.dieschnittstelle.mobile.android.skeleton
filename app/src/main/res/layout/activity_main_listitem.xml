@@ -44,7 +44,7 @@
                 android:text="Wichtig" />
         </LinearLayout>
 
-        <!--            -->
+        <!--            android:textColor="@{item.isUeberfallig() ? android.graphics.Color.RED  : android.graphics.Color.BLACK}"      -->
         <TextView
             android:id="@+id/itemName"
             android:layout_width="219dp"
