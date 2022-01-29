@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {               // macht die
 //    private Comparator<ToDo> activeComparator;
 private Button btnLogin;
 
-    private Comparator<ToDo> currentComparisionMode = null;
+    private Comparator<ToDo> currentComparisionMode = ToDo.importanceBeforeDate;
 
     private IDataItemCRUDOperations crudOperations;            // ??
 
@@ -304,7 +304,7 @@ private Button btnLogin;
                 LocalDateTime localDateTime = (LocalDateTime) data.getSerializableExtra(DetailviewActivity.ARG_TODO_DATETIME);
                 neuesToDoItem.setFinishDate(localDateTime);
                 showFeedbackMessage("created new item " + neuesToDoItem.getFinishDate());                   // Hier kommt schon ein falsches Datum an
-
+                resortList();
                 onNewItemCreated(neuesToDoItem);                                                                // Meine onXXX - Methoden werden zur Mainactivity zurückgegeben
             } else {
                 showFeedbackMessage("Die Itemerstellung wurde abgebrochen");           // Ansonsten ist quasi nichts passiert, trotzdem ne kleine Message zur Kontrolle
@@ -340,9 +340,9 @@ private Button btnLogin;
 
         new CreateTodosTask(progressBar, crudOperations, created -> {
             items.add(created);
-
 //            showFeedbackMessage("!!!!!!!: " + item.getFinishDate());
             MainActivity.this.sortListAndScrollToItem(created);
+            resortList();
         }).execute(item);
     }
 
@@ -357,6 +357,7 @@ private Button btnLogin;
 
         new UpdateToDoTaskWithFuture(this, crudOperations).execute(changedItem).thenAccept(updated -> {
 //            sortListAndScrollToItemExtra();
+            resortList();
             handleResultFromUpdateTask(changedItem, updated);
         });
     }
@@ -365,6 +366,7 @@ private Button btnLogin;
         new DeleteTodosTask(progressBar, crudOperations, deleted -> {
             if (deleted) {
                 items.remove(editedItem);
+                resortList();
                 listViewAdapter.notifyDataSetChanged();
                 showFeedbackMessage("DELETED: " + editedItem.getName());
             }
@@ -398,6 +400,7 @@ private Button btnLogin;
                 .thenAccept((updated) -> {
                     showFeedbackMessage("Item " + toDo.getName() + " HAS BEEEN UPDATED JAA");
                     sortListAndScrollToItem(toDo);
+                    resortList();
                 });
     }
 
@@ -433,6 +436,7 @@ private Button btnLogin;
                     Toast.makeText(getApplicationContext(), "Sync List feddisch", Toast.LENGTH_SHORT).show();
                     items.clear();
                     items.addAll(v);
+                    resortList();
                     listViewAdapter.notifyDataSetChanged();
 //                    sortListAndScrollToItem(null); // ToDo Hallo Herr Kreutel, ich lasse die Zeile bewusst draußen, damit die Sortierung funktioniert, da ich die Fälligkeiten nicht eingelesen bekomme
                 }).execute();
@@ -441,7 +445,8 @@ private Button btnLogin;
                 sortListAndScrollToItem(null);
                 return true;
             case R.id.sort_wichtigkeitDatum:
-                sortListAndScrollToItemByWichtigkeitDatum();
+//                sortListAndScrollToItemByWichtigkeitDatum();
+                resortList();
 //                sortWichtigkeitDatum();
                 return true;
             case R.id.sort_DatumWichtigkeit:
@@ -547,6 +552,7 @@ private Button btnLogin;
 
     private void sortitems(List<ToDo> items) {
         items.sort(Comparator.comparing(ToDo::isChecked).thenComparing(ToDo::getName));
+        resortList();
     }
 
     private void sortByWichtigkeitDatum(List<ToDo> items) {

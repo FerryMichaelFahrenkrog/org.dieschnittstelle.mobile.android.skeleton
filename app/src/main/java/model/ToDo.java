@@ -263,27 +263,21 @@ public class ToDo implements Serializable                                       
     }
 
 
-    public static Comparator<ToDo> importanceBeforeDate = (objekt_eins, objekt_zwei) -> {
+    public static Comparator<ToDo> importanceBeforeDate = (o1, o2) -> {
         int o1Greater = 1;
         int o1Smaller = -1;
-        int equal = 0;
 
-        //Wenn Objekt 1 Checked ist und Objekt 2 nicht
-        if (objekt_eins.isChecked() && !objekt_zwei.isChecked()) {
-            // Dann ist Objekt 1 größer
+        if (o1.isChecked() && !o2.isChecked()) {
             return o1Greater;
-            //Wenn Objekt 1 nicht checked ist, Objekt 2 aber schon
-        } else if (!objekt_eins.isChecked() && objekt_zwei.isChecked()) {
-            //Dann ist Objekt 1 kleiner
+        } else if (!o1.isChecked() && o2.isChecked()) {
             return o1Smaller;
         } else {
-            //
-            if (objekt_eins.isChecked() && !objekt_zwei.isChecked()) {
+            if (o1.isFavouriteToDo() && !o2.isFavouriteToDo()) {
                 return o1Smaller;
-            } else if (!objekt_eins.isChecked() && objekt_zwei.isChecked()) {
+            } else if (!o1.isFavouriteToDo() && o2.isFavouriteToDo()) {
                 return o1Greater;
             } else {
-                return objekt_eins.getFinishDate().compareTo(objekt_zwei.getFinishDate());
+                return o1.getFinishDate().compareTo(o2.getFinishDate());
             }
         }
     };
@@ -375,4 +369,9 @@ public class ToDo implements Serializable                                       
     }
 
     protected static String logtag ="ToDo";
+
+    /*
+    WAS FEHLT, BZW WAS FUNKTIONIERT NICHT IM RAHMEN DIESER APP
+        - Übertragung von Fälligkeitsdatum, Fälligkeitszeit & Kontakten von der DetailView in die Mainactivity, die restlichen Attribute klappen!
+     */
 }
