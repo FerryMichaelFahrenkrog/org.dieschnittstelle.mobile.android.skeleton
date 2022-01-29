@@ -24,6 +24,16 @@
             android:orientation="vertical">
 
             <CheckBox
+                android:id="@+id/favouriteItem"
+                android:layout_width="90dp"
+                android:layout_height="45dp"
+                android:checked="@={item.favouriteToDo}"
+                android:focusable="false"
+                android:gravity="center"
+                android:onClick="@{() -> controller.onListItemChangedInList(item)}"
+                android:text="Wichtig" />
+
+            <CheckBox
                 android:id="@+id/itemChecked"
                 android:layout_width="90dp"
                 android:layout_height="45dp"
@@ -33,15 +43,7 @@
                 android:onClick="@{() -> controller.onListItemChangedInList(item)}"
                 android:text="erledigt" />
 
-            <CheckBox
-                android:id="@+id/favouriteItem"
-                android:layout_width="90dp"
-                android:layout_height="45dp"
-                android:checked="@={item.favouriteToDo}"
-                android:focusable="false"
-                android:gravity="center"
-                android:onClick="@{() -> controller.onListItemChangedInList(item)}"
-                android:text="Wichtig" />
+
         </LinearLayout>
 
         <!--            android:textColor="@{item.isUeberfallig() ? android.graphics.Color.RED  : android.graphics.Color.BLACK}"      -->

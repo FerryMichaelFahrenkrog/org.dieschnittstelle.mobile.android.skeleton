@@ -59,6 +59,7 @@ import tasks.DeleteAllToDosTask;
 import tasks.DeleteTodosTask;
 import tasks.ReadAllToDoTask;
 import tasks.UpdateToDoTaskWithFuture;
+import tasks.UpdateToDosTask;
 
 public class MainActivity extends AppCompatActivity {               // macht die Klasse zu einer Activity
     private static String logtag = "MainActivity: ";                // Logger zur Ausgabe
@@ -515,6 +516,7 @@ private Button btnLogin;
                 currentView = binding.getRoot();
                 currentView.setTag(binding);
             }
+
 
             ToDo toDo = getItem(position);
             binding.setItem(toDo);
