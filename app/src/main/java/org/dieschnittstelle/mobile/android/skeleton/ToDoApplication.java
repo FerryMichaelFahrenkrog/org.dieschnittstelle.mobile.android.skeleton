@@ -85,12 +85,4 @@ public class ToDoApplication extends Application {
             }
         }
     }
-
-    public boolean isServerAvailable() {
-        return serverAvailable;
-    }
-
-    public void setServerAvailable(boolean serverAvailable) {
-        this.serverAvailable = serverAvailable;
-    }
 }

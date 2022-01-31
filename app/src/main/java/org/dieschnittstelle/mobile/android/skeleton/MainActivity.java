@@ -3,7 +3,6 @@ package org.dieschnittstelle.mobile.android.skeleton;
 import static android.content.DialogInterface.BUTTON_POSITIVE;
 import static java.lang.Boolean.FALSE;
 
-import static model.ToDo.dateBeforeImportance;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -20,7 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -34,10 +32,8 @@ import androidx.databinding.DataBindingUtil;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.database.collection.LLRBNode;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;
-import org.w3c.dom.Text;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -59,7 +55,6 @@ import tasks.DeleteAllToDosTask;
 import tasks.DeleteTodosTask;
 import tasks.ReadAllToDoTask;
 import tasks.UpdateToDoTaskWithFuture;
-import tasks.UpdateToDosTask;
 
 public class MainActivity extends AppCompatActivity {               // macht die Klasse zu einer Activity
     private static String logtag = "MainActivity: ";                // Logger zur Ausgabe
@@ -77,30 +72,23 @@ public class MainActivity extends AppCompatActivity {               // macht die
     private FloatingActionButton addNewItemButton;
     private EditText username;
     private EditText password;
+
     private static final int CALL_DETAILVIEW_FOR_CREATE = 0;        // Damit sage ich der "startActivityForResult" Methode, dass ich etwas erzeugen will
     private static final int CALL_DETAILVIEW_FOR_EDIT = 1;          // Damit sage ich der "startActivityForResult" Methode, dass ich etwas editieren will
-    public static final int REQCODE_ADD_CONTACT = 21;
+    public static final int CALL_CONTACT_PICKER = 3;
+
     private TextView loginErrorText;
     private boolean emailError;
     private boolean loginError;
-//    private Comparator<ToDo> currentComparisionMode = ToDo.importanceBeforeDate;
-//    private Comparator<ToDo> currentComparisionMode2 = ToDo.dateBeforeImportance;
 
-//    private Comparator<ToDo> activeComparator;
-private Button btnLogin;
+    private Comparator<ToDo> currentComparisionMode = ToDo.importanceBeforeDate;  // Aktueller Zustand der Sortierung
 
-    private Comparator<ToDo> currentComparisionMode = ToDo.importanceBeforeDate;
-
-    private IDataItemCRUDOperations crudOperations;            // ??
+    private IDataItemCRUDOperations crudOperations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-
-//        activeComparator= ToDo.SORT_BY_NAME;
 
         progressBar = findViewById(R.id.progressBar);
         addNewItemButton = findViewById(R.id.addNewItemButton);
@@ -113,10 +101,10 @@ private Button btnLogin;
         new CheckWebapiAvailableTask(webapiAvailable -> {
             ((SyncedDataItemCRUDOperationsImpl) crudOperations).setConnectionStatus(webapiAvailable);
 
-            if(webapiAvailable) {
-                Toast.makeText(getApplicationContext(), "WEB IST DA ", Toast.LENGTH_SHORT).show();
+            if (webapiAvailable) {
+                Toast.makeText(getApplicationContext(), "Webanwendung ist da :)", Toast.LENGTH_SHORT).show();
                 showLoginDialog();
-            } else{
+            } else {
                 Toast.makeText(getApplicationContext(), "WEB API is not available", Toast.LENGTH_SHORT).show();
             }
         }).execute();
@@ -125,11 +113,10 @@ private Button btnLogin;
         listView.setAdapter(listViewAdapter);
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
-//            ToDo selectedItem = listViewAdapter.getItem(position);
-            oeffneDetailansichtFuer(items.get(position), position, items.get(position).getFinishDate());                                              // Bei Klick auf ein Item öffnet sich die Detailansicht (mit Vorbefüllung)
+            oeffneDetailansichtFuer(items.get(position), position, items.get(position).getFinishDate()); // Bei Klick auf ein Item öffnet sich die Detailansicht (mit Vorbefüllung)
         });
 
-        addNewItemButton.setOnClickListener(v -> this.erzeugeNeuesToDo());                      // Bei Klick auf den New Button wird ein neues To Do erstellt (ohne Vorbefüllung)
+        addNewItemButton.setOnClickListener(v -> this.erzeugeNeuesToDo()); // Bei Klick auf den New Button wird ein neues To Do erstellt (ohne Vorbefüllung)
 
         new ReadAllToDoTask(progressBar, crudOperations, toDos -> {
             listViewAdapter.addAll(toDos);
@@ -138,8 +125,6 @@ private Button btnLogin;
     }
 
     private void showLoginDialog() {
-        btnLogin = findViewById(R.id.btnLogin);
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
 
@@ -154,13 +139,12 @@ private Button btnLogin;
             String usernameInput = username.getText().toString();
             String passwordInput = password.getText().toString();
 
-            if (isValidPassword(passwordInput))
-            {
+            if (istFormalKorrektesPasswort(passwordInput)) {
                 User currentUser = new User(usernameInput, passwordInput);
 
                 new AuthenticateUserTask(progressBarLogin, crudOperations, isAuthenticated -> {
                     if (isAuthenticated) {
-                        Toast.makeText(getApplicationContext(), "JAAAAAAAAAAAAAAAA", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getApplicationContext(), "Da ist das Ding!", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     } else {
                         loginErrorText.setText("Invalid username and/or password.");
@@ -181,7 +165,7 @@ private Button btnLogin;
         progressBarLogin = dialog.findViewById(R.id.progressBarLogin);
 
 
-        username.setOnFocusChangeListener((v, hasFocus) -> handleLoginFocusChange(v, hasFocus));
+        username.setOnFocusChangeListener((v, hasFocus) -> fokusChangeMeldung(v, hasFocus));
         username.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -210,7 +194,7 @@ private Button btnLogin;
             }
         });
 
-        password.setOnFocusChangeListener((v, hasFocus) -> handleLoginFocusChange(v, hasFocus));
+        password.setOnFocusChangeListener((v, hasFocus) -> fokusChangeMeldung(v, hasFocus));
         password.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -240,27 +224,28 @@ private Button btnLogin;
 
     }
 
-    private void handleLoginFocusChange(View v, boolean hasFocus) {
+    private void fokusChangeMeldung(View v, boolean hasFocus) {
         if (!hasFocus) {
-            verfiyUsernameInput();
+            verifiziereDenInput();
         }
     }
 
-    private void verfiyUsernameInput() {
+    private void verifiziereDenInput() {
         String usernameInput = username.getText().toString();
-        String passwordInput = password.getText().toString();
 
         if (usernameInput.equals("")) {
             loginErrorText.setText("");
-        } else if (!isValidEmail(usernameInput)) {
-            loginErrorText.setText("Username needs to be a valid email-address.");
+        } else if (!istFormalKorrekteEmail(usernameInput)) {
+            loginErrorText.setText("Der User-Name ist keine gültige E-Mail-Adresse!");
+            loginErrorText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            loginErrorText.setTextColor(Color.RED);
             emailError = true;
         } else {
             loginErrorText.setText("");
         }
     }
 
-    private boolean isValidEmail(String email) {
+    private boolean istFormalKorrekteEmail(String email) {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
                 "[a-zA-Z0-9_+&*-]+)*@" +
                 "(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
@@ -271,7 +256,7 @@ private Button btnLogin;
         return pat.matcher(email).matches();
     }
 
-    private boolean isValidPassword(String password) {
+    private boolean istFormalKorrektesPasswort(String password) {
         String emailRegex = "^[0-9]{6}$";
 
         Pattern pat = Pattern.compile(emailRegex);
@@ -304,11 +289,12 @@ private Button btnLogin;
                 ToDo neuesToDoItem = (ToDo) data.getSerializableExtra(DetailviewActivity.ARG_ITEM);
                 LocalDateTime localDateTime = (LocalDateTime) data.getSerializableExtra(DetailviewActivity.ARG_TODO_DATETIME);
                 neuesToDoItem.setFinishDate(localDateTime);
-                showFeedbackMessage("created new item " + neuesToDoItem.getFinishDate());                   // Hier kommt schon ein falsches Datum an
+//                showFeedbackMessage("created new item " + neuesToDoItem.getFinishDate());                   // Hier kommt schon ein falsches Datum an!!!!!!!!!!!!!!!!!
+                showFeedbackMessage("created new item " + neuesToDoItem.getName());                   // Hier kommt schon ein falsches Datum an!!!!!!!!!!!!!!!!!
                 resortList();
                 onNewItemCreated(neuesToDoItem);                                                                // Meine onXXX - Methoden werden zur Mainactivity zurückgegeben
             } else {
-                showFeedbackMessage("Die Itemerstellung wurde abgebrochen");           // Ansonsten ist quasi nichts passiert, trotzdem ne kleine Message zur Kontrolle
+                showFeedbackMessage("Die To-Do-Erstellung wurde abgebrochen");           // Ansonsten ist quasi nichts passiert, trotzdem ne kleine Message zur Kontrolle
             }
         } else if (requestCode == CALL_DETAILVIEW_FOR_EDIT) {                                                    // In diesem Fall wird auf ein Item bearbeitet, also per Doppelklick editiert.
             if (resultCode == Activity.RESULT_OK) {
@@ -326,7 +312,7 @@ private Button btnLogin;
                     LocalDateTime localDateTime = (LocalDateTime) data.getSerializableExtra(DetailviewActivity.ARG_TODO_DATETIME);
                     editedItem.setFinishDate(localDateTime);
                     updateItemAndUpdateList(editedItem);
-                }                                                                 // Meine onXXX - Methoden werden zur Mainactivity zurückgegeben
+                }
             } else {
                 showFeedbackMessage("Returning from detailview for edit with: " + resultCode);
             }
@@ -335,10 +321,9 @@ private Button btnLogin;
         }
     }
 
-
-    protected void onNewItemCreated(ToDo item) {                                                                // HIER CER CREATE TO DO TASK!!!!!!
+    protected void onNewItemCreated(ToDo item) {
 //        showFeedbackMessage("created new item " + item.getFinishDate());
-
+        // TODO: 31.01.2022 schauen Sie mal Herr Kreutel --> Hier kommt das FinishDate schon nicht mehr an. Unschaffbar
         new CreateTodosTask(progressBar, crudOperations, created -> {
             items.add(created);
 //            showFeedbackMessage("!!!!!!!: " + item.getFinishDate());
@@ -348,16 +333,13 @@ private Button btnLogin;
     }
 
     protected void updateItemAndUpdateList(ToDo changedItem) {
-
-
-        Toast.makeText(getApplicationContext(), "HINWEIS: " + changedItem.getName(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Update für: " + changedItem.getName(), Toast.LENGTH_SHORT).show();
 
 //        new UpdateToDosTask(progressBar, crudOperations, updated -> {
 //            handleResultFromUpdateTask(changedItem, updated);
 //        }).execute(changedItem);
 
         new UpdateToDoTaskWithFuture(this, crudOperations).execute(changedItem).thenAccept(updated -> {
-//            sortListAndScrollToItemExtra();
             resortList();
             handleResultFromUpdateTask(changedItem, updated);
         });
@@ -369,7 +351,7 @@ private Button btnLogin;
                 items.remove(editedItem);
                 resortList();
                 listViewAdapter.notifyDataSetChanged();
-                showFeedbackMessage("DELETED: " + editedItem.getName());
+                showFeedbackMessage("Gelöscht: " + editedItem.getName());
             }
         }).execute(editedItem);
     }
@@ -399,7 +381,7 @@ private Button btnLogin;
         new UpdateToDoTaskWithFuture(this, crudOperations)
                 .execute(toDo)
                 .thenAccept((updated) -> {
-                    showFeedbackMessage("Item " + toDo.getName() + " HAS BEEEN UPDATED JAA");
+                    showFeedbackMessage("ToDo: " + toDo.getName() + " wurde geupdated!");
                     sortListAndScrollToItem(toDo);
                     resortList();
                 });
@@ -434,12 +416,11 @@ private Button btnLogin;
             case R.id.SyncTodos:
                 SyncedDataItemCRUDOperationsImpl syncTodoCRUDOperations = new SyncedDataItemCRUDOperationsImpl(roomTodoCRUDOperations, retrofitTodoCRUDOperations);
                 new ReadAllToDoTask(progressBar, syncTodoCRUDOperations, v -> {
-                    Toast.makeText(getApplicationContext(), "Sync List feddisch", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Sync wurde durchgeführt", Toast.LENGTH_SHORT).show();
                     items.clear();
                     items.addAll(v);
                     resortList();
                     listViewAdapter.notifyDataSetChanged();
-//                    sortListAndScrollToItem(null); // ToDo Hallo Herr Kreutel, ich lasse die Zeile bewusst draußen, damit die Sortierung funktioniert, da ich die Fälligkeiten nicht eingelesen bekomme
                 }).execute();
                 return true;
             case R.id.sortItems:
@@ -453,7 +434,7 @@ private Button btnLogin;
             case R.id.sort_DatumWichtigkeit:
                 sortListAndScrollToItemByDatumWichtigkeit();
 //                sortDatumWichtigkeit();
-            return true;
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -461,7 +442,6 @@ private Button btnLogin;
     }
 
     protected void sortListAndScrollToItem(ToDo item) {
-//        showFeedbackMessage("Sort List!");
         sortitems(items);
 
         listViewAdapter.notifyDataSetChanged(); //Aktualisierung
@@ -469,12 +449,6 @@ private Button btnLogin;
             int pos = listViewAdapter.getPosition(item);
             listView.setSelection(pos);
         }
-    }
-
-    protected void sortListAndScrollToItemByWichtigkeitDatum() {
-        sortByWichtigkeitDatum(items);
-
-        listViewAdapter.notifyDataSetChanged();
     }
 
     protected void sortListAndScrollToItemByDatumWichtigkeit() {
@@ -493,30 +467,20 @@ private Button btnLogin;
 
         @NonNull
         @Override
-        public View getView(int position, @Nullable View existingView, @NonNull ViewGroup parent)
-        {
+        public View getView(int position, @Nullable View existingView, @NonNull ViewGroup parent) {
             Log.i(logtag, "getView(): for position " + position + " , and existingView: " + existingView);
 
             ActivityMainListitemBinding binding = null;
             View currentView = null;
 
-//            if(currentItem.getFaelligkeitsDatum().isBefore(LocalDateTime.now()) && !currentItem.isChecked()){
-//                itemView.setBackgroundColor(Color.RED);
-//            }
-
-            if (existingView != null)
-            {
+            if (existingView != null) {
                 currentView = existingView;
                 binding = (ActivityMainListitemBinding) existingView.getTag();
-            }
-
-            else
-                {
+            } else {
                 binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.activity_main_listitem, null, false);
                 currentView = binding.getRoot();
                 currentView.setTag(binding);
             }
-
 
             ToDo toDo = getItem(position);
             binding.setItem(toDo);
@@ -524,27 +488,14 @@ private Button btnLogin;
 
             TextView itemName = binding.getRoot().findViewById(R.id.itemName);
 
-            if(toDo.getFinishDate().isAfter(LocalDateTime.now())){
+            if (toDo.getFinishDate().isAfter(LocalDateTime.now())) {
                 itemName.setTextColor(Color.BLACK);
-            }
-            else{
+            } else {
                 itemName.setTextColor(Color.RED);
             }
 
             return currentView;
-    }}
-
-    public void sortWichtigkeitDatum()
-    {
-            currentComparisionMode = ToDo.importanceBeforeDate;
-            resortList();
-
-    }
-
-    public void sortDatumWichtigkeit()
-    {
-            currentComparisionMode = dateBeforeImportance;
-            resortList();
+        }
     }
 
     public void resortList() {
@@ -557,9 +508,7 @@ private Button btnLogin;
         resortList();
     }
 
-    private void sortByWichtigkeitDatum(List<ToDo> items) {
-        items.sort(Comparator.comparing(ToDo::isChecked).thenComparing(ToDo::isFavouriteToDo).thenComparing(ToDo::getFinishDate));
-    }
+
 
     private void sortByDatumWichtigkeit(List<ToDo> items) {
         items.sort(Comparator.comparing(ToDo::isChecked).thenComparing(ToDo::getFinishDate).thenComparing(ToDo::isFavouriteToDo));
@@ -568,15 +517,21 @@ private Button btnLogin;
     protected void showFeedbackMessage(String msg) {
         Snackbar.make(findViewById(R.id.rootView), msg, Snackbar.LENGTH_SHORT).show();
     }
+
+    //    public void sortWichtigkeitDatum()
+//    {
+//            currentComparisionMode = ToDo.importanceBeforeDate;
+//            resortList();
+//
+//    }
+//
+//    public void sortDatumWichtigkeit()
+//    {
+//            currentComparisionMode = dateBeforeImportance;
+//            resortList();
+//    }
+
+//    private void sortByWichtigkeitDatum(List<ToDo> items) {
+//        items.sort(Comparator.comparing(ToDo::isChecked).thenComparing(ToDo::isFavouriteToDo).thenComparing(ToDo::getFinishDate));
+//    }
 }
-
-
-/*
-TODO:
-- FÄLLIGKEITEN UND KONTAKTE LANGFRISTIG! (AN KONTAKTEN PRÜFEN ;))!!!!!!!!!!!!!!!!!!!!!!!!!!
-- Wichtigkeit oben?
-- Neue ToDos nach Algorithmus sortieren
-- Überfällige ToDos funktioniert nicht so
-- EMAILS richtig darstellen
-- Aufräumen
- */

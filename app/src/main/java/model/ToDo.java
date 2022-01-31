@@ -23,8 +23,9 @@ import java.util.Objects;
 
 import impl.RoomLocalDataItemCRUDOperationsImpl;
 
-@Entity                                                                                             // Damit sage ich, dass ich Instanzen der Klasse To-Do in meiner Datenbank ablegen möchte
-public class ToDo implements Serializable                                                           // Objekte in Bytes verwandeln, und dann wieder Objekte draus machen, braucht man um Objekte in DB zu speichern
+//Mit @Entity sage ich, dass ich Instanzen der Klasse 'To-Do' in meiner DB ablegen möchte.
+@Entity
+public class ToDo implements Serializable // Serializable --> Objekte in Bytes verwandeln, und dann wieder Objekte draus machen, braucht man um Objekte in DB zu speichern
 {
     @Expose
     @SerializedName("id")
@@ -63,14 +64,15 @@ public class ToDo implements Serializable                                       
     private ArrayList<String> contacts = new ArrayList<>();
 
     @ColumnInfo(name = "contacts")
-    private transient String contactsString = "";
+    private transient String contactsString = ""; // mit Transient sorge ich dafür, dass die Daten in der Webapplikation gespeichert werden können.
 
     @Ignore
-    private transient LocalDateTime finishDate = LocalDateTime.now();
+    private transient LocalDateTime finishDate = LocalDateTime.now(); // mit Transient sorge ich dafür, dass die Daten in der Webapplikation gespeichert werden können.
 
     @Ignore
-    private transient Date localdate = new Date();
+    private transient Date localdate = new Date(); // mit Transient sorge ich dafür, dass die Daten in der Webapplikation gespeichert werden können.
 
+    //Kontstuktoren in vers. Varianten
     @Ignore
     public ToDo() {
         finishDateLong = System.currentTimeMillis();
@@ -100,6 +102,7 @@ public class ToDo implements Serializable                                       
         this.finishDate = finishDate;
     }
 
+    // Getter & Setter
     public long getId() {
         return id;
     }
@@ -108,7 +111,8 @@ public class ToDo implements Serializable                                       
         this.id = id;
     }
 
-    public String getName() {
+    public String getName()
+    {
         Log.i(logtag, "getName()" + name);
 
         if(name == null)
@@ -190,30 +194,6 @@ public class ToDo implements Serializable                                       
         this.contactsString = contactsString;
     }
 
-    private void updateListFromString() {
-        if (contactsString != null && !contactsString.equals("")) {
-            this.contacts = new ArrayList<>(Arrays.asList(this.contactsString.split("-;-")));
-        }
-    }
-
-    private void updateStringFromList() {
-        if (this.contacts == null) {
-            this.contacts = new ArrayList<>();
-        }
-
-        String newContactsString = "";
-
-        for (int i = 0; i < this.contacts.size(); i++) {
-            newContactsString += this.contacts.get(i);
-
-            if (i < this.contacts.size() - 1) {
-                newContactsString += "-;-";
-            }
-        }
-
-        this.contactsString = newContactsString;
-    }
-
     public LocalDateTime getFinishDate() {
         this.finishDate = LocalDateTime.ofEpochSecond(this.finishDateLong / 1000, 0, ZoneOffset.UTC);
         return finishDate;
@@ -222,6 +202,30 @@ public class ToDo implements Serializable                                       
     public void setFinishDate(LocalDateTime finishDate) {
         this.finishDate = finishDate;
     }
+
+//    private void updateListFromString() {
+//        if (contactsString != null && !contactsString.equals("")) {
+//            this.contacts = new ArrayList<>(Arrays.asList(this.contactsString.split("-;-")));
+//        }
+//    }
+//
+//    private void updateStringFromList() {
+//        if (this.contacts == null) {
+//            this.contacts = new ArrayList<>();
+//        }
+//
+//        String newContactsString = "";
+//
+//        for (int i = 0; i < this.contacts.size(); i++) {
+//            newContactsString += this.contacts.get(i);
+//
+//            if (i < this.contacts.size() - 1) {
+//                newContactsString += "-;-";
+//            }
+//        }
+//
+//        this.contactsString = newContactsString;
+//    }
 
     @Override
     public String toString() {
@@ -238,114 +242,58 @@ public class ToDo implements Serializable                                       
                 '}';
     }
 
-    private void updateDateFromLong() {
-        this.finishDate = LocalDateTime.ofEpochSecond(this.finishDateLong / 1000, 0, ZoneOffset.UTC);
-    }
-
-    private void updateLongFromDate() {
-        this.finishDateLong = this.finishDate.toInstant(ZoneOffset.UTC).toEpochMilli();
-    }
-
-
-    public void readingTodoFromRoom() {
-        this.updateDateFromLong();
-        this.updateListFromString();
-    }
-
-    public void readingTodoFromRetrofit() {
-        this.updateDateFromLong();
-        this.updateStringFromList();
-    }
-
-    public void whenUpdatingTodo() {
-        this.updateLongFromDate();
-        this.updateStringFromList();
-    }
-
-
-    public static Comparator<ToDo> importanceBeforeDate = (o1, o2) -> {
-        int o1Greater = 1;
-        int o1Smaller = -1;
-
-        if (o1.isChecked() && !o2.isChecked()) {
-            return o1Greater;
-        } else if (!o1.isChecked() && o2.isChecked()) {
-            return o1Smaller;
-        } else {
-            if (o1.isFavouriteToDo() && !o2.isFavouriteToDo()) {
-                return o1Smaller;
-            } else if (!o1.isFavouriteToDo() && o2.isFavouriteToDo()) {
-                return o1Greater;
-            } else {
-                return o1.getFinishDate().compareTo(o2.getFinishDate());
-            }
-        }
-    };
-
-    public static Comparator<ToDo> dateBeforeImportance = (o1, o2) -> {
-        int o1Greater = 1;
-        int o1Smaller = -1;
-        int equal = 0;
-
-        if (o1.isChecked() && !o2.isChecked()) {
-            return o1Greater;
-        } else if (!o1.isChecked() && o2.isChecked()) {
-            return o1Smaller;
-        } else {
-            int dateComparison = o1.getFinishDate().compareTo(o2.getFinishDate());
-
-            if (dateComparison > 0) {
-                return o1Greater;
-            } else if (dateComparison < 0) {
-                return o1Smaller;
-            } else {
-                if (o1.isChecked() && !o2.isChecked()) {
-                    return o1Smaller;
-                } else if (!o1.isChecked() && o2.isChecked()) {
-                    return o1Greater;
-                } else {
-                    return equal;
-                }
-            }
-        }
-    };
-
-    public boolean isUeberfallig(){
-        if(System.currentTimeMillis() % 2 == 0){
-            return true;
-        }
-        return false;
-    }
-
-    public static Comparator<ToDo> SORT_BY_NAME = new Comparator<ToDo>() {
-        @Override
-        public int compare(ToDo o1, ToDo o2) {
-            return String.valueOf(o1.getName()).toLowerCase().compareTo(String.valueOf(o2.getName()));
-        }
-    };
-
-        public static Comparator<ToDo> SORT_BY_DESC = new Comparator<ToDo>() {
-        @Override
-        public int compare(ToDo o1, ToDo o2) {
-            return (o1.getDescription().compareTo(o2.getDescription()));
-        }
-    };
-
-
-
-
-
-//    public static Comparator<ToDo> SORT_BY_Faelligkeit = new Comparator<ToDo>() {
-//        @Override
-//        public int compare(ToDo o1, ToDo o2) {
-//            return (o1.getFinishDate().compareTo(o2.getFinishDate());
-//        }
-//    };
+//    private void updateDateFromLong() {
+//        this.finishDate = LocalDateTime.ofEpochSecond(this.finishDateLong / 1000, 0, ZoneOffset.UTC);
+//    }
 //
-//    public static Comparator<ToDo> SORT_BY_WICHTIGKEIT = new Comparator<ToDo>() {
-//        @Override
-//       public int compare(ToDo o1, ToDo o2) {
-//           return (o1.isFavouriteToDo().compareTo(o2.isFavouriteToDo()));
+//    private void updateLongFromDate() {
+//        this.finishDateLong = this.finishDate.toInstant(ZoneOffset.UTC).toEpochMilli();
+//    }
+
+    public static Comparator<ToDo> importanceBeforeDate = (toDo_eins, toDo_zwei) -> {
+        int toDo_eins_groesser = 1;
+        int toDo_zwei_kleiner = -1;
+
+        if (toDo_eins.isChecked() && !toDo_zwei.isChecked()) {
+            return toDo_eins_groesser;
+        } else if (!toDo_eins.isChecked() && toDo_zwei.isChecked()) {
+            return toDo_zwei_kleiner;
+        } else {
+            if (toDo_eins.isFavouriteToDo() && !toDo_zwei.isFavouriteToDo()) {
+                return toDo_zwei_kleiner;
+            } else if (!toDo_eins.isFavouriteToDo() && toDo_zwei.isFavouriteToDo()) {
+                return toDo_eins_groesser;
+            } else {
+                return toDo_eins.getFinishDate().compareTo(toDo_zwei.getFinishDate());
+            }
+        }
+    };
+
+//    public static Comparator<ToDo> dateBeforeImportance = (o1, o2) -> {
+//        int o1Greater = 1;
+//        int o1Smaller = -1;
+//        int equal = 0;
+//
+//        if (o1.isChecked() && !o2.isChecked()) {
+//            return o1Greater;
+//        } else if (!o1.isChecked() && o2.isChecked()) {
+//            return o1Smaller;
+//        } else {
+//            int dateComparison = o1.getFinishDate().compareTo(o2.getFinishDate());
+//
+//            if (dateComparison > 0) {
+//                return o1Greater;
+//            } else if (dateComparison < 0) {
+//                return o1Smaller;
+//            } else {
+//                if (o1.isChecked() && !o2.isChecked()) {
+//                    return o1Smaller;
+//                } else if (!o1.isChecked() && o2.isChecked()) {
+//                    return o1Greater;
+//                } else {
+//                    return equal;
+//                }
+//            }
 //        }
 //    };
 
@@ -369,9 +317,4 @@ public class ToDo implements Serializable                                       
     }
 
     protected static String logtag ="ToDo";
-
-    /*
-    WAS FEHLT, BZW WAS FUNKTIONIERT NICHT IM RAHMEN DIESER APP
-        - Übertragung von Fälligkeitsdatum, Fälligkeitszeit & Kontakten von der DetailView in die Mainactivity, die restlichen Attribute klappen!
-     */
 }

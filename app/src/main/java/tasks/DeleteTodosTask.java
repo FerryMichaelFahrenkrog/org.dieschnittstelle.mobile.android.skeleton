@@ -11,7 +11,6 @@ import model.IDataItemCRUDOperations;
 import model.ToDo;
 
 public class DeleteTodosTask extends AsyncTask<ToDo, Void, Boolean> {
-    //Die Warning irgendwann beheben
     @SuppressLint("StaticFieldLeak")
     private ProgressBar progressBar;
     private IDataItemCRUDOperations crudOperations;
@@ -36,7 +35,6 @@ public class DeleteTodosTask extends AsyncTask<ToDo, Void, Boolean> {
     protected void onPreExecute() {
         progressBar.setVisibility(View.VISIBLE);
     }
-
 
     @Override
     protected void onPostExecute(Boolean aBool) {

@@ -25,6 +25,8 @@ import model.IDataItemCRUDOperations;
 import model.User;
 import tasks.AuthenticateUserTask;
 
+// AUSGELAGERT IN MAIN!!!!!
+/*
 public class LoginActivity extends AppCompatActivity {
     private EditText editTextemailAdresse;
     private EditText editTextpassword;
@@ -204,3 +206,4 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 }
+ */

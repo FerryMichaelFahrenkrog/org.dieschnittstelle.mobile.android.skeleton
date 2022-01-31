@@ -11,7 +11,6 @@ import model.IDataItemCRUDOperations;
 import model.ToDo;
 
 public class CreateTodosTask extends AsyncTask<ToDo, Void, ToDo> {
-    //Die Warning irgendwann beheben
     @SuppressLint("StaticFieldLeak")
     private ProgressBar progressBar;
     private IDataItemCRUDOperations crudOperations;
@@ -32,7 +31,6 @@ public class CreateTodosTask extends AsyncTask<ToDo, Void, ToDo> {
     protected ToDo doInBackground(ToDo... toDos) {
         return crudOperations.createToDo(toDos[0]);
     }
-
 
     @Override
     protected void onPostExecute(ToDo todo) {

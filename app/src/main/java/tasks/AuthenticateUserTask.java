@@ -14,7 +14,6 @@ import model.IDataItemCRUDOperations;
 import model.User;
 
 public class AuthenticateUserTask extends AsyncTask<User, Void, Boolean> {
-    //Die Warning irgendwann beheben
     @SuppressLint("StaticFieldLeak")
     private ProgressBar progressBar;
     private IDataItemCRUDOperations crudOperations;
@@ -36,7 +35,6 @@ public class AuthenticateUserTask extends AsyncTask<User, Void, Boolean> {
     protected Boolean doInBackground(User... users) {
         return crudOperations.authenticateUser(users[0]);
     }
-
 
     @Override
     protected void onPostExecute(Boolean todos) {

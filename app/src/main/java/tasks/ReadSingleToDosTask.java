@@ -13,7 +13,6 @@ import model.IDataItemCRUDOperations;
 import model.ToDo;
 
 public class ReadSingleToDosTask extends AsyncTask<Long, Void, List<ToDo>> {
-    //Die Warning irgendwann beheben
     @SuppressLint("StaticFieldLeak")
     private ProgressBar progressBar;
     private IDataItemCRUDOperations crudOperations;

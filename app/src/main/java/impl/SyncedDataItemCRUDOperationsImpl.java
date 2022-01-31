@@ -17,10 +17,7 @@ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
     private IDataItemCRUDOperations localCRUD;
     private IDataItemCRUDOperations remoteCRUD;
 
-    private boolean synced;
     private boolean remoteAvailable = false;
-    private boolean connectionChecked = false;
-
 
     public SyncedDataItemCRUDOperationsImpl(IDataItemCRUDOperations localCRUD, IDataItemCRUDOperations remoteCRUD){
         this.localCRUD = localCRUD;
@@ -117,8 +114,6 @@ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
 
     @Override
     public boolean authenticateUser(User user) {
-//        checkConnection();
-
         if (!remoteAvailable) {
             return localCRUD.authenticateUser(user);
         } else {
@@ -130,7 +125,6 @@ public class SyncedDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
     }
 
     public void setConnectionStatus(boolean isAvailable) {
-        this.connectionChecked = true;
         this.remoteAvailable = isAvailable;
     }
 }

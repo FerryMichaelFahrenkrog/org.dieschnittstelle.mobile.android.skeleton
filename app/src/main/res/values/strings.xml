@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MAD Demo S21</string>
+    <string name="app_name">To-Do_Liste_MAD_Ferry</string>
     <string name="welcome_toast_text">Welcome Again!</string>
     <string name="beschreibung">Beschreibung</string>
     <string name="name">Name</string>

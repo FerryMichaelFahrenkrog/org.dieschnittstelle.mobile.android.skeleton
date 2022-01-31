@@ -23,7 +23,8 @@ import retrofit2.http.Path;
 
 public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOperations
 {
-    public static interface ToDoWebAPI{
+    public static interface ToDoWebAPI
+    {
         //Web API Dokument
         @POST("/api/todos")
         public Call<ToDo> createToDo(@Body ToDo toDo);
@@ -42,7 +43,6 @@ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOp
 
         @DELETE("/api/todos")
         public Call<Boolean> deleteAllToDos();
-        //1h 24 min rest, ab 30 min Blick auf alles
 
         @PUT("api/users/auth")
         Call<Boolean> authenticate(@Body User user);
@@ -127,12 +127,12 @@ public class RetrofitRemoteDataItemCRUDOperationsImpl implements IDataItemCRUDOp
     @Override
     public boolean authenticateUser(User user) {
         try {
-            Boolean authResponse = webAPI.authenticate(user).execute().body();
+            Boolean isAuthorisiert = webAPI.authenticate(user).execute().body();
 
-            if (authResponse != null) {
-                return authResponse;
+            if (isAuthorisiert != null) {
+                return isAuthorisiert;
             } else {
-                return authResponse;
+                return isAuthorisiert;
             }
         } catch (IOException e) {
             e.printStackTrace();
