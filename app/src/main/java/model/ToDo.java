@@ -203,30 +203,6 @@ public class ToDo implements Serializable // Serializable --> Objekte in Bytes v
         this.finishDate = finishDate;
     }
 
-//    private void updateListFromString() {
-//        if (contactsString != null && !contactsString.equals("")) {
-//            this.contacts = new ArrayList<>(Arrays.asList(this.contactsString.split("-;-")));
-//        }
-//    }
-//
-//    private void updateStringFromList() {
-//        if (this.contacts == null) {
-//            this.contacts = new ArrayList<>();
-//        }
-//
-//        String newContactsString = "";
-//
-//        for (int i = 0; i < this.contacts.size(); i++) {
-//            newContactsString += this.contacts.get(i);
-//
-//            if (i < this.contacts.size() - 1) {
-//                newContactsString += "-;-";
-//            }
-//        }
-//
-//        this.contactsString = newContactsString;
-//    }
-
     @Override
     public String toString() {
         return "ToDo{" +
@@ -241,14 +217,6 @@ public class ToDo implements Serializable // Serializable --> Objekte in Bytes v
                 ", localdate=" + localdate +
                 '}';
     }
-
-//    private void updateDateFromLong() {
-//        this.finishDate = LocalDateTime.ofEpochSecond(this.finishDateLong / 1000, 0, ZoneOffset.UTC);
-//    }
-//
-//    private void updateLongFromDate() {
-//        this.finishDateLong = this.finishDate.toInstant(ZoneOffset.UTC).toEpochMilli();
-//    }
 
     public static Comparator<ToDo> importanceBeforeDate = (toDo_eins, toDo_zwei) -> {
         int toDo_eins_groesser = 1;
@@ -268,34 +236,6 @@ public class ToDo implements Serializable // Serializable --> Objekte in Bytes v
             }
         }
     };
-
-//    public static Comparator<ToDo> dateBeforeImportance = (o1, o2) -> {
-//        int o1Greater = 1;
-//        int o1Smaller = -1;
-//        int equal = 0;
-//
-//        if (o1.isChecked() && !o2.isChecked()) {
-//            return o1Greater;
-//        } else if (!o1.isChecked() && o2.isChecked()) {
-//            return o1Smaller;
-//        } else {
-//            int dateComparison = o1.getFinishDate().compareTo(o2.getFinishDate());
-//
-//            if (dateComparison > 0) {
-//                return o1Greater;
-//            } else if (dateComparison < 0) {
-//                return o1Smaller;
-//            } else {
-//                if (o1.isChecked() && !o2.isChecked()) {
-//                    return o1Smaller;
-//                } else if (!o1.isChecked() && o2.isChecked()) {
-//                    return o1Greater;
-//                } else {
-//                    return equal;
-//                }
-//            }
-//        }
-//    };
 
     @Override
     public boolean equals(Object o) {

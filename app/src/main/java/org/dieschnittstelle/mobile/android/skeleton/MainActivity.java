@@ -517,7 +517,6 @@ public class MainActivity extends AppCompatActivity {               // macht die
     protected void showFeedbackMessage(String msg) {
         Snackbar.make(findViewById(R.id.rootView), msg, Snackbar.LENGTH_SHORT).show();
     }
-
     //    public void sortWichtigkeitDatum()
 //    {
 //            currentComparisionMode = ToDo.importanceBeforeDate;

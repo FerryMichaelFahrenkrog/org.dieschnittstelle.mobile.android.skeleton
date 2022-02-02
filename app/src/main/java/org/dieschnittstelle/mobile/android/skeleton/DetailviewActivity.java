@@ -145,8 +145,6 @@ public class DetailviewActivity extends AppCompatActivity {
         }
     }
 
-
-
     private void localDateTimeTransfer() {
         if (getIntent().getSerializableExtra(ARG_TODO_DATETIME) != null) {
             TodoDateTime = (LocalDateTime) getIntent().getSerializableExtra(ARG_TODO_DATETIME);
